@@ -1,0 +1,8 @@
+# Python virtual environment
+venv/
+env/
+# Environment variables
+.venv/
+
+.vscode/
+.env
