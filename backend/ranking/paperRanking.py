@@ -11,6 +11,7 @@ def rankPaper(csv_path, query,
 
     Weights reflect reality:
     - similarity dominates
+    
     - recency matters
     - impact factor is a weak prior
 

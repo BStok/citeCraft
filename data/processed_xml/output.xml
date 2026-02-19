@@ -1,0 +1,2349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">CholecTrack20: A Multi-Perspective Tracking Dataset for Surgical Tools</title>
+				<funder ref="#_5KJgZDx #_a9pT6w9">
+					<orgName type="full">Agence Nationale de la Recherche</orgName>
+					<orgName type="abbreviated">ANR</orgName>
+				</funder>
+				<funder ref="#_thdDA6f #_kA2rjDt #_eBgAZ7X #_jVAd5PA">
+					<orgName type="full">unknown</orgName>
+				</funder>
+				<funder ref="#_zxdv4GK">
+					<orgName type="full">Swiss National Science Foundation</orgName>
+				</funder>
+				<funder ref="#_NQtBgnE">
+					<orgName type="full">French</orgName>
+				</funder>
+				<funder ref="#_rtydKRU">
+					<orgName type="full">GENCI-IDRIS</orgName>
+				</funder>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability  status="unknown">
+					<licence/>
+				</availability>
+				<date type="published" when="2025-03-24">24 Mar 2025</date>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Chinedu</forename><forename type="middle">Innocent</forename><surname>Nwoye</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">UMR7357</orgName>
+								<orgName type="institution" key="instit1">University of Strasbourg</orgName>
+								<orgName type="institution" key="instit2">CNRS</orgName>
+								<orgName type="institution" key="instit3">INSERM</orgName>
+								<orgName type="institution" key="instit4">ICube</orgName>
+								<address>
+									<settlement>Strasbourg</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+							<affiliation key="aff2">
+								<orgName type="institution">IHU Strasbourg</orgName>
+								<address>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Kareem</forename><surname>Elgohary</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">UMR7357</orgName>
+								<orgName type="institution" key="instit1">University of Strasbourg</orgName>
+								<orgName type="institution" key="instit2">CNRS</orgName>
+								<orgName type="institution" key="instit3">INSERM</orgName>
+								<orgName type="institution" key="instit4">ICube</orgName>
+								<address>
+									<settlement>Strasbourg</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Anvita</forename><surname>Srinivas</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">UMR7357</orgName>
+								<orgName type="institution" key="instit1">University of Strasbourg</orgName>
+								<orgName type="institution" key="instit2">CNRS</orgName>
+								<orgName type="institution" key="instit3">INSERM</orgName>
+								<orgName type="institution" key="instit4">ICube</orgName>
+								<address>
+									<settlement>Strasbourg</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Fauzan</forename><surname>Zaid</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">UMR7357</orgName>
+								<orgName type="institution" key="instit1">University of Strasbourg</orgName>
+								<orgName type="institution" key="instit2">CNRS</orgName>
+								<orgName type="institution" key="instit3">INSERM</orgName>
+								<orgName type="institution" key="instit4">ICube</orgName>
+								<address>
+									<settlement>Strasbourg</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Joël</forename><forename type="middle">L</forename><surname>Lavanchy</surname></persName>
+							<affiliation key="aff1">
+								<orgName type="institution" key="instit1">University of Basel</orgName>
+								<orgName type="institution" key="instit2">University Digestive Health Care Center</orgName>
+								<address>
+									<settlement>Clarunis</settlement>
+									<country key="CH">Switzerland</country>
+								</address>
+							</affiliation>
+						</author>
+						<author>
+							<persName><forename type="first">Nicolas</forename><surname>Padoy</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="laboratory">UMR7357</orgName>
+								<orgName type="institution" key="instit1">University of Strasbourg</orgName>
+								<orgName type="institution" key="instit2">CNRS</orgName>
+								<orgName type="institution" key="instit3">INSERM</orgName>
+								<orgName type="institution" key="instit4">ICube</orgName>
+								<address>
+									<settlement>Strasbourg</settlement>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+							<affiliation key="aff2">
+								<orgName type="institution">IHU Strasbourg</orgName>
+								<address>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main">CholecTrack20: A Multi-Perspective Tracking Dataset for Surgical Tools</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date type="published" when="2025-03-24">24 Mar 2025</date>
+						</imprint>
+					</monogr>
+					<idno type="MD5">A9C89BE9F565DC1234E047599FD87EDE</idno>
+					<idno type="arXiv">arXiv:2312.07352v2[cs.CV]</idno>
+					<note type="submission">Reviewed and Accepted at CVPR 2025</note>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.2" ident="GROBID" when="2026-02-08T10:17+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<label type="revision">a91ee48</label>
+					<label type="parameters">startPage=-1, endPage=-1, consolidateCitations=0, consolidateHeader=0, consolidateFunders=0, includeRawAffiliations=false, includeRawCitations=false, includeRawCopyrights=false, generateTeiIds=false, generateTeiCoordinates=[], sentenceSegmentation=false, flavor=null</label>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<abstract/>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Abstract</head><p>Tool tracking in surgical videos is essential for advancing computer-assisted interventions, such as skill assessment, safety zone estimation, and human-machine collaboration. However, the lack of context-rich datasets limits AI applications in this field. Existing datasets rely on overly generic tracking formalizations that fail to capture surgical-specific dynamics, such as tools moving out of the camera's view or exiting the body. This results in less clinically relevant trajectories and a lack of flexibility for real-world surgical applications. Methods trained on these datasets often struggle with visual challenges such as smoke, reflection, and bleeding, further exposing the limitations of current approaches. We introduce CholecTrack20, a specialized dataset for multi-class, multi-tool tracking in surgical procedures. It redefines tracking formalization with three perspectives: (1) intraoperative, (2) intracorporeal, and (3) visibility, enabling adaptable and clinically meaningful tool trajectories. The dataset comprises 20 full-length surgical videos, annotated at 1 fps, yielding over 35K frames and 65K labeled tool instances. Annotations include spatial location, category, identity, operator, phase, and scene visual challenge. Benchmarking state-of-the-art methods on CholecTrack20 reveals significant performance gaps, with current approaches (&lt; 45% HOTA) failing to meet the accuracy required for clinical translation. These findings motivate the need for advanced and intuitive tracking algorithms and establish CholecTrack20 as a foundation for developing robust AI-driven surgical assistance systems. The dataset is released under CC-BY-NC-SA 4.0 license and is available for download through the project page.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="1.">Introduction</head><p>The true impact of computer vision research lies in its practical applications, especially in critical fields like healthcare. Among these, surgery represents one of the most demanding domains, providing a definitive test for the capabilities of vision technologies. Surgical data science, on its own, has significantly advanced interventional healthcare by leveraging data-driven techniques to provide critical decision support to medical professionals <ref type="bibr" target="#b33">[34]</ref>. A key area of this advancement is the analysis of endoscopic video data, which offers real-time insights into surgical procedures, aids in skill assessment, and helps predict complications <ref type="bibr" target="#b8">[9,</ref><ref type="bibr" target="#b55">56,</ref><ref type="bibr" target="#b64">65]</ref>. Accurate tracking of surgical tools is central to these analyses, as it guides temporal progression of procedural phases and correlates with surgical actions and management of adverse events <ref type="bibr" target="#b37">[38,</ref><ref type="bibr" target="#b58">59]</ref>. Despite progress in computer vision, research <ref type="bibr" target="#b41">[42]</ref> shows that deep learning models pretrained on general datasets often struggle with surgical contexts due to complex scene dynamics, diverse tool types, and challenging visual conditions such as bleeding, smoke, and variable lighting <ref type="bibr" target="#b11">[12,</ref><ref type="bibr" target="#b19">20,</ref><ref type="bibr" target="#b50">51]</ref>. This highlights the need for domain-specific datasets tailored to the unique requirements of surgical tool tracking. Obtaining medical and surgical data for research is challenging due to ethical and practical constraints, and annotating it requires expert knowledge. Current methods for tool tracking largely focus on Single Object Tracking (SOT) <ref type="bibr" target="#b67">[68]</ref>, Multi-Class Tracking (MCT) with one tool per class <ref type="bibr" target="#b35">[36,</ref><ref type="bibr" target="#b36">37]</ref>, or Multi-Object Tracking (MOT) treating all tools as a single class <ref type="bibr" target="#b15">[16,</ref><ref type="bibr" target="#b45">46]</ref>. However, these approaches often miss the complexities of Multi-Class Multi-Object Tracking (MC-MOT) specific to surgical contexts, where tools interact dynamically and may move out of the camera's field of view or within the body cavity.</p><p>Multi-perspective tracking addresses these challenges by defining tool trajectories across different viewpoints during surgical procedures. It includes three critical perspectives (illustrated in Fig. <ref type="figure" target="#fig_0">1</ref>): (1) intraoperative -covering the entire procedure duration to monitor tool usage and assess surgical proficiency; (2) intracorporeal -focusing on tool tracks within the body to evaluate specific tasks and predict risks; and (3) visibility -tracking tools within the camera's field of view to provide real-time feedback to surgeons. Existing surgical tracking datasets <ref type="bibr" target="#b17">[18,</ref><ref type="bibr" target="#b52">53]</ref> often lack these levels of granularity and adaptability needed for comprehensive tool modeling. They generally follow generic tracking formalizations and struggle to capture the intricacies of surgical tool interactions, particularly when tools are replaced or move beyond camera visibility <ref type="bibr" target="#b5">[6,</ref><ref type="bibr" target="#b27">28,</ref><ref type="bibr" target="#b52">53]</ref>.</p><p>To address this gap, we introduce CholecTrack20, a novel dataset, based on laparoscopic cholecystectomy surgery, designed for multi-class multi-tool tracking from intraoperative, intracorporeal, and visibility perspectives.</p><p>Derived from raw laparoscopic videos <ref type="bibr" target="#b38">[39,</ref><ref type="bibr" target="#b55">56]</ref>, it includes detailed annotations such as spatial coordinates, tool categories, track identities (IDs), visual challenges, phase labels, and other scene attributes. This dataset enhances benchmarking resources for computer vision research and supports the development of AI models tailored to surgical tool tracking, phase recognition, and surgeon performance assessment. This paper provides a comprehensive overview of the data acquisition and annotation methodology, detailed data analysis, and technical validation. In addition, we conduct extensive benchmark experiments using state-of-the-art deep learning methods for object detection and tracking, evaluating performance across various surgical phases and visual challenges, discussing insightful findings.</p><p>In summary, the main contributions are: 1. Introduction of CholecTrack20, a pioneering dataset for multi-perspective tracking with extensive annotations. 2. Extensive experimental analysis validating the dataset's effectiveness for surgical tool detection and tracking. 3. Insights from model performance analysis under diverse visual challenges, highlighting the utility of each tracking perspective for AI-driven surgical solutions.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="2.">Related Works</head><p>Object detection and tracking.</p><p>Advances in object detection and tracking have been driven by datasets like COCO <ref type="bibr" target="#b28">[29]</ref>, KITTI <ref type="bibr" target="#b19">[20]</ref>, MOTChallenge <ref type="bibr" target="#b11">[12]</ref>, VisDrone <ref type="bibr" target="#b69">[70]</ref>, DanceTrack <ref type="bibr" target="#b50">[51]</ref>, and TAO <ref type="bibr" target="#b10">[11]</ref>, enabling progress in Single Object Tracking (SOT) <ref type="bibr" target="#b9">[10]</ref>, Multi-Object Tracking (MOT) <ref type="bibr" target="#b63">[64,</ref><ref type="bibr" target="#b65">66]</ref>, and Multi-Class Multi-Object Tracking (MCMOT) <ref type="bibr" target="#b12">[13,</ref><ref type="bibr" target="#b25">26]</ref>. Applying these techniques to surgical tool tracking poses challenges especially in the phase of bleeding, smoke, rapid movements, and variable lighting. Traditional tracking, centered on visibility, struggles when tools leave the camera's view or are replaced during surgery. Surgical tool tracking and configurations. While electromagnetic and optical tracking methods <ref type="bibr" target="#b7">[8,</ref><ref type="bibr" target="#b16">17]</ref> have been explored in surgical domain, image-based approaches <ref type="bibr" target="#b52">[53]</ref> better align with surgeons' view but face issues like identity fragmentation, identity switch, and low tracking accuracy <ref type="bibr" target="#b5">[6,</ref><ref type="bibr" target="#b15">16,</ref><ref type="bibr" target="#b27">28,</ref><ref type="bibr" target="#b35">36,</ref><ref type="bibr" target="#b36">37,</ref><ref type="bibr" target="#b45">46]</ref> especially with mid-procedure tool replacements and tools exiting/re-entering the field of view or body cavity. To fully capture tool usage complexity, it is crucial to consider multiple perspectives on tool trajectories. Existing datasets <ref type="bibr" target="#b15">[16,</ref><ref type="bibr" target="#b40">41]</ref> provide insights but lack comprehensive coverage of these scenarios, highlighting the need for detailed datasets addressing these complexities.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.">Methodology</head><p>CholecTrack20 is a detailed dataset for surgical tool tracking in laparoscopic cholecystectomy, offering binary and spatial annotations for tools, including identity, category, bounding box location, motion, operator, phase, activity, usage conditions, and visual challenges, essential for training and benchmarking surgical AI tool tracking algorithms.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.1.">Data Acquisition and Collection</head><p>Data source. The raw videos are sourced from the publicly available Cholec80 <ref type="bibr" target="#b55">[56]</ref> and CholecT50 <ref type="bibr" target="#b38">[39]</ref> datasets, with appropriate permissions and adherence to license terms. Recorded at the University Hospital of Strasbourg with the aid of laparoscopic cameras, these videos document laparoscopic cholecystectomy surgeries.</p><p>Video selection. Long videos were systematically chosen to represent surgical complexities and tool variability, capturing all key phases of laparoscopic cholecystectomy. High-quality videos with clear visuals were selected, subsampled from 25 FPS to 1 FPS for annotation, maintaining temporal consistency and clarity.</p><p>Sensitive data handling. To protect patient and staff identities, out-of-body frames potentially revealing sensitive information, such as the identity of patients, clinical staff, or the operating room, were checked and anonymized following established techniques <ref type="bibr" target="#b24">[25]</ref>. This ensures compliance with ethical standards and privacy regulations.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.2.">Track Formalization</head><p>Given a video dataset D = {S 1 , S 2 , . . . , S n } of laparoscopic surgeries, each sequence S i includes frames annotated with bounding boxes B = [B 1 , B 2 , . . . , B M ] for tool locations and classes C = {C 1 , C 2 , . . . , C N }. Tools, manipulated by operators linked to trocar ports P = [P 1 , P 2 , . . . , P M ], are assigned unique track identities (ID) through time. The ID reassignment is guided by visual cues and clinical knowledge. Visually, it is based on class c ∈ C and location b ∈ B. Contextually, it considers the role and hand position of the surgeon operator linked to a unique trocar port p ∈ P . Tool tracking solves the association matrix A(t), where A i,j = 1 indicates the i-th tool in frame t is associated with the j-th tool in frame t + 1, and A i,j = 0 otherwise. The aim is to obtain tool trajectories T = {T 1 , T 2 , ..., T K }, each uniquely identified by ID, taking into consideration the visibility, intracorporeal, and intraoperative use.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.3.">Multi-Perspective (MP) Trajectory</head><p>Defining tool trajectories in surgical procedures necessitates a unique approach, given the variability in tracking across different perspectives, formalized as follows:</p><p>1. Intraoperative trajectory: This lifelong tracking starts with a tool's first appearance and ends at its last in a patient's body during a procedure. It requires re-identification post-occlusion, out-of-camera view, or reinsertion. This approach is vital for applications such as tool usage monitoring <ref type="bibr" target="#b1">[2]</ref>, inventory management <ref type="bibr" target="#b34">[35]</ref>, surgeon training <ref type="bibr" target="#b26">[27]</ref>, skill assessment <ref type="bibr" target="#b15">[16]</ref>, and tool usage pattern analysis <ref type="bibr" target="#b51">[52]</ref>.</p><p>2. Intracorporeal trajectory: Unique tracks begin when a tool enters the body and end when it exits through a trocar port, even if off-camera. If a tool exits outside the camera's view, the exit is inferred if another tool enters through the same trocar or the initial tool releases its grasp. This is essential for understanding surgical workflow, as some actions occur outside the camera's focus, like graspers holding tissue out of view to facilitate other tools' actions <ref type="bibr" target="#b26">[27]</ref>. Intracorporeal tracking supports a range of AI tasks including action evaluation <ref type="bibr" target="#b54">[55]</ref>, skill assessment <ref type="bibr" target="#b15">[16,</ref><ref type="bibr" target="#b26">27]</ref>, tool usage optimization <ref type="bibr" target="#b43">[44]</ref>, and surgical risk estimation <ref type="bibr" target="#b51">[52]</ref>.</p><p>3. Visibility trajectory: Tracking starts with a tool's first appearance within the camera view and ends when it leaves the view. It requires re-identification (re-ID) after occlusions or brief periods of disappearance within a two-second tolerance. This method is useful for assessing surgeon actions <ref type="bibr" target="#b26">[27]</ref> and skill training <ref type="bibr" target="#b13">[14,</ref><ref type="bibr" target="#b23">24]</ref>, providing go-no-go decision support, and measuring economy of motion <ref type="bibr" target="#b47">[48]</ref>.</p><p>Some existing studies <ref type="bibr" target="#b15">[16,</ref><ref type="bibr" target="#b36">37]</ref> follow the intraoperative tracking format, others <ref type="bibr" target="#b23">[24,</ref><ref type="bibr" target="#b45">46]</ref> employs visibility trajectory. The intracorporeal trajectory, being the most complex to annotate, are not well-represented in the literature. Our dataset is the first to provide fine-grained labels for all the three (Fig. <ref type="figure" target="#fig_1">2</ref>), enabling statistical analyses such as tool usage counts, events counts, abdominal entries/exits, tool idleness, out-of-camera view occurrences, and mean tracklets per perspective.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.4.">Data Annotation</head><p>Annotators and tools. Bounding boxes were annotated by four researchers skilled in surgical workflow analysis, supplemented by prior study data <ref type="bibr" target="#b36">[37,</ref><ref type="bibr" target="#b39">40,</ref><ref type="bibr" target="#b56">57]</ref>. Annotation tools used include Annonymized System, and a custom Python tool for visualization, merging, and validation. A pre-designed guide, refined by surgical experts, described the labels and provided image guidance as needed.</p><p>Label types and categories. Tool spatial positions were annotated using bounding box coordinates, while other la- bels were represented by class identities. Seven predominant tool categories were defined: (1) cold grasper, (2) bipolar grasper, (3) monopolar hook, (4) monopolar scissors, (5) clipper or clip applier, (6) irrigator or suction device, and (7) specimen bag. Four operator categories were defined: (1) main surgeon left hand MSLH, (2) main surgeon right hand MSRH, (3) assistant surgeon right hand ASRH, and (4) null operator NULL. The assistant surgeon left hand ASLH holding the endoscopic camera is unreported. A total of eight visual challenges were noted: (1) blurring, (2) bleeding, (3) camera lens fouling, (4) crowded scene, (5) occlusion, (6) smoke, (7) specular light reflection, and (8) trocar view or under-coverage. The seven commonest surgical phases were annotated: (1) preparation, (2) calot triangle dissection, (3) gallbladder dissection, (4) clipping &amp; cutting, (5) gallbladder packaging, (6) cleaning and coagulation, and (7) gallbladder extraction.</p><p>Annotation process. Annotations involved drawing bounding boxes [x, y, w, h] over tooltips tagged with tool class c ∈ C and operator class p ∈ P , following trocar ports for accurate surgeon identification. Surgical details such as phase, out-of-view statuses (camera/abdomen), tool entry/exit, and visual challenge attributes were annotated to aid accurate track assignment. Tool-tissue interaction labels from CholecT50 <ref type="bibr" target="#b38">[39]</ref> provides additional help in perpetuating track identities. Annotations were reviewed at 25 FPS in uncertain cases, and underwent rigorous quality control, ensuring high-quality labels over two years. Fig. <ref type="figure" target="#fig_2">3</ref> presents samples of images from the CholecTrack20 dataset alongside their respective annotations illustrating the meticulous labeling system employed to ensures a rich dataset for detailed surgical tool tracking analysis.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.5.">Quality Assurance</head><p>Label agreement. Two label agreement metrics validate dataset quality: Jaccard Index for spatial overlap of bounding boxes and Cohen's Kappa Statistic for category labels. The findings of our three validation forms include:</p><p>1. Intra-rater agreement involves self-correction. We observe a Jaccard Index of 99.4% and Cohen's Kappa Scores of 94.6% for tools and 94.0% for operators. 2. Inter-rater agreement is evaluated on 20 random samples across raters. The Jaccard Index is 91.8%, while tool class labels achieve 95.2% and operator labels 92.7% Cohen's Kappa. Minor differences reflect highquality annotations. 3. Label mediation uses a board-certified surgeon for ambiguities, particularly in operator labels. Out of 758 uncertain samples, 133 needed correction post-mediation.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.6.">Data Statistics</head><p>Quantitative overview. The dataset includes 20 surgical videos totaling over 14 hours, averaging 42 minutes per surgery. As detailed in Tab. 1, annotations cover 35,000 frames at 1 FPS (∼ 875, 000 at 25 FPS), with 65,000 bounding box labels, averaging two tools per frame. Fig. <ref type="figure" target="#fig_3">4</ref>(a) summarizes track configurations across perspectives, showing tool usage by type and trajectory. For example, graspers average 27 minutes 39 seconds inside the body and are re-inserted 8.4 times, while irrigators are used for about 1 minute 30 seconds per surgery. The visibility perspective contributes approximately 2,000 trajectories. Fig. <ref type="figure" target="#fig_3">4</ref>(b) outlines tool attributes and visual challenges in the dataset, with occlusion as most prevalent occurring up to 23,000 seconds, bleeding totals around 18,700 seconds. This analysis provides insights into the varied visual challenges encountered in laparoscopic cholecystectomy. Evaluating tracking methods across these challenges will reveal their strengths and weaknesses. Statistical details across dataset splits are presented in Fig. <ref type="figure" target="#fig_3">4(b)</ref>. Dataset comparison. Existing publicly available datasets primarily focus on single perspective trajectory <ref type="bibr" target="#b15">[16,</ref><ref type="bibr" target="#b45">46]</ref>. In contrast, our dataset introduces a novel approach by annotation different perspectives, as presented in Tab. 1, including visual challenges, phase details, activity labels, etc. Dataset split. The dataset is split at the procedure level into non-overlapping training, validation, and testing sets in a 5:1:4 ratio, preventing data leakage. Video distribution is balanced by procedure duration to ensure similar complexity and difficulty levels across all splits.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.7.">Data Analysis</head><p>We conduct a comprehensive analysis of the dataset to gain insights into label alignments and feature similarities, revealing correlations across labels. This would guide data preprocessing and feature selection when using the data. Our analysis as illustrated in Fig. <ref type="figure">5</ref>, Fig. <ref type="figure">6</ref>, and Fig. <ref type="figure">7</ref> encompasses four distinct dimensions and discussed further.</p><p>Tracking vs. surgical tool type correlation. This analysis explores the relationship between different tool types and their tracks, providing insights into unique patterns associated with each tool during surgery. Fig. <ref type="figure">5</ref>(a) illustrates center point locations of tools, color-coded by category over time in three videos. This shows that while some trajectories appear separable, they are mostly densely interwoven, suggesting the need for advanced modeling in tool tracking.</p><p>Tracking vs. surgeon tool operator correlation. We analyzed the alignment between tool operator identities and tool locations, revealing dynamic interactions between surgeons and instruments. Fig. <ref type="figure">5</ref>(b) shows a strong correlation between operators and their tools, attributed to the distinct positioning of trocars. This underscores the value of operator information in accurate track label generation.</p><p>Tracking vs. surgical phase segmentation. This analysis delves into tracking tools across surgical phases, uncovering how tool utilization varies with procedural stages. Fig. <ref type="figure">6</ref> shows that complex phases, such as calot triangle and gallbladder dissection, exhibit densely packed trajectories due to prolonged duration and frequent tool manipulation. Simpler phases, like preparation and clipping, feature fewer trajectories, facilitating modeling. These insights inform deep learning model assessment and AI model development for surgical tool tracking.</p><p>Tracking variance. Using Exponential Moving Average (EMA), we analyze tool tracking data, as shown in Fig. <ref type="figure">7</ref>. By overlaying EMAs on tool trajectories, we visualize vari-  Annotation position position position position position position time time time time time time bipolar hook clipper irrigator Specimen bag EMA Figure 7. Trajectories of selected tools with EMA over time. Plotted positions are computed as weighted combinations of the center coordinate of the bounding boxes, scaled by image size. ance between actual trajectories and modeled tracks. This approach highlights high-variance frames, serving as challenging cases for benchmarking model robustness and accuracy. Through this analysis, we provide a valuable resource for researchers, emphasizing the need to focus on complex scenarios for a rigorous assessment of model capabilities.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.">Benchmark and Experiments</head></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.1.">Tool Detection</head><p>Models. Owing that tool detection is a fundamental part of tool tracking, we showcase the usability of the Cholec-Track20 dataset for this task, by benchmarking several object detectors representing diverse methodologies. Faster-RCNN <ref type="bibr" target="#b42">[43]</ref> and Cascade-RCNN <ref type="bibr" target="#b6">[7]</ref> are anchor-based models, with Cascade-RCNN employing a multi-stage approach to refine detection accuracy. CenterNet <ref type="bibr" target="#b68">[69]</ref> and FCOS <ref type="bibr" target="#b53">[54]</ref> are anchor-free models, utilizing center points and direct bounding box regression for efficient detection. SSD <ref type="bibr" target="#b29">[30]</ref> provides real-time performance with its multi-scale approach. Deformable-DETR <ref type="bibr" target="#b70">[71]</ref> applies a transformerbased method for flexible feature processing, while Swin-T <ref type="bibr" target="#b30">[31]</ref> uses hierarchical transformers with shifted windows. The YOLO models <ref type="bibr" target="#b18">[19,</ref><ref type="bibr" target="#b57">58,</ref><ref type="bibr" target="#b59">[60]</ref><ref type="bibr" target="#b60">[61]</ref><ref type="bibr" target="#b61">[62]</ref> feature advanced multiscale strategies for high accuracy and speed. Evaluation metrics. We evaluate tool detection using COCO standard average precision (AP) metrics (pycocotools, not ultralytics) across several thresholds, categories, and visual challenges. We also report model inference speed in frames per seconds (FPS) on a single NVIDIA GTX 1080 Ti (10 GB) GPU.</p><p>Overall tool detection results. The detection performance of the models is summarized in Tab. 2. YOLOv7 <ref type="bibr" target="#b61">[62]</ref> achieves the highest Average Precision (AP) of 56.1%, surpassing other models. YOLOX <ref type="bibr" target="#b18">[19]</ref> follows with an AP of 44.2%. Deformable-DETR <ref type="bibr" target="#b70">[71]</ref> and Swin-T <ref type="bibr" target="#b30">[31]</ref> show competitive results with APs of 38.3% and 40.2%, respectively. The anchor-free models such as CenterNet <ref type="bibr" target="#b68">[69]</ref> and FCOS <ref type="bibr" target="#b53">[54]</ref> demonstrate robust performance, with Center-Net achieving an AP of 35.0% and FCOS 28.1%. In com-parison, Faster-RCNN <ref type="bibr" target="#b42">[43]</ref> and Cascade-RCNN <ref type="bibr" target="#b6">[7]</ref> deliver APs of 34.6% and 34.7%, respectively, showcasing their efficacy with anchor-based approaches. At IoU thresholds of 0.5 and 0.75, YOLOv7 leads with scores of 80.6% and 62.0%, respectively. In terms of inference speed, YOLO networks excel with real-time capacities exceeding 20 FPS, with CenterNet achieving the highest speed at 33.8 FPS.</p><p>Class-wise detection results. Analyzing tool detection results per category (Tab. 2), YOLOv7 emerges as the top performer, dominating in all the 7 categories, achieving above 90% accuracy in 2 tool categories and above 80% in 5. Notably, the hook exhibits the highest tendency among tools, with AP scores ranging from 74.7% to 96.0% across all models. Conversely, irrigator and specimen bag pose challenges, likely due to unclear tool tip boundaries and the bag's deformable nature, respectively. Grasper, bipolar, scissors, and clipper show high detection rates. Detection under visual challenges. Tab. 2 presents the performance of the benchmark object detection models across different surgical visual challenges. Notably, YOLOv7 achieves the highest detection accuracy across most challenges, particularly excelling in scenarios involving bleeding, smoke, and crowded scenes. Conversely, detecting tools in blurred scenes, near trocars, and specular light reflection pose significant challenges for all models, with lower detection rates observed across the board.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.2.">Tool Tracking</head><p>Models.</p><p>We train and evaluate several state-of-theart multi-object tracking (MOT) methods on the Cholec-Track20 dataset, focusing on their ability to track surgical tools. OCSORT <ref type="bibr" target="#b32">[33]</ref> and TransTrack <ref type="bibr" target="#b49">[50]</ref> employ sophisticated tracking-by-detection frameworks, with TransTrack utilizing transformers to improve feature association. Byte-Track <ref type="bibr" target="#b66">[67]</ref>, Bot-SORT <ref type="bibr" target="#b0">[1]</ref>, and SMILETrack <ref type="bibr" target="#b62">[63]</ref> use advanced tracking algorithms, with Bot-SORT and SMILE-Track incorporating extra modules for enhanced robustness. Evaluation metrics. We assess benchmark models on variety of tracking metrics: higher-order tracking accuracy (HOTA) <ref type="bibr" target="#b31">[32]</ref>, CLEAR MOT metrics <ref type="bibr" target="#b2">[3]</ref>, identity metrics  <ref type="bibr" target="#b44">[45]</ref>, counting metrics, and tracking speed. A pull request is made to the standard TrackEval <ref type="bibr" target="#b21">[22]</ref> library integrating CholecTrack20 benchmark with all its exhaustive performance evaluation protocols recommended by this study.</p><p>Multi-object tracking results. The performance of the evaluated tracking methods is summarized in Tab. 3. Models such as FairMOT and TransTrack show the lowest HOTA score of 5.8% and 7.4% respectively, highlighting challenges in maintaining tool identities over time. Byte-Track, Bot-SORT, and SMILETrack achieve higher HOTA scores, ranging from 15.7% to 17.4%, but still face difficulties in tool re-ID due to similarities among tools. Despite these advancements, there remains room for enhancement in identity association and tracking precision. The results also include metrics on the detection counts, unique identities assigned, and tracking speed, providing a comprehensive view of each method's performance. Multi-perspective tracking results. Looking at the different trajectory perspectives, Tab. 3 shows that visibility tracking is the easiest with most of the existing models showcasing their strengths. This is expected because deep learning models mostly rely on visual cues, which are captured by camera in the visibility track scenario. Here, Bot-SORT record a landslide top performance scores of 44.7% HOTA, 72.0% MOTA, and 41.4% IDF1. The intracorporeal tracking is the most challenging since the major factors marking the entry and exit of the tools from the body are not readily visible. A maximum of 27.0% HOTA suggest a decline on the leading Bot-SORT. New methods could lever-age rich fine-grained history to estimate the out-of-view and out-of-body status of the tools for improve re-ID. The intraoperative trajectory comes in the middle in terms of difficulty. While it may be challenging to ascertain the persistence of a trajectory after re-insertion, the class features are also helpful especially for tools of different categories. Again the Bot-SORT, leverage camera compensation details, shows a better tendency of estimating the persistent identity of different tools of the same class with a +1.5% HOTA higher than similarity and appearance features. Multi-class tracking results. In Fig. <ref type="figure">8</ref>, we analyze tracking performance by tool class and observe that the grasper, despite having the most instances and being the most frequently used tool in the dataset, achieves the highest tracking accuracy across perspectives. Class-agnostic results reveal medium tracking accuracy for other commonly used tools like the bipolar, hook, and clipper, while rarely used tools (e.g., scissors, irrigator) have lower scores. Specimen bag tracking is affected by shape deformation, contents, states (open/closed, empty/filled), tool interactions, and fluid stains. Tracking surgical tools beyond the visual perspective remains challenging for all models tested. Tracking results under visual challenges. We evaluate tool tracking performance across various surgical conditions using HOTA metrics in Fig. <ref type="figure">9</ref>, providing insights into model interactions with complex surgical environments. The model performs well under blurring, reflections, and limited camera coverage, likely due to effective data augmentation. However, lens fouling, smoke, and occlusion Categories Perspectives intracorporeal intraoperative visibility Models Bot-SORT SMILETrack ByteTrack OC-SORT HOTA (%) Multi-perspective tracking across surgical visual challenges 55 50 45 40 35 30 25 20 15 Figure 9. Results of multi-perspective tracking across eight surgical visual challenges in the CholecTrack20 dataset. Categories Perspectives intracorporeal intraoperative visibility Models Bot-SORT SMILETrack ByteTrack OC-SORT HOTA (%) Multi-perspective tracking across surgical phases 50 40 30 20 10 Figure 10. Results of multi-perspective tracking across seven surgical phases in the CholecTrack20 dataset. present significant challenges, reducing accuracy.</p><p>Tracking results by surgical phase. Fig. <ref type="figure" target="#fig_0">10</ref> shows performance across seven surgical phases, with the clipping and cutting phases proving easiest to track due to limited activities and a linear progression. Preparation phase shows similar performance. Phases like Calot triangle dissection and gallbladder dissection exhibit comparable tracking results, while gallbladder packaging shows the most consis-tent tracking across perspectives. Overall, OC-SORT struggles the most, while Bot-SORT achieves the best result.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.3.">Limitations and Gaps to Address</head><p>The SOTA tracking methods trained on CholecTrack20 reveal substantial limitations, with performance under 45% HOTA, which is insufficient for clinical translation. These models struggle with various visual challenges, such as smoke, bleeding, and specular light reflection, affecting detection and re-ID. Since location and appearance features alone are inadequate, especially for tools with similar appearances, this highlights the need to move beyond current cues and innovate more intuitive, context-aware methods for re-ID. CholecTrack20 serves as a critical foundation for exploring this direction, offering a dataset rich in diverse tracking perspectives and challenges, essential for developing more robust and clinically viable tracking solutions.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.">Conclusion</head><p>In this work, we presented the CholecTrack20 dataset, a novel resource designed to advance the state-of-the-art in surgical tool tracking within computer vision. Cholec-Track20 addresses a critical gap by providing comprehensive annotations and diverse tracking scenarios and tasks across various surgical phases and visual challenges. Key innovations of CholecTrack20 include multi-perspective tracking, which defines the start and termination of a tool track differently based on visibility, intracorporeal, or intraoperative contexts. It also features detailed annotations of surgical visual challenges and precise surgical phase segmentation. Our extensive benchmark experiments demonstrate the dataset's effectiveness in developing models for tool detection and multi-object tracking across these three distinct trajectory perspectives. Through evaluating several deep learning methodologies on the CholecTrack20 dataset, we gain insights into their strengths and weaknesses in handling multiple viewpoints or tracking perspectives, across surgical phases and diverse surgical scene visual challenges.</p><p>By introducing CholecTrack20 to the computer vision research community, we aim to stimulate new research directions and foster collaborations between the computer vision and surgical communities. This dataset serves as a benchmark for evaluating state-of-the-art algorithms and promotes the development of robust and reliable surgical assistance systems. We anticipate that CholecTrack20 will inspire innovative approaches and contribute significantly to advancements in surgical tool tracking and related fields. The dataset is released under the CC BY-NC-SA license.</p></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><head>Figure 1 .</head><label>1</label><figDesc>Figure 1. Illustration of multi-perspective tracking in surgical domain and CholecTrack20 dataset labels for surgical tool tracking.</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Figure 2 .</head><label>2</label><figDesc>Figure 2. Multi-perspective trajectories of surgical tool.</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_2"><head>Figure 3 .</head><label>3</label><figDesc>Figure 3. Examples of images from CholecTrack20 tracking dataset with the labels overlaid on the raw images.</figDesc><graphic coords="4,177.85,137.46,109.51,62.58" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_3"><head>Figure 4 .</head><label>4</label><figDesc>Figure 4. Dataset statistics on the distributions of (a) surgical scene visual challenges across data splits (b) track labels across perspectives, averaged across videos. Track length in seconds.</figDesc><graphic coords="4,337.81,77.87,111.32,83.58" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_4"><head>( a )Figure 5 .</head><label>a5</label><figDesc>Figure 5. 3D visualization of label alignments showing the tool position over track time. The coloring is for grouping features according to: (a) tool classes and (b) tool operators.</figDesc><graphic coords="5,323.56,380.59,71.02,53.86" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_5"><head>Figure 6 .Figure 7 .</head><label>67</label><figDesc>Figure 6. 3D visualization of tracking across different surgical phases for some randomly selected videos.grasper</figDesc><graphic coords="5,323.56,445.28,73.79,53.86" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_6"><head>Figure 8 .Figure 9 .Figure 10 .</head><label>8910</label><figDesc>Figure 8. Results of multi-perspective tracking across seven surgical tool categories in the CholecTrack20 dataset.</figDesc><graphic coords="8,70.84,252.24,187.87,110.60" type="bitmap" /></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_0"><head>Table 1 .</head><label>1</label><figDesc>Dataset comparison showing the scope, statistics, and attributes. Dataset marked ‡ are not full-length videos.</figDesc><table><row><cell>Dataset</cell><cell>Task</cell><cell></cell><cell>Track Perspectives</cell><cell></cell><cell></cell><cell cols="2">Statistics</cell><cell></cell><cell></cell><cell></cell><cell>Attributes</cell><cell></cell></row><row><cell></cell><cell></cell><cell cols="3">Visibility Intraoperative Intracorporeal</cell><cell>No. of Videos</cell><cell>Total Duration (s)</cell><cell>Frame Count</cell><cell>Tool Boxes</cell><cell>No. of Trajectories</cell><cell>Surgoen Operator</cell><cell>Visual Challenge</cell><cell>Surgical Phase</cell></row><row><cell>ATLAS Dione [47]  ‡</cell><cell>Detection</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>99</cell><cell>-</cell><cell>22467</cell><cell>-</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>Cholec80-locations [49]</cell><cell>Detection</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>-</cell><cell>4011</cell><cell cols="2">4011 6471</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>Bouget et.al [5]</cell><cell>Detection</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>14</cell><cell>-</cell><cell cols="2">2476 3819</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>m2cai16-tool-locations [21]</cell><cell>Detection</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>-</cell><cell>-</cell><cell cols="2">2532 3038</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>EndoVis'15 [15]  ‡</cell><cell>Tracking</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>16</cell><cell>540</cell><cell>13500</cell><cell>-</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>Fathollahi et el [16]  ‡</cell><cell>Tracking</cell><cell>✘</cell><cell>✔</cell><cell>✘</cell><cell>15</cell><cell>2700</cell><cell>2700</cell><cell>-</cell><cell>-</cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>RMIT [53]</cell><cell>Detection &amp; Tracking</cell><cell>✔</cell><cell>✘</cell><cell>✘</cell><cell>4</cell><cell></cell><cell cols="2">1500 1171</cell><cell></cell><cell>✘</cell><cell>✘</cell><cell>✘</cell></row><row><cell>CholecTrack20 (Ours)</cell><cell>Detection &amp; Tracking</cell><cell>✔</cell><cell>✔</cell><cell>✔</cell><cell>20</cell><cell>50581</cell><cell cols="2">35000 65200</cell><cell>2,624</cell><cell>✔</cell><cell>✔</cell><cell>✔</cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_1"><head>Table 2 .</head><label>2</label><figDesc>Benchmark Results of SOTA Object Detectors on Surgical Tool Detection Dataset.</figDesc><table><row><cell>Detector</cell><cell cols="3">Detection AP accross 3 thresholds</cell><cell cols="4">Detection AP per category. (% AP @ Θ = 0.5)</cell><cell cols="5">Detection AP across surgical visual challenges</cell><cell></cell><cell>Speed</cell></row><row><cell>Model</cell><cell cols="3">AP0.5 ↑ AP0.75 ↑ AP0.5:0.95 ↑</cell><cell cols="4">Grasper Bipolar Hook Scissors Clipper Irrigator Bag</cell><cell cols="6">Bleeding Blur Smoke Crowded Occluded Reflection Foul Lens Trocar</cell><cell>FPS↑</cell></row><row><cell>Faster-RCNN [43]</cell><cell>56.0</cell><cell>38.1</cell><cell>34.6</cell><cell>53.5</cell><cell>65.0 80.1 60.9</cell><cell>70.1</cell><cell>26.8 31.8</cell><cell>57.9 41.0 54.5</cell><cell>43.5</cell><cell>55.0</cell><cell>46.9</cell><cell>41.2</cell><cell>35.7</cell><cell>7.6</cell></row><row><cell>Cascade-RCNN [7]</cell><cell>51.7</cell><cell>39.0</cell><cell>34.7</cell><cell>52.0</cell><cell>58.9 79.7 45.7</cell><cell>44.9</cell><cell>23.7 17.9</cell><cell>53.9 39.0 48.1</cell><cell>39.5</cell><cell>46.4</cell><cell>29.1</cell><cell>33.7</cell><cell>33.7</cell><cell>7.0</cell></row><row><cell>CenterNet [69]</cell><cell>53.0</cell><cell>39.5</cell><cell>35.0</cell><cell>60.2</cell><cell>61.4 86.4 56.3</cell><cell>68.0</cell><cell>25.8 10.2</cell><cell>58.0 42.1 50.2</cell><cell>36.7</cell><cell>51.7</cell><cell>46.0</cell><cell>35.8</cell><cell>30.8</cell><cell>33.8</cell></row><row><cell>FCOS [54]</cell><cell>43.5</cell><cell>31.5</cell><cell>28.1</cell><cell>51.2</cell><cell>44.3 74.7 49.2</cell><cell>54.2</cell><cell>21.9 7.2</cell><cell>47.8 40.6 51.5</cell><cell>15.1</cell><cell>40.8</cell><cell>42.7</cell><cell>29.7</cell><cell>17.6</cell><cell>7.7</cell></row><row><cell>SSD [30]</cell><cell>61.9</cell><cell>37.8</cell><cell>36.1</cell><cell>75.2</cell><cell>62.2 91.6 63.4</cell><cell>72.9</cell><cell>22.5 40.8</cell><cell>64.5 49.3 58.3</cell><cell>57.5</cell><cell>62.4</cell><cell>53.9</cell><cell>47.7</cell><cell>42.6</cell><cell>30.9</cell></row><row><cell>PAA [23]</cell><cell>64.5</cell><cell>44.9</cell><cell>41.1</cell><cell>69.6</cell><cell>79.0 89.2 68.7</cell><cell>74.2</cell><cell>37.6 28.9</cell><cell>67.1 55.6 65.0</cell><cell>55.0</cell><cell>64.6</cell><cell>56.0</cell><cell>51.2</cell><cell>47.5</cell><cell>8.5</cell></row><row><cell>Def-DETR [71]</cell><cell>58.4</cell><cell>42.0</cell><cell>38.3</cell><cell>60.6</cell><cell>66.5 83.8 61.9</cell><cell>72.0</cell><cell>39.9 23.8</cell><cell>62.4 42.7 58.6</cell><cell>37.1</cell><cell>57.4</cell><cell>43.9</cell><cell>41.5</cell><cell>47.4</cell><cell>10.2</cell></row><row><cell>Swin-T [31]</cell><cell>62.3</cell><cell>44.3</cell><cell>40.2</cell><cell>63.3</cell><cell>64.8 83.0 80.2</cell><cell>77.2</cell><cell>38.0 26.8</cell><cell>63.5 53.8 62.8</cell><cell>35.3</cell><cell>61.1</cell><cell>66.2</cell><cell>55.2</cell><cell>45.7</cell><cell>9.8</cell></row><row><cell>YOLOX [19]</cell><cell>64.7</cell><cell>48.9</cell><cell>44.2</cell><cell>69.6</cell><cell>72.2 89.4 75.4</cell><cell>79.1</cell><cell>37.3 27.1</cell><cell>68.2 55.6 66.0</cell><cell>45.9</cell><cell>64.2</cell><cell>52.5</cell><cell>58.1</cell><cell>43.1</cell><cell>23.6</cell></row><row><cell>YOLOv7 [62]</cell><cell>80.6</cell><cell>62.0</cell><cell>56.1</cell><cell>90.5</cell><cell>86.4 96.0 82.3</cell><cell>89.3</cell><cell>49.1 66.2</cell><cell>80.2 61.2 80.1</cell><cell>79.5</cell><cell>82.1</cell><cell>65.6</cell><cell>71.2</cell><cell>66.7</cell><cell>20.6</cell></row><row><cell>YOLOv8 [58]</cell><cell>79.1</cell><cell>62.4</cell><cell>55.6</cell><cell>87.9</cell><cell>84.5 96.2 80.0</cell><cell>87.2</cell><cell>48.4 65.0</cell><cell>77.1 58.3 74.4</cell><cell>76.2</cell><cell>80.4</cell><cell>70.3</cell><cell>57.4</cell><cell>62.9</cell><cell>29.0</cell></row><row><cell>YOLOv9 [61]</cell><cell>80.2</cell><cell>62.6</cell><cell>56.5</cell><cell>88.5</cell><cell>87.6 96.0 79.3</cell><cell>87.1</cell><cell>50.1 67.7</cell><cell>78.1 54.0 78.2</cell><cell>78.6</cell><cell>81.1</cell><cell>65.3</cell><cell>63.4</cell><cell>63.1</cell><cell>23.7</cell></row><row><cell>YOLOv10 [60]</cell><cell>80.1</cell><cell>62.1</cell><cell>55.8</cell><cell>87.6</cell><cell>86.6 96.0 81.9</cell><cell>89.0</cell><cell>53.8 61.3</cell><cell>77.8 61.9 78.7</cell><cell>77.5</cell><cell>81.2</cell><cell>66.7</cell><cell>59.3</cell><cell>65.4</cell><cell>28.6</cell></row></table></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" type="table" xml:id="tab_2"><head>Table 3 .</head><label>3</label><figDesc>Benchmark Multi-Perspective Multi-Tool Tracking Results @ 25 FPS.</figDesc><table><row><cell>Model</cell><cell></cell><cell cols="2">HOTA Metrics</cell><cell></cell><cell></cell><cell cols="2">CLEAR Metrics</cell><cell></cell><cell></cell><cell cols="2">Identity Metrics</cell><cell>Count Metrics</cell><cell>Speed</cell></row><row><cell>Tracker</cell><cell cols="4">HOTA↑ DetA↑ LocA↑ AssA↑</cell><cell cols="5">MOTA↑ MOTP↑ MT↑ PT↓ ML↓</cell><cell cols="2">IDF1↑ IDSW↓ Frag↓</cell><cell>#Dets #IDs</cell><cell>FPS↑</cell></row><row><cell></cell><cell></cell><cell></cell><cell></cell><cell cols="8">Intraoperative Trajectory (Groundtruth counts: #Dets = 29994, #IDs = 70)</cell><cell></cell></row><row><cell>OCSORT [33]</cell><cell>14.6</cell><cell>52.7</cell><cell>86.7</cell><cell>4.1</cell><cell>49.2</cell><cell>85.0</cell><cell cols="3">24 32 14</cell><cell>9.5</cell><cell>2921 2731</cell><cell>21936 3336</cell><cell>10.2</cell></row><row><cell>FairMOT [66]</cell><cell>5.8</cell><cell>25.8</cell><cell>75.9</cell><cell>1.3</cell><cell>5.0</cell><cell>73.9</cell><cell>3</cell><cell cols="2">24 43</cell><cell>4.3</cell><cell>4227 1924</cell><cell>15252 4456</cell><cell>14.2</cell></row><row><cell>TransTrack [50]</cell><cell>7.4</cell><cell>31.5</cell><cell>84.4</cell><cell>1.7</cell><cell>4.2</cell><cell>82.9</cell><cell>9</cell><cell cols="2">36 25</cell><cell>4.2</cell><cell>4757 1899</cell><cell>21640 4079</cell><cell>6.7</cell></row><row><cell>ByteTrack [67]</cell><cell>15.8</cell><cell>70.6</cell><cell>85.7</cell><cell>3.6</cell><cell>67.0</cell><cell>84.0</cell><cell cols="2">54 12</cell><cell>2</cell><cell>9.5</cell><cell>4648 2429</cell><cell>28440 5383</cell><cell>16.4</cell></row><row><cell>Bot-SORT [1]</cell><cell>17.4</cell><cell>70.7</cell><cell>85.4</cell><cell>4.4</cell><cell>69.6</cell><cell>83.7</cell><cell cols="2">58 11</cell><cell>1</cell><cell>10.2</cell><cell>3907 2376</cell><cell>29302 4501</cell><cell>8.7</cell></row><row><cell cols="2">SMILETrack [63] 15.9</cell><cell>71.0</cell><cell>85.5</cell><cell>3.7</cell><cell>66.4</cell><cell>83.8</cell><cell cols="2">55 13</cell><cell>2</cell><cell>9.2</cell><cell>4968 2369</cell><cell>28821 5761</cell><cell>11.2</cell></row><row><cell></cell><cell></cell><cell></cell><cell></cell><cell cols="8">Intracorporeal Trajectory (Groundtruth counts: #Dets = 29994, #IDs = 247)</cell><cell></cell></row><row><cell>OCSORT [33]</cell><cell>23.7</cell><cell>51.4</cell><cell>86.5</cell><cell>11.0</cell><cell>47.1</cell><cell>84.8</cell><cell cols="3">115 87 45</cell><cell>18.1</cell><cell>2953 2796</cell><cell>21797 3526</cell><cell>10.2</cell></row><row><cell>FairMOT [66]</cell><cell>7.5</cell><cell>19.7</cell><cell>76.1</cell><cell>2.9</cell><cell>5.4</cell><cell>74.0</cell><cell cols="3">19 60 168</cell><cell>6.0</cell><cell>2890 1496</cell><cell>11287 3962</cell><cell>14.2</cell></row><row><cell>TransTrack [50]</cell><cell>13.1</cell><cell>31.5</cell><cell>84.4</cell><cell>5.5</cell><cell>4.6</cell><cell>82.9</cell><cell cols="3">80 79 88</cell><cell>8.7</cell><cell>4648 1791</cell><cell>21640 4079</cell><cell>6.7</cell></row><row><cell>ByteTrack [67]</cell><cell>24.7</cell><cell>70.6</cell><cell>85.7</cell><cell>8.7</cell><cell>67.4</cell><cell>84.0</cell><cell cols="3">176 48 23</cell><cell>16.9</cell><cell>4515 2290</cell><cell>28440 5383</cell><cell>16.4</cell></row><row><cell>Bot-SORT [1]</cell><cell>27.0</cell><cell>70.7</cell><cell>85.4</cell><cell>10.4</cell><cell>70.0</cell><cell>83.7</cell><cell cols="3">188 38 21</cell><cell>18.9</cell><cell>3771 2238</cell><cell>29300 4501</cell><cell>8.7</cell></row><row><cell cols="2">SMILETrack [63] 24.9</cell><cell>66.7</cell><cell>85.5</cell><cell>8.9</cell><cell>66.7</cell><cell>83.8</cell><cell cols="3">186 39 22</cell><cell>16.9</cell><cell>4868 2232</cell><cell>28820 5779</cell><cell>11.2</cell></row><row><cell></cell><cell></cell><cell></cell><cell></cell><cell cols="8">Visibility Trajectory (Groundtruth counts: #Dets = 29994, #IDs = 916)</cell><cell></cell></row><row><cell>SORT [4]</cell><cell>17.4</cell><cell>39.5</cell><cell>85.2</cell><cell>7.8</cell><cell>21.4</cell><cell>83.3</cell><cell cols="3">139 399 378</cell><cell>13.4</cell><cell>6619 2138</cell><cell>16595 8844</cell><cell>19.5</cell></row><row><cell>OCSORT [33]</cell><cell>37.0</cell><cell>52.6</cell><cell>86.5</cell><cell>26.2</cell><cell>50.2</cell><cell>84.8</cell><cell cols="3">300 371 245</cell><cell>35.9</cell><cell>2317 2260</cell><cell>22197 3587</cell><cell>10.2</cell></row><row><cell>FairMOT [66]</cell><cell>15.3</cell><cell>25.0</cell><cell>75.8</cell><cell>9.5</cell><cell>7.1</cell><cell>73.7</cell><cell cols="3">58 218 640</cell><cell>14.4</cell><cell>3140 1574</cell><cell>15338 4875</cell><cell>14.2</cell></row><row><cell>TransTrack [50]</cell><cell>19.2</cell><cell>31.6</cell><cell>84.4</cell><cell>11.8</cell><cell>5.8</cell><cell>82.9</cell><cell cols="3">224 280 412</cell><cell>16.1</cell><cell>4273 1403</cell><cell>21640 4079</cell><cell>6.7</cell></row><row><cell>ByteTrack [67]</cell><cell>41.5</cell><cell>70.7</cell><cell>85.7</cell><cell>24.8</cell><cell>69.3</cell><cell>84.0</cell><cell cols="3">591 217 108</cell><cell>36.8</cell><cell>3930 1704</cell><cell>28440 5383</cell><cell>16.4</cell></row><row><cell>Bot-SORT [1]</cell><cell>44.7</cell><cell>70.8</cell><cell>85.5</cell><cell>28.7</cell><cell>72.0</cell><cell>83.7</cell><cell cols="3">638 184 94</cell><cell>41.4</cell><cell>3183 1638</cell><cell>29300 4505</cell><cell>8.7</cell></row><row><cell cols="2">SMILETrack [63] 41.3</cell><cell>71.0</cell><cell>85.6</cell><cell>24.4</cell><cell>68.9</cell><cell>83.8</cell><cell cols="3">619 192 105</cell><cell>36.5</cell><cell>4227 1641</cell><cell>28821 5752</cell><cell>11.2</cell></row></table></figure>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div><head>Acknowledgments</head><p>This work was supported by <rs type="funder">French</rs> state funds managed within the <rs type="programName">Plan Investissements d'Avenir</rs> by the <rs type="funder">ANR</rs> under references: <rs type="programName">National AI Chair AI4ORSafety</rs> [<rs type="grantNumber">ANR-20-CHIA-0029-01</rs>], <rs type="projectName">DeepSurg</rs> [<rs type="grantNumber">ANR-16-CE33-0009</rs>], <rs type="projectName">IHU Strasbourg</rs> [<rs type="grantNumber">ANR-10-IAHU-02</rs>] and by <rs type="funder">BPI France</rs> under references: project <rs type="projectName">CONDOR</rs>, project <rs type="grantNumber">5G-OR</rs>. <rs type="person">Joël L. Lavanchy</rs> received funding by the <rs type="funder">Swiss National Science Foundation</rs> (<rs type="grantNumber">P500PM 206724</rs>, <rs type="grantNumber">P5R5PM 217663</rs>). This work was granted access to the servers/HPC resources managed by CAMMA, <rs type="person">IHU Strasbourg</rs>, <rs type="person">Unistra Mesocentre</rs>, and <rs type="funder">GENCI-IDRIS</rs> [Grant <rs type="grantNumber">2021-AD011011638R3</rs>, <rs type="grantNumber">2021-AD011011638R4</rs>].</p></div>
+			</div>
+			<listOrg type="funding">
+				<org type="funding" xml:id="_NQtBgnE">
+					<orgName type="program" subtype="full">Plan Investissements d&apos;Avenir</orgName>
+				</org>
+				<org type="funded-project" xml:id="_5KJgZDx">
+					<idno type="grant-number">ANR-20-CHIA-0029-01</idno>
+					<orgName type="project" subtype="full">DeepSurg</orgName>
+					<orgName type="program" subtype="full">National AI Chair AI4ORSafety</orgName>
+				</org>
+				<org type="funded-project" xml:id="_thdDA6f">
+					<idno type="grant-number">ANR-16-CE33-0009</idno>
+					<orgName type="project" subtype="full">IHU Strasbourg</orgName>
+				</org>
+				<org type="funded-project" xml:id="_a9pT6w9">
+					<idno type="grant-number">ANR-10-IAHU-02</idno>
+					<orgName type="project" subtype="full">CONDOR</orgName>
+				</org>
+				<org type="funding" xml:id="_zxdv4GK">
+					<idno type="grant-number">5G-OR</idno>
+				</org>
+				<org type="funding" xml:id="_kA2rjDt">
+					<idno type="grant-number">P500PM 206724</idno>
+				</org>
+				<org type="funding" xml:id="_rtydKRU">
+					<idno type="grant-number">P5R5PM 217663</idno>
+				</org>
+				<org type="funding" xml:id="_eBgAZ7X">
+					<idno type="grant-number">2021-AD011011638R3</idno>
+				</org>
+				<org type="funding" xml:id="_jVAd5PA">
+					<idno type="grant-number">2021-AD011011638R4</idno>
+				</org>
+			</listOrg>
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<monogr>
+		<author>
+			<persName><forename type="first">Nir</forename><surname>Aharon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Roy</forename><surname>Orfaig</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ben-Zion</forename><surname>Bobrovsky</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2206.14651</idno>
+		<title level="m">Robust associations multi-pedestrian tracking</title>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<analytic>
+		<title level="a" type="main">Monitoring tool usage in surgery videos using boosted convolutional and recurrent neural networks</title>
+		<author>
+			<persName><forename type="first">Hassan</forename><surname>Al Hajj</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mathieu</forename><surname>Lamard</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pierre-Henri</forename><surname>Conze</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Béatrice</forename><surname>Cochener</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Gwenolé</forename><surname>Quellec</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Medical image analysis</title>
+		<imprint>
+			<biblScope unit="volume">47</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="203" to="218" />
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<analytic>
+		<title level="a" type="main">Evaluating multiple object tracking performance: the clear mot metrics</title>
+		<author>
+			<persName><forename type="first">Keni</forename><surname>Bernardin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rainer</forename><surname>Stiefelhagen</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">EURASIP Journal on Image and Video Processing</title>
+		<imprint>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="1" to="10" />
+			<date type="published" when="2008">2008. 2008</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main">Simple online and realtime tracking</title>
+		<author>
+			<persName><forename type="first">Alex</forename><surname>Bewley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zongyuan</forename><surname>Ge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lionel</forename><surname>Ott</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fabio</forename><surname>Ramos</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ben</forename><surname>Upcroft</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2016 IEEE international conference on image processing (ICIP)</title>
+		<imprint>
+			<date type="published" when="2016">2016</date>
+			<biblScope unit="page" from="3464" to="3468" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main">Detecting surgical tools by modelling local appearance and global shape</title>
+		<author>
+			<persName><forename type="first">David</forename><surname>Bouget</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rodrigo</forename><surname>Benenson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mohamed</forename><surname>Omran</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Laurent</forename><surname>Riffaud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bernt</forename><surname>Schiele</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pierre</forename><surname>Jannin</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE transactions on medical imaging</title>
+		<imprint>
+			<biblScope unit="volume">34</biblScope>
+			<biblScope unit="issue">12</biblScope>
+			<biblScope unit="page" from="2603" to="2617" />
+			<date type="published" when="2015">2015</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title level="a" type="main">Danail Stoyanov, and Pierre Jannin. Vision-based and marker-less surgical tool detection and tracking: a review of the literature</title>
+		<author>
+			<persName><forename type="first">David</forename><surname>Bouget</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Max</forename><surname>Allan</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Medical image analysis</title>
+		<imprint>
+			<biblScope unit="volume">35</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="633" to="654" />
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main">Cascade r-cnn: High quality object detection and instance segmentation</title>
+		<author>
+			<persName><forename type="first">Zhaowei</forename><surname>Cai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nuno</forename><surname>Vasconcelos</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+		<imprint>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="1" to="1" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title level="a" type="main">Systems for tracking minimally invasive surgical instruments</title>
+		<author>
+			<persName><surname>Magdalena K Chmarra</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Ca Grimbergen</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Dankelman</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Minimally Invasive Therapy &amp; Allied Technologies</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="328" to="340" />
+			<date type="published" when="2007">2007</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<analytic>
+		<title level="a" type="main">Seong Tae Kim, and Nassir Navab. Tecno: Surgical phase recognition with multistage temporal convolutional networks</title>
+		<author>
+			<persName><forename type="first">Tobias</forename><surname>Czempiel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Magdalini</forename><surname>Paschali</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Matthias</forename><surname>Keicher</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Walter</forename><surname>Simson</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hubertus</forename><surname>Feussner</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">In Medical Image Computing and Computer Assisted Intervention MICCAI</title>
+		<imprint>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="343" to="352" />
+			<date type="published" when="2020">2020</date>
+			<publisher>Springer</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title level="a" type="main">Eco: Efficient convolution operators for tracking</title>
+		<author>
+			<persName><forename type="first">Martin</forename><surname>Danelljan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Goutam</forename><surname>Bhat</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fahad</forename><surname>Shahbaz Khan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Michael</forename><surname>Felsberg</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE conference on computer vision and pattern recognition</title>
+		<meeting>the IEEE conference on computer vision and pattern recognition</meeting>
+		<imprint>
+			<date type="published" when="2017">2017</date>
+			<biblScope unit="page" from="6638" to="6646" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<analytic>
+		<title level="a" type="main">Tao: A large-scale benchmark for tracking any object</title>
+		<author>
+			<persName><forename type="first">Achal</forename><surname>Dave</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tarasha</forename><surname>Khurana</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pavel</forename><surname>Tokmakov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cordelia</forename><surname>Schmid</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Deva</forename><surname>Ramanan</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Computer Vision-ECCV 2020: 16th European Conference</title>
+		<meeting><address><addrLine>Glasgow, UK</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2020">August 23-28, 2020. 2020</date>
+			<biblScope unit="page" from="436" to="454" />
+		</imprint>
+	</monogr>
+	<note>Proceedings, Part V 16</note>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<author>
+			<persName><forename type="first">Patrick</forename><surname>Dendorfer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hamid</forename><surname>Rezatofighi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Anton</forename><surname>Milan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Javen</forename><surname>Shi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daniel</forename><surname>Cremers</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ian</forename><surname>Reid</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Stefan</forename><surname>Roth</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Konrad</forename><surname>Schindler</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Laura</forename><surname>Leal-Taixé</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2003.09003</idno>
+	</analytic>
+	<monogr>
+		<title level="m">A benchmark for multi object tracking in crowded scenes</title>
+		<imprint>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="volume">20</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title level="a" type="main">Giaotracker: A comprehensive framework for mcmot with global information and optimizing strategies in visdrone 2021</title>
+		<author>
+			<persName><forename type="first">Yunhao</forename><surname>Du</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junfeng</forename><surname>Wan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yanyun</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Binyu</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhihang</forename><surname>Tong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Junhao</forename><surname>Dong</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE/CVF International conference on computer vision</title>
+		<meeting>the IEEE/CVF International conference on computer vision</meeting>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+			<biblScope unit="page" from="2809" to="2819" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<analytic>
+		<title level="a" type="main">A model for predicting the gears score from virtual reality surgical simulator metrics</title>
+		<author>
+			<persName><forename type="first">Ariel</forename><surname>Kate Dubin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Danielle</forename><surname>Julian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alyssa</forename><surname>Tanaka</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Patricia</forename><surname>Mattingly</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Roger</forename><surname>Smith</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Surgical endoscopy</title>
+		<imprint>
+			<biblScope unit="volume">32</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="3576" to="3581" />
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<monogr>
+		<title level="m" type="main">Endovis sub-instrument grand challenge</title>
+		<idno>2021-11-12. 5</idno>
+		<imprint>
+			<date type="published" when="2024">2024</date>
+			<publisher>EndoVis Sub-Instrument Challenge</publisher>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<analytic>
+		<title level="a" type="main">Video-based surgical skills assessment using long term tool tracking</title>
+		<author>
+			<persName><forename type="first">Mona</forename><surname>Fathollahi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mohammad</forename><surname>Hasan Sarhan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ramon</forename><surname>Pena</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lela</forename><surname>Dimonte</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Anshu</forename><surname>Gupta</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aishani</forename><surname>Ataliwala</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jocelyn</forename><surname>Barker</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Medical Image Computing and Computer Assisted Intervention-MICCAI 2022: 25th International Conference</title>
+		<meeting><address><addrLine>Singapore</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2005">September 18-22, 2022. 2022. 2, 3, 4, 5</date>
+			<biblScope unit="page" from="541" to="550" />
+		</imprint>
+	</monogr>
+	<note>Proceedings, Part VII</note>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<analytic>
+		<title level="a" type="main">Image-guided endoscopic surgery: results of accuracy and performance in a multicenter clinical study using an electromagnetic tracking system</title>
+		<author>
+			<persName><forename type="first">Jonathan</forename><surname>Marvin P Fried</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Harsha</forename><surname>Kleefield</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Edward</forename><surname>Gopal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bryan</forename><forename type="middle">T</forename><surname>Reardon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Frederick</forename><forename type="middle">A</forename><surname>Ho</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Kuhn</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Laryngoscope</title>
+		<imprint>
+			<biblScope unit="volume">107</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<biblScope unit="page" from="594" to="601" />
+			<date type="published" when="1997">1997</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title level="a" type="main">Jhu-isi gesture and skill assessment working set (jigsaws): A surgical activity dataset for human motion modeling</title>
+		<author>
+			<persName><forename type="first">Yixin</forename><surname>Gao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Swaroop</forename><surname>Vedula</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Carol</forename><forename type="middle">E</forename><surname>Reiley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Narges</forename><surname>Ahmidi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Balakrishnan</forename><surname>Varadarajan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lingling</forename><surname>Henry C Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Luca</forename><surname>Tao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Benjamın</forename><surname>Zappella</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">David</forename><forename type="middle">D</forename><surname>Béjar</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Yuh</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">MICCAI workshop: M2cai</title>
+		<imprint>
+			<date type="published" when="2014">2014</date>
+			<biblScope unit="page">3</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<monogr>
+		<title level="m" type="main">YOLOX: Exceeding yolo series in 2021</title>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Ge</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Songtao</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Feng</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zeming</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jian</forename><surname>Sun</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2107.08430</idno>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<analytic>
+		<title level="a" type="main">Are we ready for autonomous driving? the kitti vision benchmark suite</title>
+		<author>
+			<persName><forename type="first">Andreas</forename><surname>Geiger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Philip</forename><surname>Lenz</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Raquel</forename><surname>Urtasun</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2012 IEEE conference on computer vision and pattern recognition</title>
+		<imprint>
+			<date type="published" when="2012">2012</date>
+			<biblScope unit="page" from="3354" to="3361" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<analytic>
+		<title level="a" type="main">Tool detection and operative skill assessment in surgical videos using region-based convolutional neural networks</title>
+		<author>
+			<persName><forename type="first">Amy</forename><surname>Jin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Serena</forename><surname>Yeung</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jeffrey</forename><surname>Jopling</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jonathan</forename><surname>Krause</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dan</forename><surname>Azagury</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Arnold</forename><surname>Milstein</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Li</forename><surname>Fei-Fei</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2018 IEEE winter conference on applications of computer vision (WACV)</title>
+		<imprint>
+			<publisher>IEEE</publisher>
+			<date type="published" when="2018">2018</date>
+			<biblScope unit="page" from="691" to="699" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<monogr>
+		<title/>
+		<author>
+			<persName><forename type="first">Arne</forename><surname>Hoffhues</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jonathon</forename><surname>Luiten</surname></persName>
+		</author>
+		<ptr target="https://github.com/JonathonLuiten/TrackEval" />
+		<imprint>
+			<date type="published" when="2020-10-16">2020. 16 October 2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<analytic>
+		<title level="a" type="main">Probabilistic anchor assignment with iou prediction for object detection</title>
+		<author>
+			<persName><forename type="first">Kang</forename><surname>Kim</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hee</forename><surname>Seok</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lee</forename></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">ECCV</title>
+		<imprint>
+			<date type="published" when="2020">2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title level="a" type="main">Automation of surgical skill assessment using a three-stage machine learning algorithm</title>
+		<author>
+			<persName><forename type="first">Joel</forename><surname>Joël L Lavanchy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kadir</forename><surname>Zindel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Isabell</forename><surname>Kirtac</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Enes</forename><surname>Twick</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Daniel</forename><surname>Hosgor</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Guido</forename><surname>Candinas</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Beldi</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Scientific reports</title>
+		<imprint>
+			<biblScope unit="volume">11</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page">5197</biblScope>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<analytic>
+		<title level="a" type="main">Preserving privacy in surgical video analysis using a deep learning classifier to identify out-of-body scenes in endoscopic videos</title>
+		<author>
+			<persName><forename type="first">Armine</forename><surname>Joël L Lavanchy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pietro</forename><surname>Vardazaryan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Mascagni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Padoy</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Scientific reports</title>
+		<imprint>
+			<biblScope unit="volume">13</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page">9235</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<analytic>
+		<title level="a" type="main">Multi-class multi-object tracking using changing point detection</title>
+		<author>
+			<persName><forename type="first">Byungjae</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Enkhbayar</forename><surname>Erdenee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Songguo</forename><surname>Jin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mi</forename><forename type="middle">Young</forename><surname>Nam</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Young</forename><surname>Giu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jung</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Phill</forename><surname>Kyu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rhee</forename></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Computer Vision-ECCV 2016 Workshops: Amsterdam</title>
+		<meeting><address><addrLine>The Netherlands</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2016">October 8-10 and 15-16, 2016. 2016</date>
+			<biblScope unit="page" from="68" to="83" />
+		</imprint>
+	</monogr>
+	<note>Proceedings, Part II 14</note>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<analytic>
+		<title level="a" type="main">Evaluation of surgical skills during robotic surgery by deep learningbased multiple surgical instrument tracking in training and actual operations</title>
+		<author>
+			<persName><forename type="first">Dongheon</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hyeong</forename><forename type="middle">Won</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hyungju</forename><surname>Kwon</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hyoun-Joong</forename><surname>Kong</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kyu</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Eun</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hee</forename><forename type="middle">Chan</forename><surname>Kim</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of clinical medicine</title>
+		<imprint>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<date type="published" when="1964">1964. 2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<analytic>
+		<title level="a" type="main">Weakly supervised segmentation for real-time surgical tool tracking</title>
+		<author>
+			<persName><forename type="first">Eung-Joo</forename><surname>Lee</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">William</forename><surname>Plishker</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xinyang</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shuvra</forename><forename type="middle">S</forename><surname>Bhattacharyya</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Raj</forename><surname>Shekhar</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Healthcare technology letters</title>
+		<imprint>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="231" to="236" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<analytic>
+		<title level="a" type="main">Microsoft coco: Common objects in context</title>
+		<author>
+			<persName><forename type="first">Tsung-Yi</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Michael</forename><surname>Maire</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Serge</forename><surname>Belongie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">James</forename><surname>Hays</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pietro</forename><surname>Perona</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Deva</forename><surname>Ramanan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Piotr</forename><surname>Dollár</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">C</forename><surname>Lawrence</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zitnick</forename></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Computer Vision-ECCV 2014: 13th European Conference</title>
+		<meeting><address><addrLine>Zurich, Switzerland</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2014">September 6-12, 2014. 2014</date>
+			<biblScope unit="page" from="740" to="755" />
+		</imprint>
+	</monogr>
+	<note>Proceedings, Part V 13</note>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<monogr>
+		<author>
+			<persName><forename type="first">Wei</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dragomir</forename><surname>Anguelov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dumitru</forename><surname>Erhan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Christian</forename><surname>Szegedy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Scott</forename><surname>Reed</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cheng-Yang</forename><surname>Fu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexander</forename><forename type="middle">C</forename><surname>Berg</surname></persName>
+		</author>
+		<title level="m">Ssd: Single shot multibox detector. ECCV</title>
+		<imprint>
+			<date type="published" when="2016">2016</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<monogr>
+		<title level="m" type="main">Swin transformer: Hierarchical vision transformer using shifted windows</title>
+		<author>
+			<persName><forename type="first">Ze</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yutong</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yue</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Han</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yixuan</forename><surname>Wei</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zheng</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Stephen</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Baining</forename><surname>Guo</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2103.14030</idno>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b31">
+	<analytic>
+		<title level="a" type="main">Hota: A higher order metric for evaluating multi-object tracking</title>
+		<author>
+			<persName><forename type="first">Jonathon</forename><surname>Luiten</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aljosa</forename><surname>Osep</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Patrick</forename><surname>Dendorfer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Philip</forename><surname>Torr</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Andreas</forename><surname>Geiger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Laura</forename><surname>Leal-Taixé</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bastian</forename><surname>Leibe</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">International journal of computer vision</title>
+		<imprint>
+			<biblScope unit="volume">129</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="548" to="578" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b32">
+	<monogr>
+		<title level="m" type="main">Deep oc-sort: Multi-pedestrian tracking by adaptive re-identification</title>
+		<author>
+			<persName><forename type="first">Gerard</forename><surname>Maggiolino</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Adnan</forename><surname>Ahmad</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinkun</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kris</forename><surname>Kitani</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2302.11813</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b33">
+	<analytic>
+		<title level="a" type="main">Surgical data science for next-generation interventions</title>
+		<author>
+			<persName><forename type="first">Lena</forename><surname>Maier-Hein</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">S</forename><surname>Swaroop</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Stefanie</forename><surname>Vedula</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nassir</forename><surname>Speidel</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ron</forename><surname>Navab</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Adrian</forename><surname>Kikinis</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Matthias</forename><surname>Park</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hubertus</forename><surname>Eisenmann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Germain</forename><surname>Feussner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Stamatia</forename><surname>Forestier</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Giannarou</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Nature Biomedical Engineering</title>
+		<imprint>
+			<biblScope unit="volume">1</biblScope>
+			<biblScope unit="issue">9</biblScope>
+			<biblScope unit="page" from="691" to="696" />
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b34">
+	<analytic>
+		<title level="a" type="main">Improving logistics processes of surgical instruments: case of rfid tech-nology</title>
+		<author>
+			<persName><forename type="first">Afrooz</forename><surname>Moatari</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">-Kazerouni</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ygal</forename><surname>Bendavid</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Business Process Management Journal</title>
+		<imprint>
+			<biblScope unit="volume">23</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="448" to="466" />
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b35">
+	<monogr>
+		<title level="m" type="main">Deep learning methods for the detection and recognition of surgical tools and activities in laparoscopic videos</title>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+		<respStmt>
+			<orgName>Chinedu Innocent Nwoye ; Université de Strasbourg</orgName>
+		</respStmt>
+	</monogr>
+	<note type="report_type">PhD thesis</note>
+</biblStruct>
+
+<biblStruct xml:id="b36">
+	<analytic>
+		<title level="a" type="main">Weakly supervised convolutional lstm approach for tool tracking in laparoscopic videos</title>
+		<author>
+			<persName><forename type="first">Chinedu</forename><surname>Innocent Nwoye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacques</forename><surname>Marescaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>Padoy</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">International journal of computer assisted radiology and surgery</title>
+		<imprint>
+			<biblScope unit="volume">14</biblScope>
+			<biblScope unit="page">3</biblScope>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b37">
+	<analytic>
+		<title level="a" type="main">Recognition of instrument-tissue interactions in endoscopic videos via action triplets</title>
+		<author>
+			<persName><forename type="first">Chinedu</forename><surname>Innocent Nwoye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cristians</forename><surname>Gonzalez</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tong</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pietro</forename><surname>Mascagni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacques</forename><surname>Marescaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>Padoy</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">International Conference on Medical Image Computing and Computer-Assisted Intervention MICCAI</title>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="page" from="364" to="374" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b38">
+	<monogr>
+		<title level="m" type="main">Rendezvous: Attention mechanisms for the recognition of surgical action triplets in endoscopic videos</title>
+		<author>
+			<persName><forename type="first">Chinedu</forename><surname>Innocent Nwoye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tong</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Cristians</forename><surname>Gonzalez</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Barbara</forename><surname>Seeliger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pietro</forename><surname>Mascagni</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacques</forename><surname>Marescaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>Padoy</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="volume">78</biblScope>
+			<biblScope unit="page">4</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b39">
+	<monogr>
+		<title level="m" type="main">Cholectriplet2022: Show me a tool and tell me the triplet-an endoscopic vision challenge for surgical action triplet detection</title>
+		<author>
+			<persName><forename type="first">Chinedu</forename><surname>Innocent Nwoye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tong</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Saurav</forename><surname>Sharma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aditya</forename><surname>Murali</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Deepak</forename><surname>Alapatt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Armine</forename><surname>Vardazaryan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kun</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jonas</forename><surname>Hajek</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wolfgang</forename><surname>Reiter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Amine</forename><surname>Yamlahi</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2302.06294</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b40">
+	<analytic>
+		<title level="a" type="main">Real-time surgical instrument tracking in robot-assisted surgery using multi-domain convolutional neural network</title>
+		<author>
+			<persName><forename type="first">Liang</forename><surname>Qiu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Changsheng</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hongliang</forename><surname>Ren</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Healthcare technology letters</title>
+		<imprint>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="159" to="164" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b41">
+	<analytic>
+		<title level="a" type="main">Dissecting self-supervised learning methods for surgical computer vision</title>
+		<author>
+			<persName><forename type="first">Sanat</forename><surname>Ramesh</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Vinkle</forename><surname>Srivastav</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Deepak</forename><surname>Alapatt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tong</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aditya</forename><surname>Murali</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Luca</forename><surname>Sestini</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chinedu</forename><surname>Innocent Nwoye</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Idris</forename><surname>Hamoud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Saurav</forename><surname>Sharma</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Antoine</forename><surname>Fleurentin</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Medical Image Analysis</title>
+		<imprint>
+			<biblScope unit="volume">88</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page">102844</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b42">
+	<analytic>
+		<title level="a" type="main">Faster r-cnn: Towards real-time object detection with region proposal networks</title>
+		<author>
+			<persName><forename type="first">Kaiming</forename><surname>Shaoqing Ren</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ross</forename><surname>He</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jian</forename><surname>Girshick</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Sun</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+		<imprint>
+			<biblScope unit="issue">6</biblScope>
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b43">
+	<analytic>
+		<title level="a" type="main">Visual tracking of surgical tools for proximity detection in retinal surgery</title>
+		<author>
+			<persName><forename type="first">Rogério</forename><surname>Richa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Marcin</forename><surname>Balicki</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Eric</forename><surname>Meisner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Raphael</forename><surname>Sznitman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Russell</forename><surname>Taylor</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Gregory</forename><surname>Hager</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Information Processing in Computer-Assisted Interventions: Second International Conference, IPCAI 2011</title>
+		<meeting><address><addrLine>Berlin</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2011-06-22">June 22, 2011. 2011</date>
+			<biblScope unit="volume">2</biblScope>
+			<biblScope unit="page" from="55" to="66" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b44">
+	<analytic>
+		<title level="a" type="main">Performance measures and a data set for multi-target, multi-camera tracking</title>
+		<author>
+			<persName><forename type="first">Ergys</forename><surname>Ristani</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Francesco</forename><surname>Solera</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Roger</forename><surname>Zou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rita</forename><surname>Cucchiara</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Carlo</forename><surname>Tomasi</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">European conference on computer vision</title>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2016">2016</date>
+			<biblScope unit="page" from="17" to="35" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b45">
+	<analytic>
+		<title level="a" type="main">Towards real-time multiple surgical tool tracking</title>
+		<author>
+			<persName><forename type="first">Maria</forename><surname>Robu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Abdolrahim</forename><surname>Kadkhodamohammadi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Imanol</forename><surname>Luengo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Danail</forename><surname>Stoyanov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Computer Methods in Biomechanics and Biomedical Engineering: Imaging &amp; Visualization</title>
+		<imprint>
+			<biblScope unit="volume">9</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page">4</biblScope>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b46">
+	<analytic>
+		<title level="a" type="main">Detection and localization of robotic tools in robot-assisted surgery videos using deep neural networks for region proposal and detection</title>
+		<author>
+			<persName><forename type="first">Duygu</forename><surname>Sarikaya</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jason</forename><forename type="middle">J</forename><surname>Corso</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Khurshid</forename><forename type="middle">A</forename><surname>Guru</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE transactions on medical imaging</title>
+		<imprint>
+			<biblScope unit="volume">36</biblScope>
+			<biblScope unit="issue">7</biblScope>
+			<biblScope unit="page" from="1542" to="1549" />
+			<date type="published" when="2017">2017</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b47">
+	<analytic>
+		<title level="a" type="main">AlAlaween Wafa&apos;H, Nibal T Albashabsheh, and Raed Al-Taher. The economy of motion for laparoscopic ball clamping surgery: A feedback educational tool</title>
+		<author>
+			<persName><forename type="first">Ammar</forename><surname>Mohammad A Shbool</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alma</forename><surname>Al-Bazi</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Kokash</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">MethodsX</title>
+		<imprint>
+			<biblScope unit="volume">10</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page">102168</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b48">
+	<analytic>
+		<title level="a" type="main">Realtime surgical tool detection in minimally invasive surgery based on attention-guided convolutional neural network</title>
+		<author>
+			<persName><forename type="first">Pan</forename><surname>Shi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zijian</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sanyuan</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Faliang</forename><surname>Chang</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Access</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<biblScope unit="page" from="228853" to="228862" />
+			<date type="published" when="2020">2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b49">
+	<monogr>
+		<author>
+			<persName><forename type="first">Peize</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinkun</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Jiang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rufeng</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Enze</forename><surname>Xie</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zehuan</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Changhu</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping</forename><surname>Luo</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2012.15460</idno>
+		<title level="m">Transtrack: Multiple object tracking with transformer</title>
+		<imprint>
+			<date type="published" when="2020">2020</date>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b50">
+	<analytic>
+		<title level="a" type="main">Dancetrack: Multi-object tracking in uniform appearance and diverse motion</title>
+		<author>
+			<persName><forename type="first">Peize</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jinkun</forename><surname>Cao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Jiang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zehuan</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Song</forename><surname>Bai</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kris</forename><surname>Kitani</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping</forename><surname>Luo</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">ings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</title>
+		<imprint>
+			<date type="published" when="2022">2022</date>
+			<biblScope unit="page" from="20993" to="21002" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b51">
+	<analytic>
+		<title level="a" type="main">Estimation of incision patterns based on visual tracking of surgical tools in minimally invasive surgery</title>
+		<author>
+			<persName><forename type="first">Xiaochuan</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shahram</forename><surname>Payandeh</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">ASME International Mechanical Engineering Congress and Exposition</title>
+		<imprint>
+			<date type="published" when="2010">2010</date>
+			<biblScope unit="page">3</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b52">
+	<analytic>
+		<title level="a" type="main">Data-driven visual tracking in retinal microsurgery</title>
+		<author>
+			<persName><forename type="first">Raphael</forename><surname>Sznitman</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Karim</forename><surname>Ali</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rogerio</forename><surname>Richa</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">H</forename><surname>Russell</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Gregory</forename><forename type="middle">D</forename><surname>Taylor</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Pascal</forename><surname>Hager</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Fua</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">International Conference on Medical Image Computing and Computer-Assisted Intervention</title>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2005">2012. 2, 5</date>
+			<biblScope unit="page" from="568" to="575" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b53">
+	<monogr>
+		<author>
+			<persName><forename type="first">Chunhua</forename><surname>Zhi Tian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hao</forename><surname>Shen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tong</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><surname>He</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1904.01355</idno>
+		<title level="m">Fcos: Fully convolutional one-stage object detection</title>
+		<imprint>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b54">
+	<analytic>
+		<title level="a" type="main">Optimizing the surgical instrument tray to immediately increase efficiency and lower costs in the operating room</title>
+		<author>
+			<persName><forename type="first">Jay</forename><surname>Toor</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Avneesh</forename><surname>Bhangu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jesse</forename><surname>Wolfstadt</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Garry</forename><surname>Bassi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Stanley</forename><surname>Chung</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Raja</forename><surname>Rampersaud</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">William</forename><surname>Mitchell</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Joseph</forename><surname>Milner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Martin</forename><surname>Koyle</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Canadian Journal of Surgery</title>
+		<imprint>
+			<biblScope unit="volume">65</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page">275</biblScope>
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b55">
+	<analytic>
+		<title level="a" type="main">Endonet: a deep architecture for recognition tasks on laparoscopic videos</title>
+		<author>
+			<persName><forename type="first">Sherif</forename><surname>Andru P Twinanda</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Shehata</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacques</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Michel</forename><surname>Marescaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>De Mathelin</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Padoy</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE transactions on medical imaging</title>
+		<imprint>
+			<biblScope unit="volume">36</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page">3</biblScope>
+			<date type="published" when="2016">2016</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b56">
+	<analytic>
+		<title level="a" type="main">Weakly-supervised learning for tool localization in laparoscopic videos</title>
+		<author>
+			<persName><forename type="first">Armine</forename><surname>Vardazaryan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Didier</forename><surname>Mutter</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacques</forename><surname>Marescaux</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Nicolas</forename><surname>Padoy</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">MICCAI-LABEL</title>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2018">2018</date>
+			<biblScope unit="page" from="169" to="179" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b57">
+	<analytic>
+		<title level="a" type="main">Yolov8: A novel object detection algorithm with enhanced performance and robustness</title>
+		<author>
+			<persName><forename type="first">Rejin</forename><surname>Varghese</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">M</forename><surname>Sambath</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2024 International Conference on Advances in Data Engineering and Intelligent Computing Systems (ADICS)</title>
+		<imprint>
+			<publisher>IEEE</publisher>
+			<date type="published" when="2024">2024</date>
+			<biblScope unit="page" from="1" to="6" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b58">
+	<analytic>
+		<title level="a" type="main">Comparative validation of machine learning algorithms for surgical workflow and skill analysis with the heichole benchmark</title>
+		<author>
+			<persName><forename type="first">Martin</forename><surname>Wagner</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Beat-Peter</forename><surname>Müller-Stich</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Anna</forename><surname>Kisilenko</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Duc</forename><surname>Tran</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Patrick</forename><surname>Heger</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lars</forename><surname>Mündermann</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">David</forename><forename type="middle">M</forename><surname>Lubotsky</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Benjamin</forename><surname>Müller</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Tornike</forename><surname>Davitashvili</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Manuela</forename><surname>Capek</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Medical Image Analysis</title>
+		<imprint>
+			<biblScope unit="volume">86</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page">102770</biblScope>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b59">
+	<analytic>
+		<title level="a" type="main">Real-time end-to-end object detection</title>
+		<author>
+			<persName><forename type="first">Ao</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hui</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lihao</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Kai</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zijia</forename><surname>Lin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jungong</forename><surname>Han</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<biblScope unit="volume">10</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="107984" to="108011" />
+			<date type="published" when="2024">2024</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b60">
+	<monogr>
+		<title level="m" type="main">Learning what you want to learn using programmable gradient information</title>
+		<author>
+			<persName><forename type="first">Chien-Yao</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hong-Yuan Mark</forename><surname>Liao</surname></persName>
+		</author>
+		<imprint>
+			<biblScope unit="volume">9</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b61">
+	<analytic>
+		<title level="a" type="main">Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors</title>
+		<author>
+			<persName><forename type="first">Chien-Yao</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexey</forename><surname>Bochkovskiy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hong-Yuan Mark</forename><surname>Liao</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition</title>
+		<meeting>the IEEE/CVF Conference on Computer Vision and Pattern Recognition</meeting>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">7</biblScope>
+			<biblScope unit="page" from="7464" to="7475" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b62">
+	<monogr>
+		<title level="m" type="main">Smiletrack: Similarity learning for occlusion-aware multiple object tracking</title>
+		<author>
+			<persName><forename type="first">Yu-Hsiang</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jun-Wei</forename><surname>Hsieh</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping-Yang</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ming-Ching</forename><surname>Chang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hung</forename><forename type="middle">Hin</forename><surname>So</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xin</forename><surname>Li</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b63">
+	<analytic>
+		<title level="a" type="main">Simple online and realtime tracking with a deep association metric</title>
+		<author>
+			<persName><forename type="first">Nicolai</forename><surname>Wojke</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alex</forename><surname>Bewley</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dietrich</forename><surname>Paulus</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">2017 IEEE international conference on image processing (ICIP)</title>
+		<imprint>
+			<date type="published" when="2017">2017</date>
+			<biblScope unit="page" from="3645" to="3649" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b64">
+	<analytic>
+		<title level="a" type="main">Information loss challenges in surgical navigation systems: From information fusion to ai-based approaches</title>
+		<author>
+			<persName><forename type="first">Lisheng</forename><surname>Xu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haoran</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jiaole</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ang</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Shuang</forename><surname>Song</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hongliang</forename><surname>Ren</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lin</forename><surname>Qi</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jason</forename><forename type="middle">J</forename><surname>Gu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Max Q-H</forename><surname>Meng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Information Fusion</title>
+		<imprint>
+			<biblScope unit="issue">2</biblScope>
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b65">
+	<analytic>
+		<title level="a" type="main">On the fairness of detection and re-identification in multiple object tracking</title>
+		<author>
+			<persName><forename type="first">Yifu</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Chunyu</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xinggang</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenjun</forename><surname>Zeng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenyu</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Fairmot</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">International Journal of Computer Vision</title>
+		<imprint>
+			<biblScope unit="volume">129</biblScope>
+			<biblScope unit="page">7</biblScope>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b66">
+	<analytic>
+		<title level="a" type="main">Bytetrack: Multi-object tracking by associating every detection box</title>
+		<author>
+			<persName><forename type="first">Yifu</forename><surname>Zhang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Peize</forename><surname>Sun</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yi</forename><surname>Jiang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dongdong</forename><surname>Yu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Fucheng</forename><surname>Weng</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zehuan</forename><surname>Yuan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Ping</forename><surname>Luo</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wenyu</forename><surname>Liu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xinggang</forename><surname>Wang</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Computer Vision-ECCV 2022: 17th European Conference</title>
+		<meeting><address><addrLine>Tel Aviv, Israel</addrLine></address></meeting>
+		<imprint>
+			<publisher>Springer</publisher>
+			<date type="published" when="2022">October 23-27, 2022. 2022</date>
+			<biblScope unit="volume">6</biblScope>
+			<biblScope unit="page">7</biblScope>
+		</imprint>
+	</monogr>
+	<note>Proceedings, Part XXII</note>
+</biblStruct>
+
+<biblStruct xml:id="b67">
+	<analytic>
+		<title level="a" type="main">Surgical tool tracking based on two cnns: from coarse to fine</title>
+		<author>
+			<persName><forename type="first">Zijian</forename><surname>Zhao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sandrine</forename><surname>Voros</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Zhaorui</forename><surname>Chen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaolin</forename><surname>Cheng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Journal of Engineering</title>
+		<imprint>
+			<biblScope unit="issue">14</biblScope>
+			<biblScope unit="page" from="467" to="472" />
+			<date type="published" when="2019">2019. 2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b68">
+	<monogr>
+		<author>
+			<persName><forename type="first">Xingyi</forename><surname>Zhou</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dequan</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Philipp</forename><surname>Krähenbühl</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:1904.07850</idno>
+		<title level="m">Objects as points</title>
+		<imprint>
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+	<note type="report_type">arXiv preprint</note>
+</biblStruct>
+
+<biblStruct xml:id="b69">
+	<analytic>
+		<title level="a" type="main">Detection and tracking meet drones challenge</title>
+		<author>
+			<persName><forename type="first">Pengfei</forename><surname>Zhu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Longyin</forename><surname>Wen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Dawei</forename><surname>Du</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiao</forename><surname>Bian</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Qinghua</forename><surname>Heng Fan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Haibin</forename><surname>Hu</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Ling</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Transactions on Pattern Analysis and Machine Intelligence</title>
+		<imprint>
+			<biblScope unit="volume">44</biblScope>
+			<biblScope unit="issue">11</biblScope>
+			<biblScope unit="page" from="7380" to="7399" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b70">
+	<analytic>
+		<title level="a" type="main">Deformable detr: Deformable transformers for end-to-end object detection</title>
+		<author>
+			<persName><forename type="first">Xizhou</forename><surname>Zhu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Weijie</forename><surname>Su</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lewei</forename><surname>Lu</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Bin</forename><surname>Li</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Xiaogang</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jifeng</forename><surname>Dai</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">International Conference on Learning Representations</title>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>

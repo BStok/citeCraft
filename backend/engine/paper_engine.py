@@ -17,18 +17,65 @@ section = {"Abstract" : 0,
            "Literature Review" : 3,
            "Method" : 4,
            "Result" : 5,
-           "References" : 6
+           "Discussion" : 6,
+           "Full text" : 7
            }
+
+#section wise dropdowns
+Abstract_dropdown = {"view Section" : 0, 
+                     "Extract Key points" : 1,
+                     "Explain like I am 5" : 2}
+
+Metadata_dropdown = {"View Section" : 0}
+
+Introduction_dropdown = {"View Section" : 0,
+                         "Extract Key Points" : 1,
+                         "Explain like I am 5" :2 ,
+                         "List Citations" : 3}
+
+Lit_dropdown = {"View Section" : 0,
+                 "Extract Key Points" : 1,
+                 "Explain like I am 5" :2 ,
+                 "List Citations" : 3,
+                 "Summarize" : 4}
+
+Methodology_dropdown = {"View Section" : 0,
+                 "Extract Key Points" : 1,
+                 "Explain like I am 5" :2 ,
+                 "List Citations" : 3,
+                 "Highlight structure" : 5,
+                 "Summarize" : 4}
+
+Result_dropdown = {"View Section" : 0,
+                 "Extract Key Points" : 1,
+                 "Explain like I am 5" :2 ,
+                 "List Citations" : 3,
+                 "Highlight structure" : 5,
+                 "Summarize" : 4}
+
+Discussion_dropdown = {"View Section" : 0,
+                 "Extract Key Points" : 1,
+                 "Explain like I am 5" :2 ,
+                 "List Citations" : 3,
+                 "Highlight structure" : 5,
+                 "Future Scope" : 6,
+                 "Challenges" : 7,
+                 "Summarize" : 4}
+
+FullText_dropdown = {"List Citations" : 3,
+                     "Self Citation Count" : 6,
+                     "Highlight Structure" : 5,
+                     "Summarize": 4}
+
 
 #operations dictionary
 dropdown_operation = {"view Section" : 0, 
                       "Extract Key Points" : 1, 
-                      "Extract entities" : 2,
-                      "Highlight Structure": 3, 
-                      "Mark for Comparison": 4, 
-                      "Export": 5}
+                      "Highlight Structure": 5, 
+                      "Export": 5,
+                      "Explain simply" : 6}
 
-Extract_entities = {
+Entities = {
                           "Datasets": 0,
                           "Metrics": 1,
                           "Model/Architecture": 2,
@@ -86,7 +133,7 @@ def extractEntities(section,subsection):
     sentence_scores = np.array(X.sum(axis=1)).flatten()
     ranked_indices = sentence_scores.argsort()[::-1]
 
-    top_sentences = [sentences[i] for i in ranked_indices[:top_k]]
+    top_sentences = [sentences[i] for i in ranked_indices[:]]
 
     return top_sentences
 
