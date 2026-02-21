@@ -28,10 +28,13 @@ def fetchArxivPapers(query, max_results=10):
             if 'doi.org' in link.href:
                 doi = link.href.split('doi.org/')[-1]
         
+        authors = []
+        authors = ", ".join(author.name for author in entry.authors)
+        
         paper = {
             "Title": entry.title,
             "DOI": doi if doi else "N/A",  # Some arXiv papers may not have a DOI
-            
+            "Authors" : authors,
             "Publication Date": datetime.strptime(entry.published, "%Y-%m-%dT%H:%M:%SZ").strftime("%Y-%m-%d"),
             "Abstract": entry.summary.replace("\n", " ").strip(),
             "arXiv ID": entry.id.split('/')[-1],  # Optional: Include arXiv ID
@@ -86,4 +89,4 @@ if __name__ == "__main__":
     max_results = int(input("Enter max number of results (default 10): ") or 10)
     
     papers = fetchArxivPapers(search_query, max_results)
-    saveToCsv(papers,filename="arxivpaper.csv")
+    saveToCsv(papers,filename="arxivAuthorCheck.csv")
