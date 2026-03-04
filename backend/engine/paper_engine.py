@@ -1,5 +1,5 @@
 #takes input of the section of paper being referred to from paper parsing
-import paper_parsing
+import backend.parsing.paper_parsing as paper_parsing
 import re
 from lxml import etree
 import spacy

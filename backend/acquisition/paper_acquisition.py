@@ -8,28 +8,28 @@
 import os
 
 #import functions from axirv
-from axirvAPI import fetchArxivPapers
-from axirvAPI import saveToCsv as saveA
+from backend.acquisition.axirvAPI import fetchArxivPapers
+from backend.acquisition.axirvAPI import saveToCsv as saveA
 
 #import functions from biorxiv
-from biorXIV import fetch_biorxiv_preprints
-from biorXIV import save_to_csv as saveB
+from backend.acquisition.biorXIV import fetch_biorxiv_preprints
+from backend.acquisition.biorXIV import save_to_csv as saveB
 
 ##import functions from core
-from coreAPI import fetch_core_papers
-from coreAPI import save_core_to_csv as saveC
+from backend.acquisition.coreAPI import fetch_core_papers
+from backend.acquisition.coreAPI import save_core_to_csv as saveC
 core_API = os.environ["coreAPI"]
 
 ##import functions from google scholar
-from googleScholarAPI import fetch_google_scholar_papers
-from googleScholarAPI import extract_doi
-from googleScholarAPI import parse_scholar_date
-from googleScholarAPI import save_to_csv as saveG
+from backend.acquisition.googleScholarAPI import fetch_google_scholar_papers
+from backend.acquisition.googleScholarAPI import extract_doi
+from backend.acquisition.googleScholarAPI import parse_scholar_date
+from backend.acquisition.googleScholarAPI import save_to_csv as saveG
 googleAPIKey = os.environ["googleAPI"]
 
 ##import functions from pubmed
-from pubMed import fetch_pubmed_articles
-from pubMed import save_to_csv as saveP
+from backend.acquisition.pubMed import fetch_pubmed_articles
+from backend.acquisition.pubMed import save_to_csv as saveP
 
 
 if __name__ == "__main__":
