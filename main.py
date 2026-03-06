@@ -8,5 +8,10 @@ if __name__ == "__main__":
         r"C:\Users\Sanya\Downloads\NIPS-2017-attention-is-all-you-need-Paper.pdf",
     ]
 
-    results = compare_papers(papers)
-    print_comparison_table(results)
+    #results = compare_papers(papers)
+    #print_comparison_table(results)
+
+    from backend.db.db import init_db
+
+    init_db()
+    print("DB initialized")
