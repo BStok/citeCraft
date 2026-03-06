@@ -1,13 +1,16 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 import re
 import json
 from huggingface_hub import InferenceClient
-from backend.comparison.prompt import EXTRACTION_PROMPT
+from backend.comparison.promptt import EXTRACTION_PROMPT
 from backend.parsing.paper_parsing import pdf_to_tei_xml, process_pdf, load_xml, extract_paper, format_for_llm
 from pathlib import Path
 
+
 client = InferenceClient(
-    api_key=os.environ["HF_TOKEN"],
+    api_key=os.environ["HF_TOKEN"]
 )
 
 MODEL = "Qwen/Qwen2.5-72B-Instruct"  # good HF-hosted model for extraction tasks
@@ -105,13 +108,3 @@ def print_comparison_table(rows: list[dict]):
             print(f"  {col.upper():<20} {val[:120]}")  # truncate long values for display
 
 
-# ── Entry point ────────────────────────────────────────────────────────────────
-
-if __name__ == "__main__":
-    papers = [
-        r"C:\Users\Sanya\Downloads\NIPS-2017-attention-is-all-you-need-Paper.pdf",
-        r"C:\Users\Sanya\Downloads\N19-1423BERT.pdf",
-    ]
-
-    #results = compare_papers(papers)
-    #print_comparison_table(results)
