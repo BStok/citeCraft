@@ -1,0 +1,997 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TEI xml:space="preserve" xmlns="http://www.tei-c.org/ns/1.0" 
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.tei-c.org/ns/1.0 https://raw.githubusercontent.com/kermitt2/grobid/master/grobid-home/schemas/xsd/Grobid.xsd"
+ xmlns:xlink="http://www.w3.org/1999/xlink">
+	<teiHeader xml:lang="en">
+		<fileDesc>
+			<titleStmt>
+				<title level="a" type="main">Estimating the Minimizer and the Minimum Value of a Regression Function under Passive Design</title>
+				<funder ref="#_bbwuCzh">
+					<orgName type="full">Agence Nationale de la Recherche</orgName>
+					<orgName type="abbreviated">ANR</orgName>
+				</funder>
+				<funder ref="#_6cXq9VX">
+					<orgName type="full">Marie Curie action WINDMILL</orgName>
+				</funder>
+			</titleStmt>
+			<publicationStmt>
+				<publisher/>
+				<availability status="unknown"><licence/></availability>
+			</publicationStmt>
+			<sourceDesc>
+				<biblStruct>
+					<analytic>
+						<author>
+							<persName><forename type="first">Arya</forename><surname>Akhavan</surname></persName>
+							<affiliation key="aff0">
+								<orgName type="department">Data Science Department</orgName>
+								<orgName type="institution" key="instit1">Istituto Italiano di Tecnologia CREST</orgName>
+								<orgName type="institution" key="instit2">ENSAE</orgName>
+								<address>
+									<settlement>Paris</settlement>
+									<region>IP</region>
+								</address>
+							</affiliation>
+							<affiliation key="aff1">
+								<orgName type="institution">EURECOM</orgName>
+								<address>
+									<country key="FR">France</country>
+								</address>
+							</affiliation>
+							<affiliation key="aff2">
+								<orgName type="institution" key="instit1">CREST</orgName>
+								<orgName type="institution" key="instit2">ENSAE</orgName>
+								<address>
+									<settlement>Paris</settlement>
+									<region>IP</region>
+								</address>
+							</affiliation>
+						</author>
+						<title level="a" type="main">Estimating the Minimizer and the Minimum Value of a Regression Function under Passive Design</title>
+					</analytic>
+					<monogr>
+						<imprint>
+							<date/>
+						</imprint>
+					</monogr>
+					<idno type="MD5">68BE94ABBCA9AD257B7D663A1952B3B4</idno>
+					<note type="submission">Submitted 12/22; Revised 10/23;</note>
+				</biblStruct>
+			</sourceDesc>
+		</fileDesc>
+		<encodingDesc>
+			<appInfo>
+				<application version="0.8.2" ident="GROBID" when="2026-03-06T16:47+0000">
+					<desc>GROBID - A machine learning software for extracting information from scholarly documents</desc>
+					<label type="revision">a91ee48</label>
+					<label type="parameters">startPage=-1, endPage=-1, consolidateCitations=0, consolidateHeader=0, consolidateFunders=0, includeRawAffiliations=false, includeRawCitations=false, includeRawCopyrights=false, generateTeiIds=false, generateTeiCoordinates=[], sentenceSegmentation=false, flavor=null</label>
+					<ref target="https://github.com/kermitt2/grobid"/>
+				</application>
+			</appInfo>
+		</encodingDesc>
+		<profileDesc>
+			<textClass>
+				<keywords>
+					<term>Nonparametric regression</term>
+					<term>Stochastic optimization</term>
+					<term>Minimax optimality</term>
+					<term>Passive design</term>
+					<term>Local polynomial estimator</term>
+				</keywords>
+			</textClass>
+			<abstract>
+<div xmlns="http://www.tei-c.org/ns/1.0"><p>We propose a new method for estimating the minimizer x * and the minimum value f * of a smooth and strongly convex regression function f from the observations contaminated by random noise. Our estimator z n of the minimizer x * is based on a version of the projected gradient descent with the gradient estimated by a regularized local polynomial algorithm. Next, we propose a two-stage procedure for estimation of the minimum value f * of regression function f . At the first stage, we construct an accurate enough estimator of x * , which can be, for example, z n . At the second stage, we estimate the function value at the point obtained in the first stage using a rate optimal nonparametric procedure. We derive non-asymptotic upper bounds for the quadratic risk and optimization risk of z n , and for the risk of estimating f * . We establish minimax lower bounds showing that, under certain choice of parameters, the proposed algorithms achieve the minimax optimal rates of convergence on the class of smooth and strongly convex functions.</p></div>
+			</abstract>
+		</profileDesc>
+	</teiHeader>
+	<text xml:lang="en">
+		<body>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="1.">Introduction</head><p>Estimating the minimum value and the minimizer of an unknown function from observation of its noisy values on a finite set of points is a key problem in many applications. Let D = {x 1 , . . . , x n } ⊂ R d be a design set and let Θ be a compact and convex subset of R d . Assume that we observe noisy values of an unknown regression function f : R d → R at points of the design set:</p><formula xml:id="formula_0">y i = f (x i ) + ξ i , i = 1, . . . , n,<label>(1)</label></formula><p>where ξ i 's are independent zero mean errors. Our goal is to estimate the minimum value of the regression function f * = min x∈Θ f (x) and its location x * = arg min x∈Θ f (x) when x * is unique. As accuracy measures of an estimator xn of x * we consider the optimization risk E[f (x n ) -f * ] and the quadratic risk E[󰀂x n -x * 󰀂 2 ], where 󰀂 • 󰀂 denotes the Euclidean norm. The accuracy of an estimator T n of f * will be measured by the risk E|T n -f * |. We will assume that f belongs to the class of β-Hölder smooth and strongly convex functions with β ≥ 2 (see Section 2 for the definitions).</p><p>The existing literature considers two different assumptions on the choice of the design. Under the passive design setting, the points x i are sampled independently from some probability distribution. Under the active (or sequential) design setting, for each i the statistician can plan the experiment by selecting the point x i depending on the previous queries and the corresponding responses x 1 , y 1 , . . . , x i-1 , y i-1 . The accuracy of estimation under the active design is at least as good as under the passive design but it can be strictly better, which is the case for the problems considered here.</p><p>Active design, estimation of x * . Active (or sequential) scheme has a long history starting at least from the seminal work of <ref type="bibr" target="#b22">Kiefer and Wolfowitz (1952)</ref> where an analog of the Robbins-Monro algorithm was introduced to estimate the minimizer x * of a univariate function f. The idea of the Kiefer-Wolfowitz (KW) method is to approximate the derivative of f using first order differences of y i 's and plug this estimator in the gradient algorithm. <ref type="bibr" target="#b22">Kiefer and Wolfowitz (1952)</ref> proved convergence in probability of the KW algorithm under some regularity conditions on the regression function. A multivariate extension of the KW algorithm was proposed by <ref type="bibr" target="#b7">Blum (1954)</ref>. Convergence rates of the KW algorithm for d = 1 were investigated in <ref type="bibr" target="#b14">Dupač (1957)</ref> proving an upper bound on the quadratic risk of the order n -2/3 for β = 3. By using suitably chosen linear combinations of first order differences to approximate the gradient, <ref type="bibr" target="#b15">Fabian (1967)</ref> proved the existence of a method that attains, for odd integers β ≥ 3, the quadratic risk of the order n -(β-1)/β for functions f with bounded βth partial derivatives. The method of <ref type="bibr" target="#b15">Fabian (1967)</ref> uses (β -1)/2 evaluations y i at every step of the algorithm in order to approximate the gradient. <ref type="bibr" target="#b9">Chen (1988)</ref> and <ref type="bibr" target="#b33">Polyak and Tsybakov (1990)</ref> have established minimax lower bounds for the estimation risk on the class of β-Hölder smooth and strongly convex functions f , for all β ≥ 2. For the quadratic risk, these bounds are of the order n -(β-1)/β . <ref type="bibr" target="#b33">Polyak and Tsybakov (1990)</ref> proposed a new class of methods using smoothing kernels and randomization to approximate the gradient. This constitutes an alternative to the earlier used deterministic schemes derived from finite differences. <ref type="bibr" target="#b33">Polyak and Tsybakov (1990)</ref> proved that such randomized methods attain the minimax optimal rate n -(β-1)/β on the above classes for all β ≥ 2 and not only for odd integers β ≥ 3. An additional advantage over Fabian's algorithm is the computational simplicity of these methods. In particular, they require at each step only one or two evaluations of the function. For subsequent developments on similar methods, we refer to <ref type="bibr" target="#b13">Dippon (2003)</ref>; <ref type="bibr" target="#b4">Bach and Perchet (2016)</ref>; <ref type="bibr" target="#b0">Akhavan et al. (2020</ref><ref type="bibr" target="#b1">Akhavan et al. ( , 2021</ref><ref type="bibr" target="#b2">Akhavan et al. ( , 2023))</ref>, where one can find further references.</p><p>Active design, estimation of f * . The problem of estimating f * under the active scheme was first considered by <ref type="bibr" target="#b27">Mokkadem and Pelletier (2007)</ref> who suggested a recursive estimator and proved its asymptotic normality with √ n scaling. <ref type="bibr" target="#b5">Belitser et al. (2012)</ref> defined an estimator of f * via a multi-stage procedure whose complexity increases exponentially with the dimension d, and showed that this estimator achieves (asymptotically, for n greater than an exponent of d) the O p (1/ √ n) rate when f is β-Hölder and strongly convex with β &gt; 2. <ref type="bibr" target="#b0">Akhavan et al. (2020)</ref> improved upon this result by constructing a simple computationally feasible estimator fn such that E| fn -f * | = O(1/ √ n) for β ≥ 2. It can be easily shown that the rate 1/ √ n cannot be further improved when estimating f * . Indeed, using the oracle that puts all the queries at the unknown true minimizer x * one cannot achieve better rate under the Gaussian noise.</p><p>Passive design, estimation of x * . The problem of estimating the minimizer x * under the i.i.d. passive design was probably first studied in <ref type="bibr" target="#b18">Härdle and Nixdorf (1987)</ref>, where some consistency and asymptotic normality results were discussed. <ref type="bibr">Tsybakov (1990b)</ref> proposed to estimate x * by a recursive procedure using local polynomial approximations of the gradient. Considering the class of strongly convex and β-Hölder (β ≥ 2) regression functions f , <ref type="bibr">Tsybakov (1990b)</ref> proves that the minimax optimal rate of estimating x * on the above class of functions is n -(β-1)/(2β+d) , and shows that the proposed estimator attains this optimal rate. However, in order to define this estimator, one needs to know of the marginal density of the design points that may be inaccessible in practice.</p><p>There was also some work on estimating x * in different passive design settings. Several papers are analyzing estimation of x * in a passive scheme, where x i 's are given non-random points in [0, 1] ( <ref type="bibr" target="#b28">Müller (1985</ref><ref type="bibr" target="#b29">Müller ( , 1989)) ))</ref> or in [0, 1] d (Facer and <ref type="bibr" target="#b16">Müller (2003)</ref>). Another line of work <ref type="bibr" target="#b18">(Härdle and Nixdorf (1987)</ref>; <ref type="bibr" target="#b30">Nazin et al. (1989)</ref>; Tsybakov (1990b); <ref type="bibr" target="#b31">Nazin et al. (1992)</ref>) is to consider the problem of estimating the zero of a nonparametric regression function under i.i.d. design, also called passive stochastic approximation when recursive algorithms are used. <ref type="bibr" target="#b30">Nazin et al. (1989);</ref><ref type="bibr">Tsybakov (1990b)</ref>; <ref type="bibr" target="#b31">Nazin et al. (1992)</ref> establish minimax optimal rates for this problem and propose passive stochastic approximation algorithms attaining these rates. Application to transfer learning is recently developed in <ref type="bibr" target="#b24">Krishnamurthy and Yin (2022)</ref>, where one can find further references on passive stochastic approximation.</p><p>Passive design, estimation of f * . To the best of our knowledge, the problem of estimating f * under i.i.d. passive design was not studied. However, there was some work on a related and technically slightly easier problem of estimating the maximum of a function observed under the Gaussian white noise model in dimension d = 1 (Ibragimov and <ref type="bibr">Khas' minskii (1982)</ref>; <ref type="bibr" target="#b26">Lepski (1993)</ref>). Extrapolating these results to the regression model and general d suggests that the optimal rate of convergence for estimating f * on the class of β-Hölder regression functions f is of the order (n/ log n) -β/(2β+d) . It is stated as a conjecture in <ref type="bibr" target="#b6">Belitser et al. (2021)</ref> for the passive model with equidistant deterministic design. It remains unclear whether this conjecture is true since, for higher dimensions, the effect of the equidistant grid induces an additional bias. However, we prove below that, under the i.i.d. random design, the minimax optimal rate on the class of β-Hölder functions (without strong convexity) is indeed (n/ log n) -β/(2β+d) . We are not aware of any results on estimation of f * on the class of β-Hölder and strongly convex regression functions f , which is the main object of study in the current work.</p><p>Finally, we review some results on a related problem of estimating the mode of a probability density function. There exists an extensive literature on this problem. In the univariate case, <ref type="bibr" target="#b32">Parzen (1962)</ref> proposed the maximizer of kernel density estimator (KDE) as an estimator for the mode. Direct estimate of the mode based on order statistics was proposed by <ref type="bibr" target="#b17">Grenander (1965)</ref>, where the consistency of the proposed method was shown. Other estimators of the mode in the univariate case were considered by <ref type="bibr" target="#b10">(Chernoff, 1964;</ref><ref type="bibr" target="#b11">Dalenius, 1965;</ref><ref type="bibr" target="#b40">Venter, 1967)</ref>. The minimax rate of mode estimation on the class of β-Hölder densities that are strongly concave near the maximum was shown to be n -(β-1)/(2β+d) in Tsybakov (1990a), where the optimal recursive algorithm was introduced. It generalizes an earlier result of <ref type="bibr" target="#b21">Khas'minskii (1979)</ref> who considered the special case d = 1, β = 2 and derived the minimax lower bound of the order n -1/5 matching the upper rate provided by <ref type="bibr" target="#b32">Parzen (1962)</ref>. <ref type="bibr" target="#b23">Klemelä (2005)</ref> proposed to use the maximizer of KDE with the smoothing parameter chosen by the Lepski method <ref type="bibr" target="#b25">(Lepski, 1991)</ref>, and showed that this estimator achieves optimal adaptive rate of convergence. <ref type="bibr" target="#b12">Dasgupta and Kpotufe (2014)</ref> proposed minimax optimal estimators of the mode based on k-nearest neighbor density estimators, emphasizing the implementation ease of the method. Computational complexity of mode estimation was investigated by <ref type="bibr" target="#b3">Arias-Castro et al. (2022)</ref> showing the impossibility of a minimax optimal algorithm with sublinear computational complexity. It was shown that the maximum of a histogram, with a proper choice of bandwidth, achieves the minimax rate while running in linear time. Bayesian approach to the mode estimation was developed by <ref type="bibr" target="#b42">Yoo and Ghosal (2019)</ref>.</p><p>Contributions. In this paper, we consider the model described at the beginning of this section under the i.i.d. passive observation scheme. The contributions of the present work can be summarized as follows.</p><p>• Assuming that f belongs to the class of β-Hölder and strongly convex regression functions we construct a recursive estimator of the minimizer x * adaptive to the unknown marginal density of x i 's and achieving the minimax optimal rate n -(β-1)/(2β+d) , for β ≥ 2, up to a logarithmic factor.</p><p>• We show that the minimax optimal rate for the problem of estimating the minimum value f * of function f on the above class of functions scales as n -β/(2β+d) , and we propose an algorithm achieving this optimal rate for β &gt; 2.</p><p>• We prove that the minimax optimal rate of estimating f * on the class of β-Hölder functions (without strong convexity) is of the order (n/ log n) -β/(2β+d) . Thus, dropping the assumption of strong convexity causes a deterioration of the minimax rate only by a logarithmic factor. It suggests that strong convexity is not a crucial advantage in estimation of the minimum value of a function under the passive design.</p><p>Given our results, we have the following table summarizing the minimax optimal rates for estimation under the active and passive design.</p><p>rate of quadratic risk, estimation of x * rate of estimating f * passive scheme n</p><formula xml:id="formula_1">- 2(β-1) 2β+d n -β 2β+d active scheme n -β-1 β n -1 2</formula><p>Table <ref type="table">1</ref>: Comparisons between the rates of convergence for passive and active schemes in the class of β-Hlder and strongly convex functions</p><p>We note that the convergence rates for the passive scheme suffer from the curse of dimensionality, while the rates for the active scheme are independent of the dimension.</p><p>Notation. In all the theorems, where the rates contain log(n), we assume that n ≥ 2. We denote by E f the expectation with respect to the distribution of (x i , y i ) n i=1 satisfying the model (1); we also abbreviate this notation to E when there is no ambiguity. Vectors are represented by bold symbols while uppercase English letters are used to denote matrices. We denote by 󰀂 • 󰀂 the Euclidean norm, and by 󰀂•󰀂 op the operator norm, i.e., for a matrix A we have 󰀂A󰀂 op = sup 󰀂u󰀂≤1 󰀂Au󰀂 . We denote the smallest eigenvalue of a square matrix U by λ min (U ). For any m ∈ N, we denote by <ref type="bibr">[m]</ref> the set that contains all positive integers k, such that 1 ≤ k ≤ m. For β ∈ R + , let ⌊β⌋ be the biggest integer smaller than β. Let S denote the number elements in the set {m</p><formula xml:id="formula_2">: |m| ≤ ℓ}, where m is a d-dimensional multi-index. For u ∈ R d , let U (u) = 󰀕 u m (1) m (1) , . . . , u m (S) m (S) 󰀖 ⊤</formula><p>, where the numbering is such that m (1) = (0, . . . , 0), m (2) = (1, 0, . . . , 0), . . . , m (d+1) = (0, . . . , 0, 1). For </p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="2.">Definitions and assumptions</head><p>We first introduce the class of β-Hölder functions that will be used throughout the paper. For β, L &gt; 0, we denote by F β (L) the class of ℓ = ⌊β⌋ times differentiable functions</p><formula xml:id="formula_3">f : R d → R such that 󰀏 󰀏 󰀏 󰀏 󰀏 󰀏 f (x) - 󰁛 |m|≤l 1 m! D m f (x)(x -x ′ ) m 󰀏 󰀏 󰀏 󰀏 󰀏 󰀏 ≤ L󰀂x -x ′ 󰀂 β , ∀x, x ′ ∈ R d .</formula><p>Our estimators will be based on kernels satisfying the following assumption.</p><p>Assumption 1 The kernel K : R d → R has a compact support Supp(K) contained in the unit Euclidean ball, and satisfies the conditions</p><formula xml:id="formula_4">K(u) ≥ 0, 󰁝 K(u) du = 1, sup u∈R d K(u) &lt; ∞ .</formula><p>Furthermore, we assume that K is a L K -Lipschitz function, that is, for any x, y ∈ R d we have</p><formula xml:id="formula_5">|K(x) -K(y)| ≤ L K 󰀂x -y󰀂 . Assumption 2 It holds for all i, i ′ ∈ [n], that: (i) ξ i and x i ′ are independent; (ii) E[ξ i ] = 0; (iii) there exists σ &gt; 0 such that E [exp(ξ i /σ)] &lt; ∞ (sub-exponential assumption).</formula><p>Assumption 3 We consider model (1) with f : R d → R satisfying the following assumptions.</p><p>(i) The function f attains its minimum on Θ at point x * .</p><p>(ii) The function f belongs to Hölder functional class F β (L) with β ≥ 2.</p><p>(iii) There exists α &gt; 0 such that the function f is α-strongly convex on Θ i.e. for any x, y ∈ Θ, it satisfies</p><formula xml:id="formula_6">f (y) ≥ f (x) + 〈∇f (x), y -x〉 + α 2 󰀂x -y󰀂 2 .</formula><p>(iv) The function f is uniformly bounded on the set</p><formula xml:id="formula_7">Θ ′ = {x + y : x ∈ Θ and 󰀂y󰀂 ≤ 1}, that is, sup x∈Θ ′ |f (x)| ≤ M , where M is a constant.</formula><p>We denote by F β,α (L) the class of regression functions f satisfying Assumption 3. Next, we introduce an assumption on the distribution of x i 's.</p><p>Assumption 4 The random vectors x 1 , . . . , x n are i.i.d. with distribution admitting a density p(•) with respect to the Lebesgue measure such that</p><formula xml:id="formula_8">0 &lt; p min ≤ p(x) ≤ p max &lt; ∞, ∀x ∈ Θ ′ .</formula><p>Throughout this paper, we use the notation A, A i , i = 0, 1, . . . for positive constants that can only depend on d, Θ, β, L, M , p max , p min , K, and σ, where the dependence on d is at most of polynomial order with the degree of the polynomial only depending on β. The values of A and A i can vary from line to line. We note that the dependence on the strong convexity parameter α is not included in the constants A and A i since we explicitly specify it in the upper and lower bounds.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="3.">Estimating the minimizer</head><p>We estimate the minimizer x * via an approximation of the gradient algorithm, where we replace the gradient ∇f (z) by its local polynomial estimator. The objective function f ∈ F β (L) in model ( <ref type="formula" target="#formula_0">1</ref>) can be well approximated by its Taylor polynomial of order ℓ in the neighbourhood of the target point z,</p><formula xml:id="formula_9">f (x) ≈ 󰁛 |m|≤ℓ 1 m! D m f (z)(z -x) m = θ ⊤ (z)U 󰀕 x -z h 󰀖 ,</formula><p>where x is sufficiently close to z and, for h &gt; 0,</p><formula xml:id="formula_10">U (u) = 󰀣 u m (1) m (1) ! , . . . , u m (S) m (S) ! 󰀤 ⊤ , θ(z) = 󰀓 h |m (1) | D m (1) f (z), . . . , h |m (S) | D m (S) f (z) 󰀔 ⊤ .<label>(2)</label></formula><p>The local polynomial estimator of θ(z) (see, e.g., <ref type="bibr" target="#b34">Stone (1980</ref><ref type="bibr">), (Tsybakov, 2009, Section 1.6</ref>)) is defined as follows:</p><formula xml:id="formula_11">θk (z) ∈ arg min θ∈R S k 󰁛 i=1 󰀗 y i -θ ⊤ U 󰀕 x i -z h 󰀖󰀘 2 K 󰀕 x i -z h 󰀖 ,</formula><p>where K : R d → R is a kernel satisfying Assumption 1. Let the matrix B k (z) and the vector D k (z) be defined as</p><formula xml:id="formula_12">B k (z) = 1 kh d k 󰁛 i=1 U 󰀕 x i -z h 󰀖 U ⊤ 󰀕 x i -z h 󰀖 K 󰀕 x i -z h 󰀖 , D k (z) = 1 kh d k 󰁛 i=1 y i U 󰀕 x i -z h 󰀖 K 󰀕 x i -z h 󰀖 . If the matrix B k (z) is invertible we have θk (z) = B k (z) -1 D k (z)</formula><p>and an estimator for ∇f (z) can be defined in the form</p><formula xml:id="formula_13">g k (z) = 1 h A θk (z), (<label>3</label></formula><formula xml:id="formula_14">)</formula><p>where A is the matrix with elements</p><formula xml:id="formula_15">A i,j = 󰀫 1, if j = i + 1 0, otherwise, for i ∈ [d], and j ∈ [S].</formula><p>Since B k (z) is not necessarily invertible, instead of using the estimator (3) we consider its regularized version. Namely, we add a regularization constant λ &gt; 0 to the diagonal entries of B k (z) and define B k,λ (z) = B k (z) + λI, where I is the identity matrix. This leads to the following regularized estimator of the gradient:</p><formula xml:id="formula_16">g k,λ (z) = 1 h A θk,λ (z) := 1 h A(B k (z) + λI) -1 D k (z).<label>(4)</label></formula><p>The corresponding approximate gradient descent procedure is presented as Algorithm 1. It outputs z k that will be used as an estimator of x * . At round k of Algorithm 1, the matrix B k,λ (z k ) = B k (z k ) + λI and the vector D k (z k ) can be computed recursively based on the first k observations. An advantage of this method is its recursive construction enabling Algorithm 1 to handle incoming i.i.d. data points (x k , y k ) that are received sequentially in an online fashion.</p><p>The following theorem gives a bound on the estimation error of Algorithm 1.</p><p>Theorem 5 Let Assumptions 1 -4 hold and ∇f (x * ) = 0. Then, for z n generated by Algorithm 1 we have</p><formula xml:id="formula_17">E[󰀂z n -x * 󰀂 2 ] ≤ A min 󰀳 󰁃 1, 󰀕 log(n) n 󰀖 2(β-1) 2β+d α -2 󰀴 󰁄 . (<label>5</label></formula><formula xml:id="formula_18">)</formula><p>Algorithm 1: Passive Zero-Order Projected Gradient Descent</p><formula xml:id="formula_19">Requires Kernel K : R d → R, step sizes η k &gt; 0, parameters h k = 󰀓 log(k+1) k 󰀔 1 2β+d and λ k = 󰀓 log(k+1) k 󰀔 β 2β+d , for k ∈ [n].</formula><p>Initialization Choose z 1 ∈ Θ, and set</p><formula xml:id="formula_20">η k = 2 αk , for k ∈ [n]. For k ∈ [n] 1. Compute g k,λ k (z k ) = h -1 k 󰀓 AB k,λ k (z k ) -1 D k (z k ) 󰀔 . 2. Update z k+1 = Proj Θ 󰀃 z k -η k g k,λ k (z k ) 󰀄 . Return (z k ) n k=1</formula><p>The proof of Theorem 5 uses the strong convexity of f to obtain an upper bound for the term E[󰀂z k+1 -x * 󰀂 2 |z k ], which depends on the bias term</p><formula xml:id="formula_21">󰀐 󰀐 E[g k,λ k (z k )|z k ] -∇f (z k ) 󰀐 󰀐 and on the "variance" term E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬</formula><p>. These two terms need to be controlled uniformly over z k ∈ Θ, which is achieved using Lemma 13. The uniformity is the reason why the bound (5) includes an extra logarithmic factor compared to the optimal rate n -(β-1)/(2β+d) derived in <ref type="bibr">Tsybakov (1990b)</ref>.</p><p>One may consider the logarithmic factor appearing in (5) as a price to pay for the fact that our algorithm is adaptive to the marginal density of x i 's and is realized in online mode. Indeed, Tsybakov (1990b) considered estimators that depend on the marginal density of x i 's and achieve the rate n -(β-1)/(2β+d) , while Algorithm 1 is free of such dependence. On the other hand, we believe that the extra logarithmic factor in the rate can be avoided for the estimator of x * defined as a minimizer over Θ of the local polynomial estimator of function f . Such a method does not need the knowledge of the marginal density but it needs the whole sample and cannot be realized in online mode. Moreover, it is computationally intractable since it requires minimization of the estimator, which is a function of general form. It remains an open question whether there exists an algorithm combining all the three advantages, that is, online realization, adaptivity to the marginal density and convergence with the rate n -(β-1)/(2β+d) with no extra logarithmic factor.</p><p>In the following theorem, we provide a bound on the optimization risk</p><formula xml:id="formula_22">E [f (z n ) -f * ],</formula><p>where zn is the average of the outputs of Algorithm 1 over n iterations.</p><p>Theorem 6 Let Assumptions 1 -4 hold. Then, for zn = 1 n 󰁓 n k=1 z k , where z k 's are generated by Algorithm 1, we have</p><formula xml:id="formula_23">E [f (z n ) -f * ] ≤ A min 󰀕 1, 󰀕 log(n) n 󰀖 2(β-1) 2β+d α -1 󰀖 . (<label>6</label></formula><formula xml:id="formula_24">)</formula><p>Note that inequality (16) below gives a minimax lower bound for the optimization risk with the rate α -1 n -2(β-1)/(2β+d) for all α ≥ n -(β+2)/(2β+d) . This fact and Theorem 6 imply that, in the zone α ≥ n -(β+2)/(2β+d) , the estimator zn achieves the minimax optimal rate (up to a logarithmic factor) with respect to both n and α. This is the reason to use zn instead of the last output z n since for z n we get a guarantee that scales optimally only in n but not in α. Indeed, using Theorem 5 and the inequality f</p><formula xml:id="formula_25">(z n ) -f * ≤ C 󰀂z n -x * 󰀂 2 ,</formula><p>where C &gt; 0 is a constant, we get the rate</p><formula xml:id="formula_26">󰀓 log(n) n 󰀔 2(β-1) 2β+d α -2 , and not 󰀓 log(n) n 󰀔 2(β-1) 2β+d α -1</formula><p>for the optimization risk.</p><p>For very small α such that α &lt; n -(β+2)/(2β+d) the lower bound ( <ref type="formula" target="#formula_45">16</ref>) scales differently from ( <ref type="formula" target="#formula_23">6</ref>) and thus we cannot claim minimax rate optimality for the estimator zn for all n and α. Nevertheless, for any fixed α &gt; 0 independent of n, Theorem 6 and the lower bound ( <ref type="formula" target="#formula_45">16</ref>) imply that the estimator zn attains the minimax optimal rate considered as a function only of n.</p><p>It is interesting to compare the result of Theorem 6 with the optimal rates for the optimization risk in the case of active design. As discussed in the Introduction, under the active design for the same class of functions f as in Theorem 6, the dimension d disappears from the optimal rate, which upgrades to n -(β-1)/β , cf. <ref type="bibr" target="#b33">Polyak and Tsybakov (1990)</ref>; <ref type="bibr" target="#b0">Akhavan et al. (2020)</ref>. On the other hand, under active design and the class of β-Hölder functions (with no strong convexity) the optimal rate for the optimization risk deteriorates substantially and becomes (n/ log n) -β/(2β+d) , cf. <ref type="bibr" target="#b41">Wang et al. (2018)</ref>. For all β &gt; 2, this is worse than the rate under passive design and strong convexity obtained in Theorem 6.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="4.">Estimating the minimum value of a regression function</head><p>In this section, we apply the above results to estimate the minimum value f * = min x∈Θ f (x) of function f that belongs to the class F β,α (L). Note that f (z n ), which is analyzed in Theorem 6 is not an estimator for f * , because it depends on the unknown f .</p><p>We propose a method of estimating f * that uses splitting of the data in two subsamples of equal size. Throughout this section, we assume that n is an even positive integer and we set m = n/2. We split the data into two subsamples D 1 = {(x 1 , y 1 ), . . . , (x m , y m )} and D 2 = {(x m+1 , y m+1 ) . . . , (x n , y n )}. Then we apply Algorithm 1 with D 1 as an input to construct zm = 1 m 󰁓 m k=1 z k , where z k is the update of Algorithm 1 at round k ∈ [m]. Next, based on the subsample D 2 , we construct a nonparametric estimator fn (•) of f (•). At this step, we can use as fn (•) any estimator of f (•), which is pointwisely rate optimal. Finally, we take fn (z n ) as an estimator for f * .</p><p>To be specific, we consider as fn (•) a regularized local polynomial estimator defined in the same spirit as the estimator of the gradient (3). For λ m:n , h m:n &gt; 0, and z ∈ R d , we define θm:n</p><formula xml:id="formula_27">(z) = (B m:n (z) + λ m:n I) -1 D m:n (z), where B m:n (z) = 2 nh d m:n n 󰁛 i=m+1 U 󰀕 x i -z h m:n 󰀖 U ⊤ 󰀕 x i -z h m:n 󰀖 K 󰀕 x i -z h m:n 󰀖 ,<label>(7)</label></formula><formula xml:id="formula_28">D m:n (z) = 2 nh d m:n n 󰁛 i=m+1 y i U 󰀕 x i -z h m:n 󰀖 K 󰀕 x i -z h m:n 󰀖 . (<label>8</label></formula><formula xml:id="formula_29">)</formula><p>The regularized local polynomial estimator of function f at point z defined as</p><formula xml:id="formula_30">fn (z) = U ⊤ (0) θm:n (z). (<label>9</label></formula><formula xml:id="formula_31">)</formula><p>The minimum value estimator that we propose is outlined in Algorithm 2.</p><p>Algorithm 2: Estimating the Minimum Value <ref type="table">parts D 1</ref> and <ref type="table">D 2 .</ref> 2. Use Algorithm 1 to compute zm based on the subsample D 1 .</p><formula xml:id="formula_32">Requires Algorithm 1, kernel K : R d → R, parameters h m:n = n -1 2β+d , λ m:n = n -β 2β+d . 1. Split the data D in two equal</formula><p>3. Based on the second subsample D 2 , compute the estimator fn (z m ) = U ⊤ (0) θm:n (z m ).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Return fn (z m )</head><p>It is known from <ref type="bibr" target="#b34">(Stone, 1980)</ref> that the local polynomial estimator with no regularization, i.e., with λ m:n = 0, and with h m:n as in Algorithm 2 attains the minimax optimal rate of estimating the value of f at a fixed point in asymptotics as n → ∞. But for finite n this estimator is not necessarily well-defined. In the next theorem, we show that its properly regularized version attains the minimax pointwise rate for all sample sizes.</p><p>Theorem 7 Let Assumptions 1 -4 hold, and let fn be the estimator (9) with parameters h m:n and λ m:n as in Algorithm 2. Then</p><formula xml:id="formula_33">sup x∈Θ E 󰀗 󰀓 fn (x) -f (x) 󰀔 2 󰀘 ≤ An -2β 2β+d .</formula><p>Inspection of the proofs shows that the strong convexity assumption (Assumption 3 (iii)) is not needed in Theorem 7. We do not state it in the theorem since it has no incidence on the other results of the paper.</p><p>Using Theorems 6 and 7 we obtain the following bounds on the convergence rate of the estimator fn = fn (z m ) of the minimum value f * = f (x * ).</p><p>Theorem 8 Let Assumptions 1 -4 hold and let fn = fn (z m ) be the output of Algorithm 2. Then</p><formula xml:id="formula_34">E 󰀏 󰀏 󰀏 fn -f (x * ) 󰀏 󰀏 󰀏 ≤ A max 󰀃 1, α -1 󰀄 • 󰀻 󰀿 󰀽 (log(n)/n) 2 4+d if β = 2 , n -β 2β+d if β &gt; 2 , (10) Furthermore, for α ≥ n -β-2 2β+d log(n) 2(β-1) 2β+d we have E 󰀏 󰀏 󰀏 fn -f (x * ) 󰀏 󰀏 󰀏 ≤ An -β 2β+d . (<label>11</label></formula><formula xml:id="formula_35">)</formula><p>Proof Using conditioning on zm and the Cauchy-Schwarz inequality we get</p><formula xml:id="formula_36">E 󰀏 󰀏 󰀏 fn -f (x * ) 󰀏 󰀏 󰀏 ≤ E| fn (z m ) -f (z m )| + E|f (z m ) -f (x * )| = E 󰁫 E 󰀅 | fn (z m ) -f (z m )| 󰀏 󰀏 zm 󰀆 󰁬 + E|f (z m ) -f (x * )| ≤ E 󰀥 󰀕 E 󰀗 󰀓 fn (z m ) -f (z m ) 󰀔 2 |z m 󰀘󰀖 1 2 󰀦 + E|f (z m ) -f (x * )|.</formula><p>Recalling that fn (•) and zm are independent and applying Theorems 6 and 7 we deduce that</p><formula xml:id="formula_37">E 󰀏 󰀏 󰀏 fn -f (x * ) 󰀏 󰀏 󰀏 ≤ A 󰀕 n -β 2β+d + α -1 󰀕 log(n) n 󰀖 2(β-1) 2β+d 󰀖 ,<label>(12)</label></formula><p>which implies the bound (11) for α ≥ n</p><formula xml:id="formula_38">-β-2 2β+d log(n) 2(β-1)</formula><p>2β+d , and the bound (10).</p><p>Theorem 8 shows that estimation of f * = f (x * ) for smooth and strongly convex functions under passive design is realized with the same rate as function estimation at a fixed</p><formula xml:id="formula_39">point. If the condition α ≥ n -β-2 2β+d log(n) 2(β-1)</formula><p>2β+d is satisfied Theorem 8 and the lower bound (15) imply that the estimator fn attains the minimax optimal rate as function of both parameters n and α on the class F β,α (L). For β = 2 the above condition requires α to be big, namely, α ≥ log(n) 2 2β+d . Nevertheless, for β = 2 and α ≥ 1 the bounds ( <ref type="formula">10</ref>) and ( <ref type="formula" target="#formula_44">15</ref>) imply that fn is minimax optimal up to a logarithmic factor. Regarding the regime of small α,</p><formula xml:id="formula_40">where α &lt; n -β-2 2β+d log(n) 2(β-1)</formula><p>2β+d , we cannot claim that the optimality is achieved by fn with respect to both n and α. Indeed, in this regime, the lower bound (15) does not depend on α while the upper bound ( <ref type="formula" target="#formula_37">12</ref>) does. On the other hand, considering α &gt; 0 as fixed, the dependence of the convergence rate of fn on the sample size n cannot be improved in a minimax sense in all regimes (up to a logarithmic factor if β = 2) and it corresponds to the optimal rate of estimating a smooth function at a fixed point.</p><p>In the next section we show that the rate (n/ log n) -β/(2β+d) is minimax optimal for estimating the minimum value f * on the class of β-smooth regression functions without the strong convexity assumption. It coincides with the rate of function estimation in the supremum norm. Thus, the strong convexity allows us to reduce the global function reconstruction problem to a simpler, fixed point estimation leading to the rates without an extra logarithmic factor. Note also that f * cannot be estimated better than with the rate n -β/(2β+d) even in the oracle setting where the unknown minimizer x * is revealed. Indeed, in this case we still need to estimate the value of function f at point x * .</p><p>Notice that, for β &gt; 2, the convergence rate of Algorithm 1 used at the first stage to estimate the minimizer x * is more than needed to obtain (10). To achieve the minimax optimal rate for f * it suffices to estimate x * at a slower rate, namely, n -β/(2β+d) for the optimization risk. Therefore, it is not necessary to take the estimator zm at the first stage. It can be replaced by some suboptimal estimators. This could be beneficial since suboptimal algorithms may be computationally less costly.</p><p>Finally, observe that much faster rate can be obtained in the active design setting, see Table <ref type="table">1</ref>. Specifically, f * can be estimated with the parametric rate Cn -1/2 where C &gt; 0 is a constant independent of the dimension d and smoothness β for any β &gt; 2 and all n large enough <ref type="bibr" target="#b0">(Akhavan et al., 2020)</ref>. Clearly, the rate n -1/2 cannot be improved even in the oracle setting where the unknown minimizer x * is revealed and one makes all queries at point x * .</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="5.">Lower bounds</head><p>The following theorem provides lower bounds for the minimax risks of arbitrary estimators on the class F β,α (L). Let w(•) be a monotone non-decreasing function on [0, ∞) such that w(0) = 0 and w ∕ ≡ 0.</p><p>Theorem 9 Let x 1 , . . . , x n be i.i.d. random vectors with a bounded Lebesgue density on R d . Assume that the random variables ξ i are i.i.d. having a density p ξ (•) with respect to the Lebesgue measure on R such that</p><formula xml:id="formula_41">∃I * &gt; 0, v 0 &gt; 0 : 󰁝 󰀕 󰁴 p ξ (u) - 󰁴 p ξ (u + v) 󰀖 2 du ≤ I * v 2 , (<label>13</label></formula><formula xml:id="formula_42">)</formula><p>for |v| ≤ v 0 , and (ξ 1 , . . . , ξ n ) is independent of (x 1 , . . . , x n ). Then, for any α, L &gt; 0, β ≥ 2, we have inf</p><formula xml:id="formula_43">xn sup f ∈F β,α (L) E f w 󰀓 max 󰀓 αn β-1 2β+d , n 1 2β+d 󰀔 󰀂x n -x * 󰀂 󰀔 ≥ c 1 ,<label>(14)</label></formula><p>and inf</p><formula xml:id="formula_44">Tn sup f ∈F β,α (L) E f w(n β 2β+d |T n -f * |) ≥ c ′ 1 ,<label>(15)</label></formula><p>where inf xn and inf Tn denote the infimum over all estimators of the minimizer and over all estimators of the minimum value of f , respectively, and c 1 &gt; 0, c ′ 1 &gt; 0 are constants that depend only on β, L, d, Θ, I * , v 0 , and w(•). Furthemore,</p><formula xml:id="formula_45">inf xn sup f ∈F β,α (L) E f [f (x n ) -f * ] ≥ c 2 min 󰀓 α -1 n - 2(β-1) 2β+d , αn -2 2β+d 󰀔 , (<label>16</label></formula><formula xml:id="formula_46">)</formula><p>where c 2 &gt; 0 is a constant that depends only on β, L, d, Θ, I * , v 0 .</p><p>Condition ( <ref type="formula" target="#formula_41">13</ref>) is rather general. It is satisfied, for example, for the Gaussian distribution and also for a large class of regular densities, cf. <ref type="bibr">Ibragimov and Has'minskii (1981)</ref>. The instance of the lower bound ( <ref type="formula" target="#formula_43">14</ref>) with α ≍ 1 was proved in Tsybakov (1990b) under a more restrictive condition on the density p ξ . In ( <ref type="formula" target="#formula_43">14</ref>), we extend this result by deriving the dependence of the lower bound on the parameter α, which reveals two non-asymptotic regimes. This is also reflected in ( <ref type="formula" target="#formula_45">16</ref>), which is a direct consequence of ( <ref type="formula" target="#formula_43">14</ref>).</p><p>The proof of Theorem 9 is given in Section 7.3. It is based on a reduction to the problem of testing two hypotheses for ( <ref type="formula" target="#formula_43">14</ref>) and two fuzzy hypotheses for (15) (cf. Tsybakov ( <ref type="formula">2009</ref>)).</p><p>Combining the bound (14) with w(u) = u 2 and Theorem 5 we conclude that the estimator z n achieves the minimax optimal rate up to a logarithmic factor for estimating x * under the squared risk on the class of functions 2β+d) . Similar conclusion holds true for the optimization risk, see the comment after Theorem 6, and for the estimation of the minimum value f * , see the comment after Theorem 8.</p><formula xml:id="formula_47">F β,α (L) if α ≥ n -(β-2)/(</formula><p>It is interesting to compare our results about estimation of f * with the setting where f is not strongly convex. To this end, we provide a minimax lower bound on estimation of f * over the class of β-Hölder functions F β (L).</p><p>Theorem 10 Let x 1 , . . . , x n be i.i.d. random vectors with a bounded Lebesgue density on R d . Let ξ i 's be i.i.d. Gaussian random variables with zero mean and variance σ 2 and let (ξ 1 , . . . , ξ n ) be independent of (x 1 , . . . , x n ). Assume that Θ contains an open subset of R d . Then, for any β &gt; 0, L &gt; 0, we have</p><formula xml:id="formula_48">inf Tn sup f ∈F β (L) E f w 󰀓 󰀕 n log n 󰀖 β 2β+d |T n -f * | 󰀔 ≥ c 3 ,<label>(17)</label></formula><p>where inf Tn denotes the infimum over all estimators of the minimum value of f and c 3 &gt; 0 is a constant that depends only on β, α, d, L, Θ, σ 2 , and w(•).</p><p>Theorem 10 implies that</p><formula xml:id="formula_49">󰀓 n log n 󰀔 -β</formula><p>2β+d is the minimax rate of estimating the minimum value f * on the class F β (L). Indeed, the matching upper bound with the rate</p><formula xml:id="formula_50">󰀓 n log n 󰀔 -β 2β+d is</formula><p>obtained in a trivial way if we estimate f * by the minimum of any rate optimal (in supremum norm) nonparametric estimator of f , for example, by the local polynomial estimator as in <ref type="bibr" target="#b35">Stone (1982)</ref>. Thus, if we drop the assumption of strong convexity, the minimax rate deteriorates only by a logarithmic factor. It suggests that strong convexity is not a crucial advantage in estimation of the minimum value of a function under the passive design.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="6.">Conclusion</head><p>In this paper, we considered the problem of estimating the minimizer and the minimum value of a regression function from i.i.d data with a focus on highly smooth and strongly convex regression functions. We provide upper bounds for the proposed algorithms and minimax lower bounds for all estimators. We show that the minimax optimal rates of estimating the minimizer are the same as for estimating the gradient of the regression function while for the minimum value they are the same as for estimation of a regression function at a fixed point. To estimate the minimum value, we propose a two-stage procedure, where we first estimate the location of the minimum, and then the function value at the estimated location. We show that this two-stage procedure achieves minimax optimal rates of convergence.</p><p>An interesting open question is to make our algorithms adaptive to the unknown smoothness β and to the strong convexity parameter α. Adaptation to β needs developing a datadriven choice of the smoothing parameter h and of the regularization parameter λ. Optimal rates for estimation of the minimum value f * under adaptation to β are presumably slower by a logarithmic factor than the rates that we established in the setting with known β.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7.">Proofs</head><p>In this section, we provide the proofs of Theorems 5 -7, 9 and 10. Section 7.1 is devoted to the proofs of Theorems 5 and 6 on the upper bounds for Algorithm 1. Section 7.2 provides the proof of Theorem 7 on the behavior of regularized local polynomial estimator. In Sections 7.3 and 7.4, we prove the results on the lower bounds (Theorems 9 and 10, respectively).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7.1">Proof of Theorem 5</head><p>We will use the following notation. For any k ∈ [n], and i ∈</p><formula xml:id="formula_51">[k], let R i,k (x) = U 󰀕 x i -x h k 󰀖 K 󰀕 x i -x h k 󰀖 ,</formula><p>and</p><formula xml:id="formula_52">C k (x) = 1 kh d k k 󰁛 i=1 R i,k (x)f (x i ), G k (x) = 1 kh d k k 󰁛 i=1 R i,k (x)ξ i , E k (x) = E[B k (x)]. Note that D k (x) = C k (x) + G k (x).</formula><p>We first prove some preliminary lemmas. The following lemma provides an upper bound on the bias of g k,λ k .</p><p>Lemma 11 For k ∈ [n], let g k,λ k be defined by Algorithm 1. Let Assumptions 1 -4 hold. Then</p><formula xml:id="formula_53">sup x∈Θ 󰀐 󰀐 E[g k,λ k (x)] -∇f (x) 󰀐 󰀐 ≤ A 󰀕 log(k + 1) k 󰀖 β-1 2β+d . (<label>18</label></formula><formula xml:id="formula_54">)</formula><p>Proof By Lemma 17(ii), matrix E k (x) is positive definite for all x ∈ Θ. Fix x ∈ Θ and introduce the notation</p><formula xml:id="formula_55">φ k = g k,λ k (x) -h -1 k 󰀃 AE k (x) -1 B k (x)c h k (f, x) 󰀄 ,<label>where</label></formula><formula xml:id="formula_56">c h (f, x) = 󰀓 h |m (1) | D m (1) f (x), . . . , h |m (S) | D m (S) f (x) 󰀔 ⊤ for h &gt; 0. Noticing that E 󰀅 h -1 k AE k (x) -1 B k (x)c h k (f, x) 󰀆 = h -1 k Ac h k (f, x) = ∇f (x)</formula><p>we get</p><formula xml:id="formula_57">E [φ k ] = E 󰀅 g k,λ k (x) 󰀆 -∇f (x).</formula><p>Thus, to conclude the proof we need to bound 󰀂E [φ k ]󰀂 from above. Define</p><formula xml:id="formula_58">ψ 1,k = h -1 k 󰀃 AE k (x) -1 C k (x) 󰀄 , ψ 2,k = h -1 k 󰀃 A(E k (x) + λ k I) -1 C k (x) 󰀄 .</formula><p>We have</p><formula xml:id="formula_59">󰀂E[φ k ]󰀂 ≤ 󰀐 󰀐 E[ψ 1,k -h -1 k 󰀃 AE k (x) -1 B k (x)c k (f, x) 󰀄 ] 󰀐 󰀐 󰁿 󰁾󰁽 󰂀 term I + 󰀐 󰀐 E[ψ 2,k -ψ 1,k ] 󰀐 󰀐 󰁿 󰁾󰁽 󰂀 term II + 󰀐 󰀐 E[g k,λ k (x) -ψ 2,k ] 󰀐 󰀐 󰁿 󰁾󰁽 󰂀 term III</formula><p>.</p><p>We now establish upper bounds for each of the three terms in the above expression. We have</p><formula xml:id="formula_60">term I = h -1 k 󰀐 󰀐 󰀐 󰀐 󰀐 AE k (x) -1 E 󰀥 1 kh d k k 󰁛 i=1 R i,k (x) 󰀕 f (x i ) -U ⊤ 󰀕 x i -x h k 󰀖 c h k (f, x) 󰀖 󰀦󰀐 󰀐 󰀐 󰀐 󰀐 ≤ h -1 k 󰀐 󰀐 AE k (x) -1 󰀐 󰀐 op 󰀐 󰀐 󰀐 󰀐 󰀐 E 󰀥 1 kh d k k 󰁛 i=1 R i,k (x) 󰀕 f (x i ) -U ⊤ 󰀕 x i -x h k 󰀖 c h k (f, x) 󰀖 󰀦󰀐 󰀐 󰀐 󰀐 󰀐 .</formula><p>By Lemma 17(ii) and the fact that 󰀂A󰀂 op ≤ 1 we have</p><formula xml:id="formula_61">󰀐 󰀐 AE k (x) -1 󰀐 󰀐 op ≤ λ -1 min . Therefore, term I ≤ h -1 k λ -1 min 󰀣 1 kh d k k 󰁛 i=1 E 󰀗󰀐 󰀐 󰀐 󰀐 R i,k (x) 󰀕 f (x i ) -U ⊤ 󰀕 x i -x h k 󰀖 c h k (f, x) 󰀖󰀐 󰀐 󰀐 󰀐 󰀘 󰀤 . Since by Assumption 3(ii), f ∈ F β (L) for any i ∈ [k] we have |f (x i ) -U ⊤ 󰀕 x i -x h k 󰀖 c h k (f, x)| ≤ L 󰀂x -x i 󰀂 β , so that term I ≤ Lh -1 k λ -1 min 󰀣 1 kh d k k 󰁛 i=1 E 󰁫 󰀂R i,k (x)󰀂 󰀂x -x i 󰀂 β 󰁬 󰀤 = Lh -d-1 k λ -1 min 󰁝 R d 󰀂x -u󰀂 β 󰀐 󰀐 󰀐 󰀐 U 󰀕 u -x h k 󰀖 K 󰀕 u -x h k 󰀖󰀐 󰀐 󰀐 󰀐 p(u) du = Lh β-1 k λ -1 min 󰁝 R d 󰀂w󰀂 β 󰀂U (w)K(w)󰀂 p(x + h k w) dw ≤ Ah β-1 k . (<label>19</label></formula><formula xml:id="formula_62">) Next, term II = h -1 k 󰀐 󰀐 󰀐A 󰀓 (E k (x) + λ k I) -1 -E k (x) -1 󰀔 E [C k (x)] 󰀐 󰀐 󰀐 ≤ h -1 k λ k 󰀂A󰀂 op 󰀐 󰀐 E k (x) -1 󰀐 󰀐 op 󰀐 󰀐 󰀐(E k (x) + λ k I) -1 󰀐 󰀐 󰀐 op E [󰀂C k (x)󰀂] .</formula><p>By Assumption 3(iv), we have sup x∈Θ ′ |f (x)| ≤ M . Using this inequality and Lemma 17(i) we get</p><formula xml:id="formula_63">sup x∈Θ E [󰀂C k (x)󰀂] ≤ M p max ν 1 . (20) Moreover, Lemma 17(ii) implies that 󰀐 󰀐 E k (x) -1 󰀐 󰀐 op 󰀐 󰀐 󰀐(E k (x) + λ k I) -1 󰀐 󰀐 󰀐 op ≤ λ -2 min . Therefore, term II ≤ Ah -1 k λ k .<label>(21)</label></formula><p>Finally, we bound term III. Using Assumption 2 it is easy to see that</p><formula xml:id="formula_64">E[g k,λ k (x)] = E 󰀅 h -1 k AB k,λ k (x) -1 C k (x) 󰀆 . (<label>22</label></formula><formula xml:id="formula_65">)</formula><p>Taking into account ( <ref type="formula" target="#formula_64">22</ref>) and the fact that</p><formula xml:id="formula_66">E k (x) + λ k I = E[B k,λ k (x)] we obtain term III ≤ h -1 k 󰀐 󰀐 󰀐 󰀐 E 󰀗 A 󰀓 B k,λ k (x) -1 -(E[B k,λ k (x)]) -1 󰀔 (C k (x) -E [C k (x)]) 󰀘󰀐 󰀐 󰀐 󰀐 + h -1 k 󰀐 󰀐 󰀐 󰀐 E 󰀗 A 󰀓 B k,λ k (x) -1 -(E[B k,λ k (x)]) -1 󰀔 E [C k (x)] 󰀘󰀐 󰀐 󰀐 󰀐 ≤ h -1 k E 󰀗 󰀐 󰀐 󰀐B k,λ k (x) -1 -(E[B k,λ k (x)]) -1 󰀐 󰀐 󰀐 op 󰀂C k (x) -E [C k (x)]󰀂 󰀘 + h -1 k E 󰀗 󰀐 󰀐 󰀐B k,λ k (x) -1 -(E[B k,λ k (x)]) -1 󰀐 󰀐 󰀐 op 󰀘 sup x∈Θ E [󰀂C k (x)󰀂] .</formula><p>Using Lemma 24 and (20) we find:</p><formula xml:id="formula_67">term III ≤ A 󰀕 k -1 h -d-1 k + h -1 k E 󰀗 󰀐 󰀐 󰀐B k,λ k (x) -1 -(E[B k,λ k (x)]) -1 󰀐 󰀐 󰀐 op 󰀘󰀖 .</formula><p>This and Lemma 18 yield</p><formula xml:id="formula_68">term III ≤ A 󰀕 k -1 h -d-1 k + k -1 2 h -d 2 -1 k 󰀖 ≤ Ak -1 2 h -d 2 -1 k . (<label>23</label></formula><formula xml:id="formula_69">)</formula><p>Combining ( <ref type="formula" target="#formula_61">19</ref>), ( <ref type="formula" target="#formula_63">21</ref>) and ( <ref type="formula" target="#formula_68">23</ref>) we obtain</p><formula xml:id="formula_70">󰀐 󰀐 E[g k,λ k (x)] -∇f (x) 󰀐 󰀐 ≤ A 󰀕 h β-1 k + h -1 k λ k + h -1-d 2 k k -1 2 󰀖 . Since h k = 󰀓 log(k+1) k 󰀔 1 2β+d and λ k = 󰀓 log(k+1) k</formula><p>󰀔 β 2β+d this inequality implies the result of the lemma.</p><p>The next lemma provides a bound on the stochastic component of the error uniformly over Θ.</p><p>Lemma 12 Let g k,λ k be defined by Algorithm 1, and let Assumptions 1 -4 hold. Then</p><formula xml:id="formula_71">E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) -E 󰀅 g k,λ k (x) 󰀆󰀐 󰀐 2 󰀘 ≤ A 󰀕 log(k + 1) k 󰀖 2(β-1) 2β+d . Proof Recalling that D k (x) = C k (x) + G k (x), where C k (x) = 1 kh d k 󰁓 k i=1 R i,k (x)f (x i ), G k (x) = 1 kh d k 󰁓 k i=1 R i,k<label>(x</label></formula><p>)ξ i , and taking into account ( <ref type="formula" target="#formula_64">22</ref>) we obtain</p><formula xml:id="formula_72">E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) -E 󰀅 g k,λ k (x) 󰀆󰀐 󰀐 2 󰀘 ≤ 2h -2 k E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐AB k,λ k (x) -1 G k (x) 󰀐 󰀐 󰀐 2 󰀘 󰁿 󰁾󰁽 󰂀 term I + 2h -2 k E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐AB k,λ k (x) -1 C k (x) -E 󰁫 AB k,λ k (x) -1 C k (x) 󰁬󰀐 󰀐 󰀐 2 󰀘 󰁿 󰁾󰁽 󰂀 term II . (<label>24</label></formula><formula xml:id="formula_73">)</formula><p>Recalling that 󰀂A󰀂 op ≤ 1 and using the Cauchy-Schwarz inequality and Lemmas 20 and 21 we get</p><formula xml:id="formula_74">term I ≤ 󰀕 E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 E 󰀗 sup x∈Θ 󰀂G k (x)󰀂 4 󰀘󰀖 1 2 ≤ Ak -1 h -d k log(k + 1). (<label>25</label></formula><formula xml:id="formula_75">)</formula><p>Next, using again the Cauchy-Schwarz inequality we obtain</p><formula xml:id="formula_76">term II ≤ 3E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 (C k (x) -E [C k (x)]) 󰀐 󰀐 󰀐 2 󰀘 + 3E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐 󰀓 B k,λ k (x) -1 -(E [B k,λ k (x)]) -1 󰀔 E [C k (x)] 󰀐 󰀐 󰀐 2 󰀘 + 3 sup x∈Θ 󰀐 󰀐 󰀐E 󰁫󰀓 (E [B k,λ k (x)]) -1 -B k,λ k (x) -1 󰀔 C k (x) 󰁬󰀐 󰀐 󰀐 2 ≤ 3E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 (C k (x) -E [C k (x)]) 󰀐 󰀐 󰀐 2 󰀘 + 3E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 -(E [B k,λ k (x)]) -1 󰀐 󰀐 󰀐 2 op sup x∈Θ 󰀂E [C k (x)]󰀂 2 󰀘 + 3 sup x∈Θ E 󰀗 󰀐 󰀐 󰀐(E [B k,λ k (x)]) -1 -B k,λ k (x) -1 󰀐 󰀐 󰀐 2 op 󰀘 E[󰀂C k (x)󰀂 2 ] ≤ 3 E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 (C k (x) -E [C k (x)]) 󰀐 󰀐 󰀐 2 󰀘 󰁿 󰁾󰁽 󰂀 term III + 6 E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 -(E [B k,λ k (x)]) -1 󰀐 󰀐 󰀐 2 op 󰀘 sup x∈Θ E 󰁫 󰀂C k (x)󰀂 2 󰁬 󰁿 󰁾󰁽 󰂀 term IV .<label>(26)</label></formula><p>The Cauchy-Schwarz inequality and Lemmas 20 and 23 imply:</p><formula xml:id="formula_77">term III ≤ 󰀕 E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ k (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 E 󰀗 sup x∈Θ 󰀂C k (x) -E [C k (x)]󰀂 4 󰀘󰀖 1 2 ≤ Ak -1 h -d k log (k + 1</formula><p>) . Moreover, again by the Cauchy-Schwarz inequality, (66) and Lemma 20 we get</p><formula xml:id="formula_78">term IV ≤ Ak -1 h -d k log (k + 1) . Thus, term II ≤ Ak -1 h -d k log(k + 1). (<label>27</label></formula><formula xml:id="formula_79">)</formula><p>We conclude the proof by combining ( <ref type="formula" target="#formula_72">24</ref>) -( <ref type="formula" target="#formula_78">27</ref>) and using the fact that</p><formula xml:id="formula_80">h k = 󰀓 log(k+1) k 󰀔 1 2β+d .</formula><p>Lemma 13 Let g k,λ k be defined by Algorithm 1, and let Assumptions 1 -4 hold. Then</p><formula xml:id="formula_81">E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) -∇f (x)] 󰀐 󰀐 2 󰀘 ≤ A 󰀕 log(k + 1) k 󰀖 2(β-1) 2β+d ,<label>(28)</label></formula><p>and</p><formula xml:id="formula_82">E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) 󰀐 󰀐 2 󰀘 ≤ A. (<label>29</label></formula><formula xml:id="formula_83">)</formula><p>Proof The bound ( <ref type="formula" target="#formula_81">28</ref>) is immediate in view of Lemmas 11 and 12. Next, note that, since f is uniformly bounded by M on Θ and f ∈ F β (L), the value sup x∈Θ 󰀂∇f (x)󰀂 is bounded by a constant depending only on M , L, d and β. This fact and ( <ref type="formula" target="#formula_81">28</ref>) imply ( <ref type="formula" target="#formula_82">29</ref>).</p><p>Proof of Theorem 5. By the definition of Algorithm 1 and the contracting property of the Euclidean projection, for any k ∈ [n] we have</p><formula xml:id="formula_84">E[󰀂z k+1 -x * 󰀂 2 |z k ] ≤ 󰀂z k -x * 󰀂 2 - 4 αk (z k -x * ) ⊤ E 󰀅 g k,λ k (z k )|z k 󰀆 + 4 α 2 k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬 .</formula><p>We further obtain</p><formula xml:id="formula_85">E[a k+1 |z k ] ≤ a k - 4 αk (z k -x * ) ⊤ ∇f (z k ) + 4 αk 󰀂z k -x * 󰀂 󰀐 󰀐 E[g k,λ k (z k )|z k ] -∇f (z k ) 󰀐 󰀐 + 4 α 2 k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬 ,<label>(30)</label></formula><p>where a k = 󰀂z k -x * 󰀂 2 . Since f is an α-strongly convex function we have</p><formula xml:id="formula_86">αa k ≤ (z k -x * ) ⊤ ∇f (z k ) .<label>(31)</label></formula><p>Combining ( <ref type="formula" target="#formula_85">30</ref>) and ( <ref type="formula" target="#formula_86">31</ref>) yields</p><formula xml:id="formula_87">E[a k+1 |z k ] ≤ 󰀕 1 - 4 k 󰀖 a k + 4 αk 󰀂z k -x * 󰀂 󰀐 󰀐 E[g k,λ k (z k )|z k ] -∇f (z k ) 󰀐 󰀐 + 4 α 2 k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬 .<label>(32)</label></formula><p>Since 2ab ≤ γa 2 + b 2 γ for any a, b ∈ R and γ &gt; 0 we deduce, with γ = 3α/2, that</p><formula xml:id="formula_88">󰀂z k -x * 󰀂 󰀐 󰀐 E[g k,λ k (z k )|z k ] -∇f (z k ) 󰀐 󰀐 ≤ 3α 4 a k + 1 3α 󰀐 󰀐 E[g k,λ k (z k )|z k ] -∇f (z k ) 󰀐 󰀐 2 ≤ 3α 4 a k + 1 3α E[ 󰀐 󰀐 g k,λ k (z k ) -∇f (z k ) 󰀐 󰀐 2 |z k ]. (<label>33</label></formula><formula xml:id="formula_89">)</formula><p>Using this inequality in (32) and taking the expectations yields</p><formula xml:id="formula_90">r k+1 ≤ 󰀕 1 - 1 k 󰀖 r k + 4 3α 2 k E 󰁫 󰀐 󰀐 g k,λ k (z k ) -∇f (z k ) 󰀐 󰀐 2 󰁬 + 4 α 2 k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 󰁬 ≤ 󰀕 1 - 1 k 󰀖 r k + 4 3α 2 k E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) -∇f (x) 󰀐 󰀐 2 󰀘 + 4 α 2 k 2 E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) 󰀐 󰀐 2 󰀘 , where r k = E[a k ]</formula><p>. By invoking Lemma 13 we deduce that</p><formula xml:id="formula_91">r k+1 ≤ 󰀕 1 - 1 k 󰀖 r k + Ak -1- 2(β-1) 2β+d log(k + 1) 2(β-1) 2β+d α -2 .</formula><p>Finally, applying Lemma 25 with b k = r k log(k)</p><formula xml:id="formula_92">- 2(β-1)</formula><p>2β+d we obtain the following bound that concludes the proof:</p><formula xml:id="formula_93">E[󰀂z n -x * 󰀂 2 ] ≤ A 󰀓 (diam(Θ)) 2 n + n - 2(β-1) 2β+d α -2 󰀔 log(n) 2(β-1) 2β+d ,</formula><p>where diam(Θ) = sup x,y∈Θ 󰀂x -y󰀂 and we used the fact that log(n + 1) ≤ 2 log(n) for n ≥ 2.</p><p>Proof of Theorem 6. The definition of Algorithm 1 implies the inequality</p><formula xml:id="formula_94">󰀂z k+1 -x * 󰀂 2 ≤ 󰀐 󰀐 z k -η k g k,λ k (z k ) -x * 󰀐 󰀐 2 . Therefore, 〈g k,λ k (z k ), z k -x * 〉 ≤ 󰀂z k -x * 󰀂 2 -󰀂z k+1 -x * 󰀂 2 2η k + η k 2 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 . (<label>34</label></formula><formula xml:id="formula_95">)</formula><p>On the other hand, by Assumption 3(iii) we have</p><formula xml:id="formula_96">f (z k ) -f * ≤ (z k -x * ) ⊤ ∇f (z k ) - α 2 󰀂z k -x * 󰀂 2 . (<label>35</label></formula><formula xml:id="formula_97">)</formula><p>Combining ( <ref type="formula" target="#formula_94">34</ref>) and ( <ref type="formula" target="#formula_96">35</ref>) gives</p><formula xml:id="formula_98">E [f (z k ) -f * |z k ] ≤ 󰀐 󰀐 E 󰀅 g k,λ k (z k )|z k 󰀆 -∇f (z k ) 󰀐 󰀐 󰀂z k -x * 󰀂 + 1 2η k E [a k -a k+1 |z k ] + η k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬 - α 2 a k ,</formula><p>where a k = 󰀂z k -x * 󰀂 2 . Acting as in ( <ref type="formula" target="#formula_88">33</ref>) but now with γ = α/2 we find</p><formula xml:id="formula_99">E [f (z k ) -f * |z k ] ≤ 1 α E 󰁫 󰀐 󰀐 g k,λ k (z k ) -∇f (z k ) 󰀐 󰀐 2 |z k 󰁬 + 1 2η k E [a k -a k+1 |z k ] + η k 2 E 󰁫 󰀐 󰀐 g k,λ k (z k ) 󰀐 󰀐 2 |z k 󰁬 - α 4 a k .</formula><p>Taking the expectations of both sides of this inequality and recalling the notation</p><formula xml:id="formula_100">r k = E [a k ] we obtain E [f (z k ) -f * ] ≤ 1 α E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) -∇f (x) 󰀐 󰀐 2 󰀘 + 1 2η k (r k -r k+1 ) + η k 2 E 󰀗 sup x∈Θ 󰀐 󰀐 g k,λ k (x) 󰀐 󰀐 2 󰀘 - α 4 r k .</formula><p>Lemma 13 and the fact that η k = 2 αk further imply</p><formula xml:id="formula_101">E [f (z k ) -f * ] ≤ αk 4 (r k -r k+1 ) - α 4 r k + A 󰀕 log(k + 1) k 󰀖 2(β-1) 2β+d α -1 .</formula><p>Summing both sides of this inequality from 1 to n yields</p><formula xml:id="formula_102">n 󰁛 k=1 E [f (z k ) -f * ] ≤ An 2+d 2β+d log(n) 2(β-1) 2β+d α -1 ,</formula><p>where we used the inequalities</p><formula xml:id="formula_103">󰁓 n k=1 k - 2(β-1) 2β+d ≤ 2β+d 2+d n 2+d 2β+d</formula><p>, and log(n + 1) ≤ 2 log(n) for n ≥ 2. We conclude the proof by using the convexity of f and Jensen's inequality.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7.2">Proof of Theorem 7</head><p>Theorem 7 is an immediate consequence of the bounds on the bias and variance of the regularized local polynomial estimator f n in Lemmas 14 and 15 below. In the proofs of these lemmas, we will write for brevity h = h m:n and λ = λ m:n . We will use the following notation:</p><formula xml:id="formula_104">R k (x) = U 󰀕 x k -x h 󰀖 K 󰀕 x k -x h 󰀖 , B m:n,λ (x) = B m:n (x) + λI, C m:n (x) = 2 nh d n 󰁛 k=m+1 R k (x)f (x k ), G m:n (x) = 2 nh d n 󰁛 k=m+1 R k (x)ξ k .</formula><p>The proofs will use the fact that Lemmas 18 and 23 apply not only to the vector C k (x) and matrix B k,λ (x) but also quite analogously to C m:n (x) and B m:n,λ (x), so that under the assumptions of Theorem 7 we have</p><formula xml:id="formula_105">sup x∈Θ E 󰀗 󰀐 󰀐 󰀐B m:n,λ (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 ≤ Aλ -4 min ,<label>(36)</label></formula><p>sup</p><formula xml:id="formula_106">x∈Θ E 󰁫 󰀐 󰀐 B m:n,λ (x) -1 -(E[B m:n,λ (x)]) -1 󰀐 󰀐 2 op 󰁬 ≤ Ah -d n -1 . (<label>37</label></formula><formula xml:id="formula_107">) sup x∈Θ E 󰁫 󰀂C m:n (x) -E [C m:n (x)]󰀂 4 󰁬 ≤ Ah -2d n -2 (38) and sup x∈Θ E 󰁫 󰀂C m:n (x))󰀂 4 󰁬 ≤ A. (<label>39</label></formula><formula xml:id="formula_108">)</formula><p>The following lemma establishes a bound on the bias of f n .</p><p>Lemma 14 Under Assumptions 1 -4 we have</p><formula xml:id="formula_109">sup x∈Θ |E [f n (x)] -f (x)| ≤ An -β 2β+d . Proof Set E m:n (x) = E[B m:n (x)]. It follows from Lemma 17(ii) that matrix E m:n (x) is positive definite for all x ∈ Θ and sup x∈Θ 󰀐 󰀐 E m:n (x) -1 󰀐 󰀐 op ≤ λ -1 min , sup x∈Θ 󰀐 󰀐 (E [B m:n,λ (x)]) -1 󰀐 󰀐 op ≤ λ -1 min . (40) Fix x ∈ Θ and introduce the notation φn = f n (x) -U ⊤ (0)E m:n (x) -1 B m:n (x)c h (f, x),</formula><p>where c h (f, x) is defined in the proof of Lemma 11. Using the fact that</p><formula xml:id="formula_110">E[U ⊤ (0)E m:n (x) -1 B m:n (x)c h (f, x)] = U ⊤ (0)c h (f, x) = f (x) (41)</formula><p>we have</p><formula xml:id="formula_111">E 󰀅 φn 󰀆 = E [f n (x)] -f (x).</formula><p>Thus, we need to control</p><formula xml:id="formula_112">|E 󰀅 φn 󰀆 |. Introduce the notation ψ1,n = U ⊤ (0)E m:n (x) -1 C m:n (x), ψ2,n = U ⊤ (0) (E m:n (x) + λI) -1 C m:n (x).</formula><p>We have</p><formula xml:id="formula_113">|E[ φn ]| ≤ |E[ ψ1,n -U ⊤ (0)E m:n (x) -1 B m:n (x)c h (f, x)]| 󰁿 󰁾󰁽 󰂀 term I + |E[ ψ2,n -ψ1,n ]| 󰁿 󰁾󰁽 󰂀 term II + |E[f n (x) -ψ2,n ]| 󰁿 󰁾󰁽 󰂀 term III</formula><p>.</p><p>Using the fact that 󰀂U (0)󰀂 = 1 the analysis of the three terms in this expression follows the same lines as the analysis of analogous terms in the proof of Lemma 11. The only essential difference is that factor h -1 is now dropped. Thus, we get term I ≤ Ah β .</p><p>The terms II and III are also evaluated in the same way as in Lemma 11 (but with no h -1 factor) by applying ( <ref type="formula" target="#formula_105">36</ref>) -( <ref type="formula" target="#formula_107">39</ref>) instead of the analogous bounds from Lemmas 18 and 22. This yields term II ≤ Aλ and term III ≤ Ah -d 2 n -1 2 .</p><p>Therefore,</p><formula xml:id="formula_114">|E[ φn ]| ≤ A 󰀓 h β + λ + h -d 2 n -1 2 󰀔 . Since h = n -1 2β+d and λ = n -β</formula><p>2β+d the lemma follows.</p><p>The next lemma establishes a bound on the variance of the regularized local polynomial estimator f n .</p><p>Lemma 15 Under Assumptions 1 -4 we have</p><formula xml:id="formula_115">sup x∈Θ E 󰁫 (f n (x) -E [f n (x)]) 2 󰁬 ≤ An -2β 2β+d .</formula><p>Proof Since D m:n (x) = G m:n (x) + C m:n (x) then, taking into account the facts that 󰀂U (0)󰀂 = 1 and</p><formula xml:id="formula_116">E [f n (x)] = E 󰁫 U ⊤ (0)B m:n,λ (x) -1 C m:n (x) 󰁬 (<label>42</label></formula><formula xml:id="formula_117">)</formula><p>we obtain</p><formula xml:id="formula_118">E[(f n (x) -E [f n (x)]) 2 ] ≤ 2 E 󰁫 󰀐 󰀐 B m:n,λ (x) -1 G m:n (x) 󰀐 󰀐 2 󰁬 󰁿 󰁾󰁽 󰂀 term I + 2 E 󰁫 󰀐 󰀐 B m:n,λ (x) -1 C m:n (x) -E 󰀅 B m:n,λ (x) -1 C m:n (x) 󰀆󰀐 󰀐 2 󰁬 󰁿 󰁾󰁽 󰂀 term II</formula><p>.</p><p>Using Assumption 2 we get</p><formula xml:id="formula_119">term I ≤ A E 󰀥 󰀐 󰀐 B m:n,λ (x) -1 󰀐 󰀐 2 op 󰀣 n -2 h -2d n 󰁛 k=m+1 󰀂R k (x)󰀂 2 󰀤󰀦 .</formula><p>Applying the Cauchy-Schwarz inequality and ( <ref type="formula" target="#formula_105">36</ref>) we find that</p><formula xml:id="formula_120">term I ≤ A 󰀳 󰁃 E 󰁫 󰀂B m:n,λ (x)]󰀂 -4 op 󰁬 E 󰀵 󰀷 󰀣 n -2 h -2d n 󰁛 k=m+1 󰀂R k (x)󰀂 2 󰀤 2 󰀶 󰀸 󰀴 󰁄 1 2 ≤ Aλ -2 min 󰀳 󰁃 E 󰀵 󰀷 󰀣 n -2 h -2d n 󰁛 k=m+1 󰀂R k (x)󰀂 2 󰀤 2 󰀶 󰀸 󰀴 󰁄 1 2 ≤ An -2 h -2d 󰀕 n 󰁛 k=m+1 E[󰀂R k (x)󰀂 4 ] + n 󰁛 j,k=m+1,j∕ =k E[󰀂R j (x)󰀂 2 ]E[󰀂R k (x)󰀂 2 ] 󰀖 1 2 ≤ An -2 h -2d (nh d + n 2 h 2d ) 1/2 ≤ An -2β 2β+d ,</formula><p>where in the last line we have used Lemma 17(i) and the fact that h = n -1 2β+d . Next, arguing analogously to (26) we get</p><formula xml:id="formula_121">term II ≤ 3 E 󰀗 󰀐 󰀐 󰀐B m:n,λ (x) -1 (C m:n (x) -E [C m:n (x)]) 󰀐 󰀐 󰀐 2 󰀘 + 6 E 󰀗 󰀐 󰀐 󰀐B m:n,λ (x) -1 -(E [B m:n,λ (x)]) -1 󰀐 󰀐 󰀐 2 op 󰀘 E 󰁫 󰀂C m:n (x)󰀂 2 󰁬 ≤ 3 󰀕 E 󰀗 󰀐 󰀐 󰀐B m:n,λ (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 E 󰁫 󰀂C m:n (x) -E [C m:n (x)]󰀂 4 󰁬 󰀖 1 2 + 6 E 󰀗 󰀐 󰀐 󰀐B m:n,λ (x) -1 -(E [B m:n,λ (x)]) -1 󰀐 󰀐 󰀐 2 op 󰀘 󰀓 E 󰁫 󰀂C m:n (x)󰀂 4 󰁬󰀔 1 2 .</formula><p>Applying here the bounds (36) -(39) and using the fact that h = n</p><formula xml:id="formula_122">-1 2β+d we obtain term II ≤ An -2β 2β+d .</formula><p>The proof is completed by putting together the bounds on terms I and II.</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7.3">Proof of Theorem 9</head><p>We first prove (15). We apply the scheme of proving lower bounds for estimation of functionals described in Section 2.7.4 in Tsybakov <ref type="bibr">(2009)</ref>. Moreover, we use its basic form when the problem is reduced to testing two simple hypotheses (that is, the mixture measure µ from Section 2.7.4 in Tsybakov ( <ref type="formula">2009</ref>) is the Dirac measure). Without loss of generality, assume that Θ is a sufficiently large Euclidean ball centered at 0. The functional we are estimating is F (f ) = f * = min x∈Θ f (x). We choose the two hypotheses as the probability measures P ⊗n 1 and P ⊗n 2 , where P j stands for the distribution of a pair (x i , y i ) satisfying (1) with f = f j , j = 1, 2. For r &gt; 0, δ &gt; 0, we set</p><formula xml:id="formula_123">f 1 (x) = α(1 + δ)󰀂x󰀂 2 /2, f 2 (x) = f 1 (x) + rh β n Φ 󰀣 x -x (n) h n 󰀤 ,</formula><p>where</p><formula xml:id="formula_124">h n = n -1/(2β+d) , x (n) = (h n /8, 0, . . . , 0) ∈ R d and Φ(x) = 󰁔 d i=1 Ψ(x i ) with Ψ(t) = 󰁝 t -∞ (η(y + 1/2) -η(y)) dy,</formula><p>where η(•) is an infinitely many times differentiable function on R 1 such that</p><formula xml:id="formula_125">η(x) ≥ 0, η(x) = 󰀫 0, x / ∈ [0, 1/2] 1, x ∈ [1/8, 3/8] .</formula><p>First, assume that α ≥ n -(β-2)/(2β+d) . It is shown in Tsybakov (1990b) that if r is small enough the functions f 1 and f 2 are α-strongly convex and belong to F β (L). Thus, f j ∈ F β,α (L), j = 1, 2. It is also not hard to check that for the function η 1 (y) = η(y + 1/2) -η(y) we have 2β+d) and sufficiently small values of r and δ. Using this remark we get that the minimizers x * j = arg min x∈Θ f j (x) have the form</p><formula xml:id="formula_126">η 1 󰀣 - rΨ d-1 (0)h β-2 n α(1 + δ) - 1 8 󰀤 = 1, due to the fact that rα -1 (1 + δ) -1 h β-2 n &lt; 1/4, for α ≥ n -(β-2)/(</formula><formula xml:id="formula_127">x * 1 = (0, 0, . . . , 0) and x * 2 = 󰀣 - rΨ d-1 (0)h β-1 n α(1 + δ) , 0, . . . , 0 󰀤 .</formula><p>The values of the functional F on f 1 and f 2 are F (f 1 ) = 0 and</p><formula xml:id="formula_128">F (f 2 ) = f 2 (x * 2 ) = r 2 Ψ 2(d-1) (0) 2α(1 + δ) h 2(β-1) n + rΨ d-1 (0)Ψ 󰀣 - rΨ d-1 (0)h β-2 n α(1 + δ) - 1 8 󰀤 h β n ≥ r 2 Ψ 2(d-1) (0) 2α(1 + δ) h 2(β-1) n + rΨ d-1 (0)Ψ(-1/4)h β n (for r small enough) ≥ rΨ d-1 (0)Ψ(-1/4)h β n .</formula><p>Here, Ψ(0) = 󰁕 ∞ -∞ η(y) dy &gt; 0 and Ψ(-1/4) = 󰁕 1/4 -∞ η(y) dy &gt; 0. Note that assumption (i) of Theorem 2.14 in Tsybakov ( <ref type="formula">2009</ref>) is satisfied with β 0 = β 1 = 0, c = 0 and s = rΨ d-1 (0)Ψ(-1/4)h β n /2. Therefore, by Theorem 2.15 (ii) in Tsybakov ( <ref type="formula">2009</ref>), (15) will be proved if we show that</p><formula xml:id="formula_129">H 2 󰀃 P ⊗n 1 , P ⊗n 2 󰀄 ≤ a &lt; 2, (<label>43</label></formula><formula xml:id="formula_130">)</formula><p>where H 2 (P, Q) denotes the Hellinger distance between the probability measures P and Q.</p><p>Using assumption ( <ref type="formula" target="#formula_41">13</ref>) we obtain</p><formula xml:id="formula_131">H 2 󰀃 P ⊗n 1 , P ⊗n 2 󰀄 = 2 󰀕 1 - 󰀕 1 - H 2 (P 1 , P 2 ) 2 󰀖 n 󰀖 ≤ n H 2 (P 1 , P 2 ) (as (1 -x) n ≥ 1 -xn, x ∈ [0, 1]) = n 󰁝 󰀕 󰁴 p ξ (y) - 󰁴 p ξ (y + (f 1 (x) -f 2 (x))) 󰀖 2 p(x) dx dy ≤ nI * 󰁝 (f 1 (x) -f 2 (x)) 2 p(x) dx = nI * r 2 h 2β+d n 󰁝 Φ 2 (u)p 󰀓 x (n) + uh n 󰀔 du ≤ p max I * r 2 󰁝 Φ 2 (u) du, for r ≤ v 0 ,</formula><p>where p max is the maximal value of the density p(•) of x i . Choosing r ≤ 󰁴 a/ 󰀃 p max I * 󰁕 Φ 2 (u) du 󰀄 , with a &lt; 2 we obtain (43). This completes the proof of the lower bound (15) for α ≥ n -(β-2)/(2β+d) . If 0 &lt; α &lt; α 0 := n -(β-2)/(2β+d) the same lower bound holds due to the nesting property of the classes F α,β (L). Indeed, F α 0 ,β (L) ⊂ F α,β (L) for 0 &lt; α &lt; α 0 . The proof of ( <ref type="formula" target="#formula_44">15</ref>) is now complete.</p><p>In order to prove ( <ref type="formula" target="#formula_43">14</ref>), it suffices to use the same construction of two hypotheses as above, apply the Hellinger version of Theorem 2.2 from Tsybakov (2009) and notice that,</p><formula xml:id="formula_132">for α ≥ n -(β-2)/(2β+d) , 󰀂x * 1 -x * 2 󰀂 ≥ Aα -1 h β-1 n .<label>(44)</label></formula><p>This proves the lower bound ( <ref type="formula" target="#formula_43">14</ref>) for α ≥ α 0 , with the normalizing factor αn (β-1)/(2β+d) . Notably, if α = α 0 this factor is equal to n 1/(2β+d) . Using the inclusion F α 0 ,β (L) ⊂ F α,β (L) valid for 0 &lt; α &lt; α 0 we conclude that the bound ( <ref type="formula" target="#formula_43">14</ref>) with the normalizing factor n 1/(2β+d) holds true for all such values of α. This completes the proof of ( <ref type="formula" target="#formula_43">14</ref>). Finally, the lower bound (16) follows immediately from ( <ref type="formula" target="#formula_43">14</ref>) with w(u) = u 2 and the inequality f (x n ) -f * ≥ (α/2) 󰀂x n -x * 󰀂 2 granted by the α-strong convexity of f .</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head n="7.4">Proof of Theorem 10</head><p>We apply again the scheme of proving lower bounds for estimation of functionals from Section 2.7.4 in Tsybakov <ref type="bibr">(2009)</ref>. However, we use a different construction of the hypotheses. Without loss of generality, assume that n ≥ 2 and that Θ contains the cube [0, 1] d . Define</p><formula xml:id="formula_133">h n = (n/ log(n)) -1/(2β+d) , N = (1/h n ) d ,</formula><p>and assume without loss of generality that N is an integer. For r &gt; 0, we set</p><formula xml:id="formula_134">f j (x) = -rh β n Φ 󰀣 x -t (j) h n 󰀤 , j = 1, . . . , N,</formula><p>where</p><formula xml:id="formula_135">Φ(x) = 󰁔 d i=1 Ψ(x i )</formula><p>, where Ψ(•) is an infinitely many times differentiable function on R taking positive values on its support [-1/2, 1/2], and we denote by t (1) , . . . , t (N ) the N points of the equispaced grid on [0, 1] d with step h n over each coordinate, such that the supports of all f j 's are included in [0, 1] d and are disjoint. It is not hard to check that for r small enough all the functions f j , j = 1, . . . , N , belong to F β (L).</p><p>We consider the product probability measures P ⊗n 0 and P ⊗n 1 , . . . P ⊗n N , where P 0 stands for the distribution of a pair (x i , y i ) satisfying (1) with f ≡ 0, and P j stands for the distribution of (x i , y i ) satisfying (1) with f = f j . Consider the mixture probability measure P µ = 1 N 󰁓 N j=1 P ⊗n j , where µ denotes the uniform distribution on {1, . . . , N }. Note that, for each j = 1, . . . , N , we have F (f j ) = -rh β n Φ max , where F (f ) = f * = min x∈Θ f (x), and Φ max &gt; 0 denotes the maximal value of function Φ(•). Let χ 2 (P ′ , P ) =</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>󰁝</head><p>( dP ′ / dP ) 2 dP -1 denote the chi-square divergence between two mutually absolutely continuous probability measures P ′ and P . We will use the following lemma, which is a special case of Theorem 2.15 in <ref type="bibr" target="#b39">Tsybakov (2009)</ref>.</p><p>Lemma 16 Assume that there exist v &gt; 0, b &gt; 0 such that F (f j ) = -2v for j = 1, . . . , N and χ 2 (P µ , P ⊗n 0 ) ≤ b, Then</p><formula xml:id="formula_136">inf fn sup j=0,1,...,N P ⊗n j 󰀃 | fn -F (f j )| ≥ v 󰀄 ≥ 1 4 exp(-b),</formula><p>where inf fn denotes the infimum over all estimators.</p><p>In our case, the first condition of this lemma is satisfied with v = rh β n Φ max /2. We now check that the second condition χ 2 (P µ , P ⊗n 0 ) ≤ b holds with some constant b &gt; 0 independent of n. Using a standard representation of the chi-square divergence of a Gaussian mixture from the pure Gaussian noise measure (see, for example, Lemma 8 in <ref type="bibr" target="#b8">Carpentier et al. (2019))</ref> we obtain</p><formula xml:id="formula_137">χ 2 (P µ , P ⊗n 0 ) = 1 N 2 N 󰁛 j,j ′ =1 E exp 󰀕 󰁓 n i=1 f j (x i )f j ′ (x i ) σ 2 󰀖 -1 = 1 N 2 N 󰁛 j,j ′ =1 E exp 󰀕 󰁓 n i=1 f j (x i )f j ′ (x i ) σ 2 󰀖 -1 = 1 N 2 N 󰁛 j=1 E exp 󰀣 󰁓 n i=1 f 2 j (x i ) σ 2 󰀤 + N (N -1) N 2 -1 ≤ 1 N 2 N 󰁛 j=1 E exp 󰀣 󰁓 n i=1 f 2 j (x i ) σ 2 󰀤 = 1 N 2 N 󰁛 j=1 󰀥 E exp 󰀣 f 2 j (x 1 ) σ 2 󰀤󰀦 n</formula><p>, where the equality in the third line is due to the fact that if j ∕ = j ′ then f j and f j ′ have disjoint supports and thus f j (x i )f j ′ (x i ) = 0. Note that max x∈R d f 2 j (x) ≤ r 2 Φ 2 max , for all j = 1, . . . , N . Choose r such that r ≤ σ/Φ max . Then</p><formula xml:id="formula_138">f 2 j (x 1 ) σ 2</formula><p>≤ 1, and using the elementary inequality exp(u) ≤ 1 + 2u, u ∈ [0, 1], we obtain that exp</p><formula xml:id="formula_139">󰀕 f 2 j (x 1 ) σ 2 󰀖 ≤ 1 + 2f 2 j (x 1 ) σ 2</formula><p>for all j = 1, . . . , N . Substituting this bound in the last display and noticing that E(f</p><formula xml:id="formula_140">2 j (x 1 )) = 󰁕 f 2 j (x)p(x) dx ≤ p max r 2 h 2β+d n 󰁕 Φ 2 (x) dx = c * log n</formula><p>n , where c * = p max r 2 󰁕 Φ 2 (x) dx, we obtain:</p><formula xml:id="formula_141">χ 2 (P µ , P ⊗n 0 ) ≤ 1 N 󰀥 1 + 2E(f 2 j (x 1 )) σ 2 󰀦 n ≤ 1 N 󰀗 1 + 2c * log n σ 2 n 󰀘 n ≤ 1 N exp 󰀕 2c * log n σ 2 󰀖 = n c 0 N , where c 0 = 2c * /σ 2 = 2p max r 2 󰁕 Φ 2 (x) dx/σ 2 . Since N = (n/ log n) d 2β+d we finally get χ 2 (P µ , P ⊗n 0 ) ≤ n c 0 -d 2β+d (log n) d 2β+d</formula><p>.</p><p>By choosing r small enough to have c 0 ≤ d 2(2β+d) we obtain that χ 2 (P µ , P ⊗n 0 ) ≤</p><formula xml:id="formula_142">󰀓 log n √ n 󰀔 d 2β+d ≤ 󰀓 log 2 √ 2</formula><p>󰀔 d 2β+d := b. Thus, the second condition of Lemma 16 holds if r is chosen as a small enough constant. Notice that, in Lemma 16, the rate v is of the desired order</p><formula xml:id="formula_143">(n/ log n) -β</formula><p>2β+d . The result of the theorem now follows from Lemma 16 and the standard argument to obtain the lower bounds, see Section 2.7.4 in Tsybakov (2009).</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>Appendix A. Auxiliary lemmas</head><p>Recall that Θ ′ = {x + y : x ∈ Θ and 󰀂y󰀂 ≤ 1} ⊇ {x + y : x ∈ Θ and y ∈ Supp(K)}.</p><p>Lemma 17 For any q ≥ 1 let</p><formula xml:id="formula_144">ν q = 󰁝 R d 󰀂U (u)K(u)󰀂 q du</formula><p>and p max = max y∈Θ ′ p(y). Under Assumptions 1 and 4 for any</p><formula xml:id="formula_145">x ∈ Θ, k ∈ [n] and i ∈ [k] we have (i) sup x∈Θ E [󰀂R i,k (x)󰀂 q ] ≤ p max ν q h d k , and sup x∈Θ E [󰀂R k (x)󰀂 q ] ≤ p max ν q h d m:n .</formula><p>(ii) There exists a constant λ min &gt; 0 such that</p><formula xml:id="formula_146">inf x∈Θ λ min (E k (x)) ≥ λ min and inf x∈Θ λ min (E m:n (x)) ≥ λ min .</formula><p>Proof We have</p><formula xml:id="formula_147">h -d k sup x∈Θ E [󰀂R i,k (x)󰀂 q ] = h -d k sup x∈Θ 󰁝 R d 󰀐 󰀐 󰀐 󰀐 U 󰀕 y -x h k 󰀖 K 󰀕 y -x h k 󰀖󰀐 󰀐 󰀐 󰀐 q p(y) dy ≤ 󰁝 R d 󰀂U (u)K(u)󰀂 q sup x∈Θ p(x + h k u) du ≤ p max ν q .</formula><p>The bound for sup x∈Θ E [󰀂R k (x)󰀂 q ] is proved exactly in the same way. To prove (ii) note that</p><formula xml:id="formula_148">E k (x) = E [B k (x)] = h -d k E 󰀗 U 󰀕 x 1 -x h k 󰀖 U ⊤ 󰀕 x 1 -x h k 󰀖 K 󰀕 x 1 -x h k 󰀖󰀘 = 󰁝 R d U (u) U ⊤ (u) K (u) p(x + h k u) du</formula><p>and thus inf x∈Θ λ min (E k (x)) ≥ p min λ min (H), where H = 󰁕 R d U (u) U ⊤ (u) K (u) du. Arguing as in <ref type="bibr" target="#b36">(Tsybakov, 1986</ref>, Lemma 1) we obtain that λ min (H) &gt; 0. This gives the desired bound for inf x∈Θ λ min (E k (x)) with λ min = p min λ min (H). The bound inf x∈Θ λ min (E m:n (x)) ≥ λ min is proved exactly in the same way.</p><p>Lemma 18 Let Assumptions 1 and 4 hold. Then there exists a constant A &gt; 0 such that for kh d k ≥ 1 we have</p><formula xml:id="formula_149">sup x∈Θ E 󰁫 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰁬 ≤ Ah -2d k k -2 . (<label>45</label></formula><formula xml:id="formula_150">)</formula><p>Furthermore, for kh d k ≥ λ -2 we have</p><formula xml:id="formula_151">sup x∈Θ E 󰀗 󰀐 󰀐 󰀐B k,λ (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 ≤ Aλ -4 min (<label>46</label></formula><formula xml:id="formula_152">)</formula><p>and</p><formula xml:id="formula_153">sup x∈Θ E 󰁫 󰀐 󰀐 B k,λ (x) -1 -(E[B k,λ (x)]) -1 󰀐 󰀐 2 op 󰁬 ≤ Ah -d k k -1 . (<label>47</label></formula><formula xml:id="formula_154">)</formula><p>Proof For s, s ′ ∈ [S], consider the function G (ss ′ ) : R d → R such that</p><formula xml:id="formula_155">G (ss ′ ) (u) = 󰀓 U (u) U ⊤ (u) 󰀔 ss ′ , u ∈ R d</formula><p>, where, for a matrix A, we denote by (A) ss ′ its (s, s ′ )-entry. Set</p><formula xml:id="formula_156">F (s,s ′ ) i (x) = G (ss ′ ) 󰀕 x i -x h k 󰀖 K 󰀕 x i -x h k 󰀖 -E 󰀗 G (ss ′ ) 󰀕 x i -x h k 󰀖 K 󰀕 x i -x h k 󰀖󰀘 .</formula><p>The inequality between the operator norm and the ℓ 1 -norm of a matrix yields that</p><formula xml:id="formula_157">󰀂B k,λ (x) -E [B k,λ (x)]󰀂 op ≤ S 󰁛 s,s ′ =1 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ,<label>(48)</label></formula><p>so that</p><formula xml:id="formula_158">E 󰁫 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰁬 ≤ S 6 S 󰁛 s,s ′ =1 E 󰀵 󰀷 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 = 4S 6 S 󰁛 s,s ′ =1 󰁝 ∞ 0 t 3 P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 &gt; t 󰀦 dt.</formula><p>To control the probabilities on the right hand side, we use Bernstein's inequality that we recall here for convenience.</p><p>Lemma 19 Let {ζ i } k i=1 be a collection of real valued independent random variables with zero means such that, for any i = 1, . . . , k and any q ∈ {2, 3, . . . }, the Bernstein condition E[|ζ i | q ] ≤ (q!/2)νH q-2 is satisfied with some ν &gt; 0, H &gt; 0. Then, for any t &gt; 0,</p><formula xml:id="formula_159">P 󰀣󰀏 󰀏 󰀏 󰀏 󰀏 1 k k 󰁛 i=1 ζ i 󰀏 󰀏 󰀏 󰀏 󰀏 &gt; t 󰀤 ≤ 2 exp 󰀕 - t 2 k 2(ν + Ht) 󰀖 .</formula><p>We apply Lemma 19 with</p><formula xml:id="formula_160">ζ i = h -d k F (s,s ′ ) i (x). Let q ≥ 2. We have F (s,s ′ ) i (x) = X -E[X] with X = G (ss ′ ) ( x i -x h k )K( x i -x h k ). Using the inequalities E[|X -E[X]| q ] ≤ 2 q-1 (E[|X| q ] + |E[X]| q ) ≤ 2 q E[|X| q ] we obtain that, for any x ∈ Θ, E[|F (s,s ′ ) i (x)| q ] ≤ 2 q E 󰀗󰀏 󰀏 󰀏 󰀏 G (ss ′ ) 󰀕 x i -x h k 󰀖 K 󰀕 x i -x h k 󰀖󰀏 󰀏 󰀏 󰀏 q 󰀘 = 2 q 󰁝 󰀏 󰀏 󰀏 󰀏 G (ss ′ ) 󰀕 w -x h k 󰀖 K 󰀕 w -x h k 󰀖󰀏 󰀏 󰀏 󰀏 q p(w) dw ≤ p max 2 q h d k 󰁝 󰀏 󰀏 󰀏G (ss ′ ) (u)K(u) 󰀏 󰀏 󰀏 q du ≤ A 0 A q 1 h d k ,</formula><p>where we have used the fact that the functions G (ss ′ ) and K are uniformly bounded on the support of K. Here, the constants A 0 , A 1 do not depend on x, s, s ′ . Thus, for any i = 1, . . . , k and any q ∈ {2, 3, . . . },</p><formula xml:id="formula_161">E[|ζ i | q ] ≤ νH q-2 with ν = A 0 A 2 1 h -d k , H = A 1 h -d k .</formula><p>Applying Lemma 19 with these values of ν and H we get that there exists a constant A 2 &gt; 0 such that, for any t &gt; 0 and any x ∈ Θ,</p><formula xml:id="formula_162">P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 2 exp 󰀕 - t 2 kh d k A 2 (1 + t) 󰀖 .<label>(49)</label></formula><p>Consequently,</p><formula xml:id="formula_163">E 󰁫 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰁬 ≤ 8S 8 󰁝 ∞ 0 t 3 exp 󰀕 - t 2 kh d k A 2 (1 + t) 󰀖 dt ≤ A 󰀕󰁝 1 0 t 3 exp 󰀕 - t 2 kh d k 2A 2 󰀖 dt + 󰁝 ∞ 1 t 3 exp 󰀕 - tkh d k 2A 2 󰀖 dt 󰀖 ≤ A 3 h -2d k k -2 ,</formula><p>where we have used the assumption kh d k ≥ 1 and A 3 is a constant that does not depend on x. This proves (45).</p><p>To prove (46), note that Lemma 17(ii) implies the inequality sup x∈Θ</p><formula xml:id="formula_164">󰀐 󰀐 󰀐(E [B k (x)]) -1 󰀐 󰀐 󰀐 op ≤ λ -1 min . Thus, also sup x∈Θ 󰀐 󰀐 󰀐(E [B k,λ (x)]) -1 󰀐 󰀐 󰀐 op ≤ λ -1 min ,<label>(50)</label></formula><formula xml:id="formula_165">while sup x∈Θ 󰀐 󰀐 B k,λ (x) -1 󰀐 󰀐 op ≤ λ -1 . Therefore, E 󰁫 󰀐 󰀐 B k,λ (x) -1 󰀐 󰀐 4 op 󰁬 ≤ 8E 󰁫 󰀐 󰀐 B k,λ (x) -1 -(E[B k,λ (x)]) -1 󰀐 󰀐 4 op 󰁬 + 8 λ 4 min ≤ 8λ -4 min λ -4 E 󰁫 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰁬 + 8λ -4 min (51) ≤ 8A 3 λ 4 λ 4 min h -2d k k -2 + 8 λ 4 min , so that for kh d k ≥ λ -2</formula><p>we obtain (46). Finally, we prove (47). Using (50) and then the Cauchy-Schwarz inequality we obtain</p><formula xml:id="formula_166">E 󰀗 󰀐 󰀐 󰀐B k,λ (x) -1 -(E[B k,λ (x)]) -1 󰀐 󰀐 󰀐 2 op 󰀘 ≤ E 󰀗 󰀐 󰀐 B k,λ (x) -1 󰀐 󰀐 2 op 󰀐 󰀐 (E[B k,λ (x)]) -1 󰀐 󰀐 2 op 󰀂B k,λ (x) -E[B k,λ (x)]󰀂 2 op 󰀘 ≤ λ -2 min 󰀓 E 󰁫 󰀐 󰀐 B k,λ (x) -1 󰀐 󰀐 4 op 󰁬 E 󰁫 󰀂B k,λ (x) -E[B k,λ (x)]󰀂 4 op 󰁬󰀔 1 2 ,<label>(52)</label></formula><p>so that (47) follows by applying ( <ref type="formula" target="#formula_149">45</ref>) and ( <ref type="formula" target="#formula_151">46</ref>). </p><formula xml:id="formula_167">E 󰀗 sup x∈Θ 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰀘 ≤ Ah -2d k k -2 log(k + 1) 2 . (<label>53</label></formula><formula xml:id="formula_168">)</formula><p>Furthermore, for kh d k ≥ λ -2 log(k + 1) we have</p><formula xml:id="formula_169">E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐B k,λ (x) -1 󰀐 󰀐 󰀐 4 op 󰀘 ≤ Aλ -4 min .<label>(54)</label></formula><p>and</p><formula xml:id="formula_170">E 󰀗 sup x∈Θ 󰀐 󰀐 B k,λ (x) -1 -(E [B k,λ (x)]) -1 󰀐 󰀐 2 op 󰀘 ≤ Ah -d k k -1 log(k + 1). (<label>55</label></formula><formula xml:id="formula_171">)</formula><p>Proof Notice that, due to Assumption 1 and the choice of h k , the functions</p><formula xml:id="formula_172">x 󰀁 → G (ss ′ ) ( x i -x h k )K( x i -x h k ) are supported on the compact Θ ′ and are Lipschitz continuous with Lipschitz constant A 1 h -1</formula><p>k , where the A 1 &gt; 0 is independent of x i 's and also on s, s ′ (by taking the maximum over s, s ′ ∈ [S]). It follows that there exists a constant A such that for all x, y ∈ Θ and all s, s ′ ∈ [S] we have</p><formula xml:id="formula_173">󰀏 󰀏 󰀏 󰀏 󰀏 k 󰁛 i=1 (F (s,s ′ ) i (x) -F (s,s ′ ) i (y)) 󰀏 󰀏 󰀏 󰀏 󰀏 ≤ Akh -1 k 󰀂x -y󰀂 . (<label>56</label></formula><formula xml:id="formula_174">) Set for brevity B(x) = B k,λ (x) -E [B k,λ (x)]. Using (48) we obtain E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐 B(x) 󰀐 󰀐 󰀐 4 op 󰀘 ≤ S 6 S 󰁛 s,s ′ =1 E 󰀵 󰀷 sup x∈Θ 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 .</formula><p>For 󰂃 &gt; 0, let N be the minimal 󰂃-net of Θ with respect to the Euclidean norm. Using (56) we get</p><formula xml:id="formula_175">E 󰀗 sup x∈Θ 󰀐 󰀐 󰀐 B(x) 󰀐 󰀐 󰀐 4 op 󰀘 ≤ 8S 6 S 󰁛 s,s ′ =1 E 󰀵 󰀷 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 + 8S 6 k 4 h 4d k S 󰁛 s,s ′ =1 E 󰀵 󰀷 sup x,y:󰀂x-y󰀂≤󰂃 󰀏 󰀏 󰀏 󰀏 󰀏 k 󰁛 i=1 󰀓 F (s,s ′ ) i (x) -F (s,s ′ ) i (y) 󰀔 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 ≤ 8S 6 S 󰁛 s,s ′ =1 E 󰀵 󰀷 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 + Ah -4d-4 k 󰂃 4 .<label>(57)</label></formula><p>We now provide an upper bound for the last sum in (57). Denote by N (Θ, 󰂃) the cardinality of N . Using a standard bound N (Θ, 󰂃) ≤</p></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>󰀓 diam(Θ) 󰂃</head><p>+ 1 󰀔 d we find that, for any t &gt; 0,</p><formula xml:id="formula_176">P 󰀥 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ N (Θ, 󰂃) sup x∈N P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 󰀕 diam(Θ) 󰂃 + 1 󰀖 d sup x∈N P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 .</formula><p>Combining the last inequality with (49) we get that, for any t &gt; 0,</p><formula xml:id="formula_177">P 󰀥 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 2 exp 󰀕 - t 2 kh d k A(1 + t) + d log 󰀕 diam(Θ) 󰂃 + 1 󰀖󰀖 . Set 󰂃 = diam(Θ)h d 2 +1 k k -1 2 . Then, for some constant A 3 &gt; 0, P 󰀥 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 2 exp 󰀕 - t 2 kh d k A 3 (1 + t) + A 3 log (k + 1) 󰀖 . (<label>58</label></formula><formula xml:id="formula_178">) Let a = A 3 (2k -1 h -d k log(k + 1)) 1 2</formula><p>, where A 3 is the constant from (58). Noticing that kh d k ≥ log(k + 1) and using (58) we obtain</p><p>S 󰁛 s,s ′ =1 E 󰀵 󰀷 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s,s ′ ) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 ≤ S 2 a 4 + 4S 2 󰁝 A 3 √ 2 a t 3 exp 󰀕 -t 2 kh d k A 󰀖 dt + 4S 2 󰁝 ∞ A 3 √ 2 t 3 exp 󰀕 -tkh d k A 󰀖 dt ≤ Ak -2 h -2d k log(k + 1) 2 . (59) Using (57), (59) and the fact that 󰂃 = diam(Θ)h d 2 +1 k k -1 2 we get (53). To prove inequality (54) we argue analogously to (51) to obtain E 󰀗 sup x∈Θ 󰀐 󰀐 B k,λ (x) -1 󰀐 󰀐 4 op 󰀘 ≤ 8λ -4 min λ -4 E 󰀗 sup x∈Θ 󰀂B k,λ (x) -E [B k,λ (x)]󰀂 4 op 󰀘 + 8λ -4 min ≤ Aλ -4 min λ -4 k -2 h -2d k log(k + 1) 2 + 8λ -4 min ,</p><p>where the last inequality follows from (59). Since, by assumption, kh d k ≥ λ -2 log(k + 1) the bound (54) follows.</p><p>Finally, the bound ( <ref type="formula" target="#formula_170">55</ref>) is derived from ( <ref type="formula" target="#formula_167">53</ref>) and ( <ref type="formula" target="#formula_169">54</ref>) by using the same argument as in (52) with the only difference that 󰀂•󰀂 op should be replaced by sup x∈Θ 󰀂•󰀂 op . we have</p><formula xml:id="formula_179">E 󰀗 sup x∈Θ 󰀂G k (x)󰀂 4 󰀘 ≤ Ak -2 h -2d k log(k + 1) 2 . Proof Recall that G k (x) = k -1 h -d k 󰁓 k i=1 R i,k<label>(</label></formula><p>x)ξ i and set F (s) i (x) = 󰀓 U 󰀓 x i -x h k 󰀔 K 󰀓 x i -x h k 󰀔󰀔 s ξ i , for i ∈ [k], where 󰀓 U 󰀓 x i -x h k 󰀔 K 󰀓 x i -x h k 󰀔󰀔 s is the s-th coordinate of the vector R i,k (x) = U 󰀓 x i -x h k 󰀔 K 󰀓 x i -x h k 󰀔 , for s ∈ [S]. Note that 󰀂G k (x)󰀂 ≤ S 󰁛 s=1 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 , and therefore E 󰀗 sup x∈Θ 󰀂G k (x)󰀂 4 󰀘 ≤ S 3 S 󰁛 s=1 E 󰀵 󰀷 sup x∈Θ 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 . (60) Next, arguing as in the proof of Lemma 20 we deduce that, for any x, y ∈ Θ, 󰀏 󰀏 󰀏 󰀏 󰀏 k 󰁛 i=1 󰀓 F (s) i (x) -F (s) i (y) 󰀔 󰀏 󰀏 󰀏 󰀏 󰀏 ≤ Akh -1 k 󰀂x -y󰀂 . (61) Given (60) and (61), the rest of the proof is quite analogous to the proof of Lemma 20. Thus, as in (56) we get E 󰀗 sup x∈Θ 󰀂G k (x)󰀂 4 󰀘 ≤ 8S 3 S 󰁛 s=1 E 󰀵 󰀷 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 4 󰀶 󰀸 + Ah -4d-4 k 󰂃 4 , (62) and, for any t &gt; 0, P 󰀥 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 󰀕 diam(Θ) 󰂃 + 1 󰀖 d sup x∈N P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 .</p><p>To control the probability on the right hand side we apply Lemma 19 with</p><formula xml:id="formula_180">ζ i = h -d k F (s)</formula><p>i (x). For any q ≥ 2, and x ∈ N we have</p><formula xml:id="formula_181">E 󰀗󰀏 󰀏 󰀏 󰀏 󰀕 U 󰀕 x i -x h k 󰀖 K 󰀕 x i -x h k 󰀖󰀖 s 󰀏 󰀏 󰀏 󰀏 q 󰀘 = h d k 󰁝 |(U (u)K(u)) s | q p(x + h k u) du ≤ p max h d k 󰁝 |(U (u)K(u)) s | q du ≤ A 0 A q 1 h d k ,<label>(63)</label></formula><p>where we have used the fact that the functions (U (u)K(u)) s are uniformly bounded on the support of K for all s ∈ [S]. Here, the constants A 0 , A 1 do not depend on x, s. Since ξ i is a sub-exponential random variable we have E[|ξ i | q ] ≤ (A 2 q) q for any q ≥ 1, where the constant A 2 &gt; 0 does not depend on q. Using this fact and (63) we obtain</p><formula xml:id="formula_182">E 󰁫󰀏 󰀏 󰀏F (s) i (x)</formula></div>
+<div xmlns="http://www.tei-c.org/ns/1.0"><head>󰀏 󰀏 󰀏</head><p>q 󰁬 ≤ A 0 (A 3 q) q h d k .</p><p>(64)</p><p>It follows from (64) that, for any q ∈ {2, 3, . . . }, E[|ζ i | q ] ≤ A 0 (A 3 q) q h -(q-1)d k ≤ (q!/2)νH q-2 , where ν = A 4 h -d k , H = A 5 h -d k with some constants A 4 , A 5 that do not depend on q. Applying Lemma 19 we get that, for any t &gt; 0 and any fixed x,</p><formula xml:id="formula_183">P 󰀥󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F<label>(</label></formula><p>s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 2 exp 󰀕 -t 2 kh d k A(1 + t) 󰀖 , so that P 󰀥 sup x∈N 󰀏 󰀏 󰀏 󰀏 󰀏 k -1 h -d k k 󰁛 i=1 F (s) i (x) 󰀏 󰀏 󰀏 󰀏 󰀏 ≥ t 󰀦 ≤ 2 exp 󰀕 -t 2 kh d k A(1 + t) + d log 󰀕 diam(Θ) 󰂃 + 1</p><p>󰀖󰀖 .</p><p>Note that this inequality is of the same form as (58). The rest of the proof repeats the argument after (58) in the proof of Lemma 20 and therefore we omit it. (66)</p><formula xml:id="formula_184">Proof Recall that C k (x) = k -1 h -d k 󰁓 k i=1 U 󰀓 x i -x h k 󰀔 K 󰀓 x i -x h k 󰀔 f (x i )</formula><p>. Assumption 3(iv) implies that f (x i )'s are uniformly bounded. Given this fact, the proof of ( <ref type="formula">65</ref>) is derived following the same lines as in Lemma 18 and it is therefore omitted. The bound (66) is obtained by plugging ( <ref type="formula">20</ref>) and ( <ref type="formula">65</ref> This lemma follows immediately from the Cauchy-Schwarz inequality, ( <ref type="formula" target="#formula_153">47</ref>) and ( <ref type="formula">65</ref>).</p><p>Finally, we recall a lemma from <ref type="bibr" target="#b0">Akhavan et al. (2020)</ref> used in the proof of Theorem 5.</p><p>Lemma 25 <ref type="bibr" target="#b0">(Akhavan et al. (2020)</ref> Lemma D.1) Let {b k } be a sequence of real numbers such that for all integers k ≥ 2,</p><formula xml:id="formula_185">b k+1 ≤ 󰀕 1 - 1 k 󰀖 b k + N 󰁛 i=1 a i k p i +1 ,</formula><p>where 0 &lt; p i &lt; 1 and a i ≥ 0 for 1 ≤ i ≤ N . Then for k ≥ 2 we have</p><formula xml:id="formula_186">b k ≤ 2b 2 k + N 󰁛 i=1 a i (1 -p i )k p i .</formula></div><figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_0"><head>.</head><figDesc>d-dimensional multi-index m = (m 1 , . . . , m d ), where m j ≥ 0 are integers, we define the absolute value |m| = m 1 + . . . + m d , the factorial m! = m 1 ! . . . m d !, the power u m = u m 1 1 . . . u m d d and the differentiation operator D m = We denote by Proj Θ (x) the Euclidean projection of x ∈ R d onto Θ.</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_1"><head>Lemma 20</head><label>20</label><figDesc>Let k ∈ [n], and hk = 󰀓 log(k+1) k 󰀔 1 2β+d .Let Assumptions 1 and 4 hold. Then there exists a constant A &gt; 0 such that</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_3"><head>Lemma 21</head><label>21</label><figDesc>Let Assumptions 1, 2 and 4 hold. Then, for k ∈ [n] and h k =</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_4"><head>Lemma 22 󰁬</head><label>22</label><figDesc>Let k ∈ [n], kh d k ≥ 1, and let Assumptions 1, 3(iv) and 4 hold. Then sup x∈Θ E 󰁫 󰀂C k (x) -E [C k (x)]󰀂 4</figDesc></figure>
+<figure xmlns="http://www.tei-c.org/ns/1.0" xml:id="fig_5"><figDesc>󰀂C k (x) -E [C k (x)]󰀂 4 󰀘 ≤ Ah -2d k k -2 log(k + 1) 2 .The proof of this lemma is omitted since, for the same reason as in Lemma 22, it is analogous to the proof of Lemma 20.Lemma 24 Let k ∈ [n], andh k = λ (x) -1 -(E[B k,λ (x)]) -1 󰀐 󰀐 󰀐 op 󰀂C k (x) -E [C k (x)]󰀂 󰀘 ≤ Ah -d k k -1 .</figDesc></figure>
+		</body>
+		<back>
+
+			<div type="acknowledgement">
+<div><head>Acknowledgments</head><p>The work of <rs type="person">Arya Akhavan</rs> and <rs type="person">Alexandre B. Tsybakov</rs> was supported by the grant of <rs type="funder">French National Research Agency (ANR)</rs> "<rs type="programName">Investissements d'Avenir</rs>" <rs type="projectName">LabEx Ecodec</rs>/<rs type="grantNumber">ANR-11-LABX-0047</rs>. The work of <rs type="person">Davit Gogolashvili</rs> was funded by the <rs type="funder">Marie Curie action WINDMILL</rs> (grant No. <rs type="grantNumber">813999</rs>).</p></div>
+			</div>
+			<listOrg type="funding">
+				<org type="funded-project" xml:id="_bbwuCzh">
+					<idno type="grant-number">ANR-11-LABX-0047</idno>
+					<orgName type="project" subtype="full">LabEx Ecodec</orgName>
+					<orgName type="program" subtype="full">Investissements d&apos;Avenir</orgName>
+				</org>
+				<org type="funding" xml:id="_6cXq9VX">
+					<idno type="grant-number">813999</idno>
+				</org>
+			</listOrg>
+			<div type="references">
+
+				<listBibl>
+
+<biblStruct xml:id="b0">
+	<analytic>
+		<title level="a" type="main">Exploiting higher order smoothness in derivative-free optimization and continuous bandits</title>
+		<author>
+			<persName><forename type="first">Arya</forename><surname>Akhavan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Massimiliano</forename><surname>Pontil</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<biblScope unit="volume">33</biblScope>
+			<date type="published" when="2020">2020</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b1">
+	<analytic>
+		<title level="a" type="main">Distributed zero-order optimization under adversarial noise</title>
+		<author>
+			<persName><forename type="first">Arya</forename><surname>Akhavan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Massimiliano</forename><surname>Pontil</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<date type="published" when="2021">2021</date>
+			<biblScope unit="volume">34</biblScope>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b2">
+	<monogr>
+		<title level="m" type="main">Gradient-free optimization of highly smooth functions: improved analysis and a new algorithm</title>
+		<author>
+			<persName><forename type="first">Arya</forename><surname>Akhavan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Evgenii</forename><surname>Chzhen</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Massimiliano</forename><surname>Pontil</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+		<idno type="arXiv">arXiv:2306.02159</idno>
+		<imprint>
+			<date type="published" when="2023">2023</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b3">
+	<analytic>
+		<title level="a" type="main">Estimation of the global mode of a density: Minimaxity, adaptation, and computational complexity</title>
+		<author>
+			<persName><forename type="first">Ery</forename><surname>Arias-Castro</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Wanli</forename><surname>Qiao</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Lin</forename><surname>Zheng</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Electronic Journal of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="2774" to="2795" />
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b4">
+	<analytic>
+		<title level="a" type="main">Highly-smooth zero-th order online optimization</title>
+		<author>
+			<persName><forename type="first">Francis</forename><surname>Bach</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Vianney</forename><surname>Perchet</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="m">Proc. 29th Annual Conference on Learning Theory</title>
+		<meeting>29th Annual Conference on Learning Theory</meeting>
+		<imprint>
+			<date type="published" when="2016">2016</date>
+			<biblScope unit="page" from="1" to="27" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b5">
+	<analytic>
+		<title level="a" type="main">Optimal two-stage procedures for estimating location and size of the maximum of a multivariate regression function</title>
+		<author>
+			<persName><forename type="first">Eduard</forename><surname>Belitser</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Subhashis</forename><surname>Ghosal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Harry</forename><surname>Van Zanten</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Ann. Statist</title>
+		<imprint>
+			<biblScope unit="volume">40</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="2850" to="2876" />
+			<date type="published" when="2012">2012</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b6">
+	<analytic>
+		<title level="a" type="main">Optimal two-stage procedures for estimating location and size of the maximum of a multivariate regression function</title>
+		<author>
+			<persName><forename type="first">Eduard</forename><surname>Belitser</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Subhashis</forename><surname>Ghosal</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Harry</forename><surname>Van Zanten</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Ann. Statist</title>
+		<imprint>
+			<biblScope unit="volume">49</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="612" to="613" />
+			<date type="published" when="2021">2021</date>
+		</imprint>
+	</monogr>
+	<note>Correction note</note>
+</biblStruct>
+
+<biblStruct xml:id="b7">
+	<analytic>
+		<title level="a" type="main">Multidimensional stochastic approximation methods</title>
+		<author>
+			<persName><forename type="first">Julius</forename><forename type="middle">R</forename><surname>Blum</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">25</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="737" to="744" />
+			<date type="published" when="1954">1954</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b8">
+	<analytic>
+		<title level="a" type="main">Minimax rate of testing in sparse linear regression</title>
+		<author>
+			<persName><forename type="first">Alexandra</forename><surname>Carpentier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Olivier</forename><surname>Collier</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Laëtitia</forename><surname>Comminges</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yuhao</forename><surname>Wang</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Automation and Remote Control</title>
+		<imprint>
+			<biblScope unit="volume">80</biblScope>
+			<biblScope unit="page" from="1817" to="1834" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b9">
+	<analytic>
+		<title level="a" type="main">Lower rate of convergence for locating a maximum of a function</title>
+		<author>
+			<persName><forename type="first">Hung</forename><surname>Chen</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="1330" to="1334" />
+			<date type="published" when="1988">1988</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b10">
+	<analytic>
+		<title level="a" type="main">Estimation of the mode</title>
+		<author>
+			<persName><forename type="first">Herman</forename><surname>Chernoff</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Annals of the Institute of Statistical Mathematics</title>
+		<imprint>
+			<biblScope unit="volume">16</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="31" to="41" />
+			<date type="published" when="1964">1964</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b11">
+	<analytic>
+		<title level="a" type="main">The mode-a neglected statistical parameter</title>
+		<author>
+			<persName><forename type="first">Tore</forename><surname>Dalenius</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of the Royal Statistical Society. Series A (General)</title>
+		<imprint>
+			<biblScope unit="volume">128</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="110" to="117" />
+			<date type="published" when="1965">1965</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b12">
+	<analytic>
+		<title level="a" type="main">Optimal rates for k-nn density and mode estimation</title>
+		<author>
+			<persName><forename type="first">Sanjoy</forename><surname>Dasgupta</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Samory</forename><surname>Kpotufe</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<biblScope unit="volume">27</biblScope>
+			<date type="published" when="2014">2014</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b13">
+	<analytic>
+		<title level="a" type="main">Accelerated randomized stochastic optimization</title>
+		<author>
+			<persName><forename type="first">Jürgen</forename><surname>Dippon</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">31</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="1260" to="1281" />
+			<date type="published" when="2003">2003</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b14">
+	<monogr>
+		<title level="m" type="main">Časopis pro pěstování matematiky</title>
+		<author>
+			<persName><forename type="first">Václav</forename><surname>Dupač</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">.</forename><forename type="middle">O</forename><surname>Kiefer-Wolfowitzově Aproximační Methodě</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1957">1957</date>
+			<biblScope unit="volume">82</biblScope>
+			<biblScope unit="page" from="47" to="75" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b15">
+	<analytic>
+		<title level="a" type="main">Stochastic approximation of minima with improved asymptotic speed</title>
+		<author>
+			<persName><forename type="first">Vaclav</forename><surname>Fabian</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">38</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="191" to="200" />
+			<date type="published" when="1967">1967</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b16">
+	<analytic>
+		<title level="a" type="main">Nonparametric estimation of the location of a maximum in a response surface</title>
+		<author>
+			<persName><forename type="first">R</forename><surname>Matthew</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Hans-Georg</forename><surname>Facer</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Müller</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Multivariate Analysis</title>
+		<imprint>
+			<biblScope unit="volume">87</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="191" to="217" />
+			<date type="published" when="2003">2003</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b17">
+	<analytic>
+		<title level="a" type="main">Some direct estimates of the mode</title>
+		<author>
+			<persName><forename type="first">Ulf</forename><surname>Grenander</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">36</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="131" to="138" />
+			<date type="published" when="1965">1965</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b18">
+	<analytic>
+		<title level="a" type="main">Nonparametric sequential estimation of zeros and extrema of regression functions</title>
+		<author>
+			<persName><forename type="first">Wolfgang</forename><surname>Härdle</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Rainer</forename><surname>Nixdorf</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE transactions on information theory</title>
+		<imprint>
+			<biblScope unit="volume">33</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="367" to="372" />
+			<date type="published" when="1987">1987</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b19">
+	<monogr>
+		<title level="m" type="main">Ibragimov and Rafail Z. Has&apos;minskii. Statistical Estimation, Asymptotic Theory</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Ildar</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1981">1981</date>
+			<publisher>Springer</publisher>
+			<pubPlace>New York</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b20">
+	<analytic>
+		<title level="a" type="main">Khas&apos; minskii. Estimation of the maximum value of a signal in gaussian white noise</title>
+		<author>
+			<persName><forename type="first">A</forename><surname>Ildar</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Ibragimov</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Z</forename><surname>Rafail</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Mat. Zametki</title>
+		<imprint>
+			<biblScope unit="volume">32</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="746" to="750" />
+			<date type="published" when="1982">1982</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b21">
+	<analytic>
+		<title level="a" type="main">Lower bound for the risks of nonparametric estimates of the mode</title>
+		<author>
+			<persName><forename type="first">Z</forename><surname>Rafail</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Khas'minskii</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Contributions to statistics</title>
+		<imprint>
+			<biblScope unit="volume">23</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="91" to="97" />
+			<date type="published" when="1979">1979</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b22">
+	<analytic>
+		<title level="a" type="main">Stochastic estimation of the maximum of a regression function</title>
+		<author>
+			<persName><forename type="first">Jack</forename><surname>Kiefer</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Jacob</forename><surname>Wolfowitz</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">23</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="462" to="466" />
+			<date type="published" when="1952">1952</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b23">
+	<analytic>
+		<title level="a" type="main">Adaptive estimation of the mode of a multivariate density</title>
+		<author>
+			<persName><forename type="first">Jussi</forename><surname>Klemelä</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Journal of Nonparametric Statistics</title>
+		<imprint>
+			<biblScope unit="volume">17</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="83" to="105" />
+			<date type="published" when="2005">2005</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b24">
+	<analytic>
+		<title level="a" type="main">Multikernel passive stochastic gradient algorithms and transfer learning</title>
+		<author>
+			<persName><forename type="first">Vikram</forename><surname>Krishnamurthy</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">George</forename><surname>Yin</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Trans. Automat. Control</title>
+		<imprint>
+			<biblScope unit="volume">67</biblScope>
+			<biblScope unit="page" from="1792" to="1805" />
+			<date type="published" when="2022">2022</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b25">
+	<monogr>
+		<title level="m" type="main">On a problem of adaptive estimation in Gaussian white noise. Theory of Probability and its Applications</title>
+		<author>
+			<persName><forename type="first">Oleg</forename><forename type="middle">V</forename><surname>Lepski</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1991">1991</date>
+			<biblScope unit="volume">35</biblScope>
+			<biblScope unit="page" from="454" to="466" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b26">
+	<monogr>
+		<title level="m" type="main">Estimation of the maximum of a nonparametric signal up to a constant. Theory of Probability and its Applications</title>
+		<author>
+			<persName><forename type="first">Oleg</forename><forename type="middle">V</forename><surname>Lepski</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1993">1993</date>
+			<biblScope unit="volume">38</biblScope>
+			<biblScope unit="page" from="152" to="158" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b27">
+	<analytic>
+		<title level="a" type="main">A companion for the Kiefer-Wolfowitz-Blum stochastic approximation algorithm</title>
+		<author>
+			<persName><forename type="first">Abdelkader</forename><surname>Mokkadem</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Mariane</forename><surname>Pelletier</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">35</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="1749" to="1772" />
+			<date type="published" when="2007">2007</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b28">
+	<analytic>
+		<title level="a" type="main">Kernel estimators of zeros and of location and size of extrema of regression functions</title>
+		<author>
+			<persName><forename type="first">Hans-Georg</forename><surname>Müller</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Scandinavian journal of statistics</title>
+		<imprint>
+			<biblScope unit="volume">12</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="221" to="232" />
+			<date type="published" when="1985">1985</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b29">
+	<analytic>
+		<title level="a" type="main">Adaptive nonparametric peak estimation</title>
+		<author>
+			<persName><forename type="first">Hans-Georg</forename><surname>Müller</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">17</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="1053" to="1069" />
+			<date type="published" when="1989">1989</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b30">
+	<monogr>
+		<title level="m" type="main">Passive stochastic approximation. Automation and Remote Control</title>
+		<author>
+			<persName><forename type="first">Alexander</forename><forename type="middle">V</forename><surname>Nazin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Boris</forename><forename type="middle">T</forename><surname>Polyak</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1989">1989</date>
+			<biblScope unit="volume">50</biblScope>
+			<biblScope unit="page" from="1563" to="1569" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b31">
+	<analytic>
+		<title level="a" type="main">Optimal and robust algorithms of passive stochastic approximation</title>
+		<author>
+			<persName><forename type="first">Alexander</forename><forename type="middle">V</forename><surname>Nazin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Boris</forename><forename type="middle">T</forename><surname>Polyak</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">IEEE Transactions on Information Theory</title>
+		<imprint>
+			<biblScope unit="volume">38</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<biblScope unit="page" from="1577" to="1583" />
+			<date type="published" when="1992">1992</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b32">
+	<analytic>
+		<title level="a" type="main">On estimation of a probability density function and mode</title>
+		<author>
+			<persName><forename type="first">Emanuel</forename><surname>Parzen</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">33</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="1065" to="1076" />
+			<date type="published" when="1962">1962</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b33">
+	<analytic>
+		<title level="a" type="main">Optimal order of accuracy of search algorithms in stochastic optimization</title>
+		<author>
+			<persName><forename type="first">Boris</forename><forename type="middle">T</forename><surname>Polyak</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Alexandre</forename><forename type="middle">B</forename><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Problems of Information Transmission</title>
+		<imprint>
+			<biblScope unit="volume">26</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="45" to="53" />
+			<date type="published" when="1990">1990</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b34">
+	<analytic>
+		<title level="a" type="main">Optimal rates of convergence for nonparametric estimators</title>
+		<author>
+			<persName><forename type="first">Charles</forename><forename type="middle">J</forename><surname>Stone</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">8</biblScope>
+			<biblScope unit="issue">6</biblScope>
+			<biblScope unit="page" from="1348" to="1360" />
+			<date type="published" when="1980">1980</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b35">
+	<analytic>
+		<title level="a" type="main">Optimal global rates of convergence for nonparametric regression</title>
+		<author>
+			<persName><forename type="first">J</forename><surname>Charles</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Stone</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Statistics</title>
+		<imprint>
+			<biblScope unit="volume">10</biblScope>
+			<biblScope unit="issue">4</biblScope>
+			<biblScope unit="page" from="1040" to="1053" />
+			<date type="published" when="1982">1982</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b36">
+	<analytic>
+		<title level="a" type="main">Robust reconstruction of functions by the local-approximation method</title>
+		<author>
+			<persName><forename type="first">B</forename><surname>Alexandre</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Problems of Information Transmission</title>
+		<imprint>
+			<biblScope unit="volume">22</biblScope>
+			<biblScope unit="issue">2</biblScope>
+			<biblScope unit="page" from="69" to="84" />
+			<date type="published" when="1986">1986</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b37">
+	<analytic>
+		<title level="a" type="main">Recursive estimation of the mode of a multivariate distribution</title>
+		<author>
+			<persName><forename type="first">B</forename><surname>Alexandre</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Tsybakov</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Problems of Information Transmission</title>
+		<imprint>
+			<biblScope unit="volume">26</biblScope>
+			<biblScope unit="issue">1</biblScope>
+			<biblScope unit="page" from="31" to="37" />
+			<date type="published" when="1990">1990</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b38">
+	<monogr>
+		<title level="m" type="main">Locally-polynomial algorithms of passive stochastic approximation. Problems of Control and Information Theory</title>
+		<author>
+			<persName><forename type="first">B</forename><surname>Alexandre</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Tsybakov</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="1990">1990</date>
+			<biblScope unit="volume">19</biblScope>
+			<biblScope unit="page" from="181" to="195" />
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b39">
+	<monogr>
+		<title level="m" type="main">Introduction to Nonparametric Estimation</title>
+		<author>
+			<persName><forename type="first">B</forename><surname>Alexandre</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Tsybakov</surname></persName>
+		</author>
+		<imprint>
+			<date type="published" when="2009">2009</date>
+			<publisher>Springer</publisher>
+			<pubPlace>New York</pubPlace>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b40">
+	<analytic>
+		<title level="a" type="main">On estimation of the mode</title>
+		<author>
+			<persName><forename type="first">Hendrik</forename><surname>Johannes</surname></persName>
+		</author>
+		<author>
+			<persName><surname>Venter</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">The Annals of Mathematical Statistics</title>
+		<imprint>
+			<biblScope unit="volume">38</biblScope>
+			<biblScope unit="issue">5</biblScope>
+			<biblScope unit="page" from="1446" to="1455" />
+			<date type="published" when="1967">1967</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b41">
+	<analytic>
+		<title level="a" type="main">Optimization of smooth functions with noisy observations: Local minimax rates</title>
+		<author>
+			<persName><forename type="first">Yining</forename><surname>Wang</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Sivaraman</forename><surname>Balakrishnan</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Aarti</forename><surname>Singh</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Advances in Neural Information Processing Systems</title>
+		<imprint>
+			<biblScope unit="page">31</biblScope>
+			<date type="published" when="2018">2018</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+<biblStruct xml:id="b42">
+	<analytic>
+		<title level="a" type="main">Bayesian mode and maximum estimation and accelerated rates of contraction</title>
+		<author>
+			<persName><forename type="first">William</forename><surname>Weimin</surname></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Yoo</forename></persName>
+		</author>
+		<author>
+			<persName><forename type="first">Subhashis</forename><surname>Ghosal</surname></persName>
+		</author>
+	</analytic>
+	<monogr>
+		<title level="j">Bernoulli</title>
+		<imprint>
+			<biblScope unit="volume">25</biblScope>
+			<biblScope unit="issue">3</biblScope>
+			<biblScope unit="page" from="2330" to="2358" />
+			<date type="published" when="2019">2019</date>
+		</imprint>
+	</monogr>
+</biblStruct>
+
+				</listBibl>
+			</div>
+		</back>
+	</text>
+</TEI>

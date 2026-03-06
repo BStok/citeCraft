@@ -198,6 +198,3 @@ def process_pdf(pdf_path: str) -> str:
     # Step 4: Format for LLM
     return format_for_llm(paper)
 
-path = r"C:\Users\Sanya\Downloads\minimizerRP.pdf"
-struc = process_pdf(path)
-print(struc)
