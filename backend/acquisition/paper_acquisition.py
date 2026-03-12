@@ -43,8 +43,8 @@ def get_papers(query: str, save_csv: bool = False, csv_filename: str = "citeCraf
     """
 
     # keys
-    core_API = os.environ["coreAPI"]
-    googleAPIKey = os.environ["googleAPI"]
+    core_api_key = os.environ["coreAPI"]
+    google_api_key= os.environ["googleAPI"]
 
     
     all_papers: list[dict] = []
