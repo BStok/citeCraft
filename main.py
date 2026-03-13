@@ -28,17 +28,16 @@ async def search_papers(body: SearchRequest):
         return {"papers": papers}
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
+    
+ 
+class CompareRequest(BaseModel):
+    file_paths: list[str]
 
 @app.post("/compare_papers")
-async def compare(request: Request):
-    data = await request.json()
-    folder_path = data.get("folder_path")
-    if not folder_path:
-        return JSONResponse({"error": "No folder path provided"}, status_code=400)
-
+async def compare(body: CompareRequest):
     try:
-        comparison = compare_papers(folder_path)
-        return {"comparison": comparison}
+        rows = compare_papers(body.file_paths)
+        return {"comparison": rows}
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=500)
 
