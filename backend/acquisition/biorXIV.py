@@ -94,17 +94,3 @@ def save_to_csv(preprints, filename="biorxiv_preprints.csv"):
         # Create new file
         df.to_csv(filename, index=False)
         print(f"Created new file and saved {len(df)} preprints to {filename}")
-
-
-if __name__ == "__main__":
-    
-    query = input("Enter your search query (e.g., 'CRISPR'): ").strip()
-    max_results = int(input("Max results (default 10): ") or 10)
-    
-    print(f"Searching bioRxiv for: '{query}'...")
-    preprints = fetch_biorxiv_preprints( query, max_results)
-    
-    if preprints:
-        save_to_csv(preprints)
-    else:
-        print("No results found. Try a different query.")

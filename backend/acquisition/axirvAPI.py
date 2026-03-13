@@ -81,12 +81,3 @@ def saveToCsv(papers, filename="biorxiv_preprints.csv"):
     
     action = "Appended" if file_exists else "Saved"
     print(f"{action} {len(papers)} papers to {filename}.")
-
-# Example usage
-if __name__ == "__main__":
-    
-    search_query = input("What are you researching today ?\n ")
-    max_results = int(input("Enter max number of results (default 10): ") or 10)
-    
-    papers = fetchArxivPapers(search_query, max_results)
-    saveToCsv(papers,filename="arxivAuthorCheck.csv")

@@ -58,13 +58,3 @@ def save_core_to_csv(papers, filename="biorxiv_preprints.csv"):
     df = pd.DataFrame(papers)
     df.to_csv(filename, mode='a', index=False, encoding='utf-8')
     print(f"Saved {len(papers)} papers to {filename}")
-
-if __name__ == "__main__":
-    # User input
-    query = input("Enter your research query: ")
-    api_key = "xPTaiHlqI2gwevucODB6mMy5bKEtjFSo"  
-    max_results = int(input("Max results (default 10): ") or 10)
-
-    # Fetch and save papers
-    papers = fetch_core_papers(query, api_key, max_results)
-    save_core_to_csv(papers)
