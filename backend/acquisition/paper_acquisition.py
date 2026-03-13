@@ -1,85 +1,103 @@
-#gets research papers from all the libraries
-#- [ ]  Arxiv
-#- [ ]  biorxiv
-#- [ ]  core
-#- [ ]  scholar
-#- [ ]  pubmed
-
 import os
-
-#import functions from axirv
 from backend.acquisition.axirvAPI import fetchArxivPapers
 from backend.acquisition.axirvAPI import saveToCsv as saveA
-
-#import functions from biorxiv
 from backend.acquisition.biorXIV import fetch_biorxiv_preprints
 from backend.acquisition.biorXIV import save_to_csv as saveB
-
-##import functions from core
 from backend.acquisition.coreAPI import fetch_core_papers
 from backend.acquisition.coreAPI import save_core_to_csv as saveC
-
-##import functions from google scholar
 from backend.acquisition.googleScholarAPI import fetch_google_scholar_papers
-from backend.acquisition.googleScholarAPI import extract_doi
-from backend.acquisition.googleScholarAPI import parse_scholar_date
 from backend.acquisition.googleScholarAPI import save_to_csv as saveG
-
-##import functions from pubmed
 from backend.acquisition.pubMed import fetch_pubmed_articles
 from backend.acquisition.pubMed import save_to_csv as saveP
 
+
+def normalize(paper: dict, source: str) -> dict:
+    """Normalize all source-specific key names to a consistent schema."""
+    return {
+        "title":            paper.get("Title") or paper.get("title"),
+        "doi":              paper.get("DOI") or paper.get("doi"),
+        "authors":          paper.get("Authors") or paper.get("authors"),
+        "publication_date": (
+            paper.get("Publication Date") or
+            paper.get("publication_date") or
+            paper.get("Date") or
+            paper.get("date") or
+            str(paper.get("Publication Year") or paper.get("year") or "")
+        ),
+        "abstract":         paper.get("Abstract") or paper.get("abstract"),
+        "pdf_link":         (
+            paper.get("PDF Link") or
+            paper.get("pdf_link") or
+            paper.get("PDF_Link") or
+            paper.get("pdfLink")
+        ),
+        "citation_count":   paper.get("citation_count") or paper.get("citationCount") or paper.get("Citation Count"),
+        "source":           source,
+    }
+
+
 def get_papers(query: str, save_csv: bool = False, csv_filename: str = "citeCraft.csv") -> list[dict]:
     """
-    Fetch research papers from all sources for a given query.
- 
-    Args:
-        query:        The research query string.
-        save_csv:     If True, also persist results to a CSV file.
-        csv_filename: Path/name of the CSV file (used only when save_csv=True).
- 
-    Returns:
-        A flat list of paper dicts from all sources.
+    Fetch and normalize research papers from all sources.
+    Returns a flat list of normalized paper dicts.
     """
+    core_api_key   = os.environ.get("coreAPI", "")
+    google_api_key = os.environ.get("googleAPI", "")
 
-    # keys
-    core_api_key = os.environ["coreAPI"]
-    google_api_key= os.environ["googleAPI"]
-
-    
     all_papers: list[dict] = []
 
     # --- Arxiv ---
-    arxiv_papers = fetchArxivPapers(query, max_results=5)
-    all_papers.extend(arxiv_papers)
-    if save_csv:
-        saveA(arxiv_papers, filename=csv_filename)
- 
+    try:
+        arxiv_papers = fetchArxivPapers(query, max_results=5)
+        normalized = [normalize(p, "arXiv") for p in arxiv_papers]
+        all_papers.extend(normalized)
+        if save_csv:
+            saveA(arxiv_papers, filename=csv_filename)
+    except Exception as e:
+        print(f"Arxiv error: {e}")
+
     # --- bioRxiv ---
-    biorxiv_papers = fetch_biorxiv_preprints(query, max_results=3)
-    all_papers.extend(biorxiv_papers)
-    if save_csv:
-        saveB(biorxiv_papers, filename=csv_filename)
- 
+    try:
+        biorxiv_papers = fetch_biorxiv_preprints(query, max_results=3)
+        normalized = [normalize(p, "bioRxiv") for p in biorxiv_papers]
+        all_papers.extend(normalized)
+        if save_csv:
+            saveB(biorxiv_papers, filename=csv_filename)
+    except Exception as e:
+        print(f"bioRxiv error: {e}")
+
     # --- CORE ---
-    core_papers = fetch_core_papers(query, core_api_key, max_results=3)
-    all_papers.extend(core_papers)
-    if save_csv:
-        saveC(core_papers, filename=csv_filename)
- 
+    try:
+        core_papers = fetch_core_papers(query, core_api_key, max_results=3)
+        normalized = [normalize(p, "CORE") for p in core_papers]
+        all_papers.extend(normalized)
+        if save_csv:
+            saveC(core_papers, filename=csv_filename)
+    except Exception as e:
+        print(f"CORE error: {e}")
+
     # --- Google Scholar ---
-    scholar_papers = fetch_google_scholar_papers(query, google_api_key, max_results=6)
-    all_papers.extend(scholar_papers)
-    if save_csv:
-        saveG(scholar_papers, filename=csv_filename)
- 
+    try:
+        scholar_papers = fetch_google_scholar_papers(query, google_api_key, max_results=6)
+        normalized = [normalize(p, "Google Scholar") for p in scholar_papers]
+        all_papers.extend(normalized)
+        if save_csv:
+            saveG(scholar_papers, filename=csv_filename)
+    except Exception as e:
+        print(f"Google Scholar error: {e}")
+
     # --- PubMed ---
-    pubmed_papers = fetch_pubmed_articles(query, max_results=5)
-    all_papers.extend(pubmed_papers)
-    if save_csv:
-        saveP(pubmed_papers, filename=csv_filename)
- 
+    try:
+        pubmed_papers = fetch_pubmed_articles(query, max_results=5)
+        normalized = [normalize(p, "PubMed") for p in pubmed_papers]
+        all_papers.extend(normalized)
+        if save_csv:
+            saveP(pubmed_papers, filename=csv_filename)
+    except Exception as e:
+        print(f"PubMed error: {e}")
+
     return all_papers
+
 
 if __name__ == "__main__":
     query = input("Enter your research query: ")
