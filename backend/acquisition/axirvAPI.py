@@ -44,18 +44,7 @@ def fetchArxivPapers(query, max_results=10):
     
     return papers
 
-'''def saveToCsv(papers, filename="arxiv_papers.csv"):
-    """Save the extracted papers to a CSV file."""
-    if not papers:
-        print("No papers found.")
-        return
-    
-    keys = papers[0].keys()
-    with open(filename, 'w', newline='', encoding='utf-8') as f:
-        writer = csv.DictWriter(f, fieldnames=keys)
-        writer.writeheader()
-        writer.writerows(papers)
-    print(f"Saved {len(papers)} papers to {filename}.")'''
+
 
 
 def saveToCsv(papers, filename="biorxiv_preprints.csv"):
