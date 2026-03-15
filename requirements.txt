@@ -1,0 +1,14 @@
+feedparser
+requests
+pandas
+huggingface-hub
+spacy
+scikit-learn
+numpy
+openai
+python-dotenv
+lxml
+
+sqlalchemy 
+psycopg2-binary 
+flask-sqlalchemy
