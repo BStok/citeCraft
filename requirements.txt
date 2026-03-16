@@ -1,14 +1,32 @@
-feedparser
-requests
-pandas
-huggingface-hub
-spacy
-scikit-learn
-numpy
-openai
-python-dotenv
-lxml
+# Web framework
+fastapi==0.115.12
+uvicorn==0.34.0
+python-multipart==0.0.20
+starlette==0.46.1
 
-sqlalchemy 
-psycopg2-binary 
-flask-sqlalchemy
+# Database
+sqlalchemy==2.0.41
+psycopg2-binary==2.9.11
+
+# Auth
+bcrypt==5.0.0
+PyJWT==2.12.0
+
+# Environment
+python-dotenv==1.2.2
+
+# Paper acquisition
+requests==2.32.3
+feedparser==6.0.12
+pandas==2.3.0
+numpy==2.2.4
+
+# LLM / Comparison
+huggingface_hub==1.6.0
+
+# Parsing
+lxml==5.4.0
+
+# Utilities
+pydantic==2.0.0
+python-dateutil==2.9.0.post0
