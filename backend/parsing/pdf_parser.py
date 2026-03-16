@@ -1,8 +1,11 @@
-# backend/parsing/pdf_parser.py
+print("starts here")
 import re
 from pathlib import Path
 from typing import Optional
 import pypdf
+from dotenv import load_dotenv
+print("updated")
+load_dotenv()
 
 # ─── Section Detection ────────────────────────────────────────────────────────
 
