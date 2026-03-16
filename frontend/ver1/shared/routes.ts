@@ -3,7 +3,7 @@ import { z } from 'zod';
 // ============================================
 // CONFIG — change this to your deployed URL in prod
 // ============================================
-const API_BASE = 'https://citecraft-production.up.railway.app/docs';
+const API_BASE = 'https://citecraft-production.up.railway.app';
 
 // ============================================
 // HELPERS
