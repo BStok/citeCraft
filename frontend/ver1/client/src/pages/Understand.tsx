@@ -6,9 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { getToken } from "@shared/routes";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { API_BASE, getToken } from "@shared/routes";
 
 interface Message {
   role: "user" | "assistant";
@@ -21,18 +19,14 @@ interface UploadedPaper {
   file_path: string;
 }
 
-// ─── Section filters ──────────────────────────────────────────────────────────
-
 const SECTIONS = [
-  { value: "",             label: "Whole paper"   },
-  { value: "abstract",    label: "Abstract"       },
+  { value: "",              label: "Whole paper"  },
+  { value: "abstract",     label: "Abstract"      },
   { value: "introduction", label: "Introduction"  },
-  { value: "methodology", label: "Methodology"    },
-  { value: "results",     label: "Results"        },
-  { value: "conclusion",  label: "Conclusion"     },
+  { value: "methodology",  label: "Methodology"   },
+  { value: "results",      label: "Results"       },
+  { value: "conclusion",   label: "Conclusion"    },
 ];
-
-// ─── Suggested prompts ────────────────────────────────────────────────────────
 
 const SUGGESTED_QUESTIONS = [
   "What is the main contribution of this paper?",
@@ -41,8 +35,6 @@ const SUGGESTED_QUESTIONS = [
   "How does this compare to prior work?",
   "Summarize the methodology in simple terms.",
 ];
-
-// ─── Chat message bubble ──────────────────────────────────────────────────────
 
 function MessageBubble({ message }: { message: Message }) {
   const isUser = message.role === "user";
@@ -63,63 +55,59 @@ function MessageBubble({ message }: { message: Message }) {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-
 export default function Understand() {
-  const [paper, setPaper]           = useState<UploadedPaper | null>(null);
-  const [uploading, setUploading]   = useState(false);
-  const [messages, setMessages]     = useState<Message[]>([]);
-  const [input, setInput]           = useState("");
-  const [sectionFilter, setSectionFilter] = useState("");
+  const [paper, setPaper]                   = useState<UploadedPaper | null>(null);
+  const [uploading, setUploading]           = useState(false);
+  const [messages, setMessages]             = useState<Message[]>([]);
+  const [input, setInput]                   = useState("");
+  const [sectionFilter, setSectionFilter]   = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Hook is called with paper_id; re-instantiated when paper changes
   const askMutation = useAskPaper(paper?.paper_id ?? "");
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // ── Upload ──────────────────────────────────────────────────────────────────
-
+  // ── Upload + auto-index ─────────────────────────────────────────────────────
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setUploading(true);
     try {
+      // 1. Upload
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await fetch("https://citecraft-production.up.railway.app/upload_pdf", {
+      const uploadRes = await fetch(`${API_BASE}/upload_pdf`, {
         method: "POST",
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Upload failed");
+      if (!uploadRes.ok) throw new Error("Upload failed");
+      const uploadData = await uploadRes.json();
+      // backend returns: { file_path, filename, paper_id }
 
-      const data = await res.json();
-      setPaper({ paper_id: data.paper_id, filename: data.filename, file_path: data.file_path });
-      setMessages([]);
-
-      // Auto-index after upload so ask endpoint can find chunks
-      const indexRes = await fetch("https://citecraft-production.up.railway.app/papers/index", {
+      // 2. Auto-index so /ask can find chunks
+      const indexRes = await fetch(`${API_BASE}/papers/index`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${getToken()}`,
         },
         body: JSON.stringify({
-          paper_ids:  [data.paper_id],
-          file_paths: [data.file_path],
+          paper_ids:  [uploadData.paper_id],
+          file_paths: [uploadData.file_path],
         }),
       });
 
       if (!indexRes.ok) throw new Error("Indexing failed");
 
+      setPaper({ paper_id: uploadData.paper_id, filename: uploadData.filename, file_path: uploadData.file_path });
+      setMessages([]);
       toast({ title: "Paper ready", description: `${file.name} has been loaded and indexed.` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
@@ -130,7 +118,6 @@ export default function Understand() {
   };
 
   // ── Ask ─────────────────────────────────────────────────────────────────────
-
   const handleAsk = (question?: string) => {
     const q = question ?? input.trim();
     if (!q || !paper) return;
@@ -158,8 +145,6 @@ export default function Understand() {
     }
   };
 
-  // ── Render ──────────────────────────────────────────────────────────────────
-
   return (
     <div className="flex min-h-screen bg-background text-foreground">
       <Sidebar />
@@ -174,8 +159,6 @@ export default function Understand() {
             <h2 className="text-3xl font-display font-bold">Paper Understanding</h2>
             <p className="text-muted-foreground">Upload a paper and ask anything about it.</p>
           </div>
-
-          {/* Current paper badge */}
           {paper && (
             <div className="flex items-center gap-2 bg-primary/10 text-primary rounded-lg px-3 py-2 text-sm max-w-xs">
               <FileText className="w-4 h-4 shrink-0" />
@@ -184,9 +167,8 @@ export default function Understand() {
           )}
         </div>
 
-        {/* Body — split: upload/idle state OR chat */}
+        {/* No paper loaded */}
         {!paper ? (
-          // ── No paper loaded yet ──────────────────────────────────────────
           <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
               <BookOpen className="w-8 h-8 text-primary" />
@@ -210,11 +192,11 @@ export default function Understand() {
             </label>
           </div>
         ) : (
-          // ── Chat interface ───────────────────────────────────────────────
+          // Chat interface
           <div className="flex-1 flex flex-col overflow-hidden">
 
-            {/* Section filter row */}
-            <div className="px-8 py-3 border-b border-border shrink-0 flex items-center gap-3">
+            {/* Section filter + swap paper */}
+            <div className="px-8 py-3 border-b border-border shrink-0 flex items-center gap-3 flex-wrap">
               <span className="text-sm text-muted-foreground">Focus on:</span>
               <div className="flex gap-2 flex-wrap">
                 {SECTIONS.map((s) => (
@@ -231,7 +213,6 @@ export default function Understand() {
                   </button>
                 ))}
               </div>
-              {/* Swap paper */}
               <div className="ml-auto">
                 <input type="file" accept=".pdf" id="understand-swap" className="hidden" onChange={handleUpload} />
                 <label htmlFor="understand-swap">
@@ -307,7 +288,9 @@ export default function Understand() {
                   }
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Press Enter to send · answers are based solely on the uploaded paper</p>
+              <p className="text-xs text-muted-foreground mt-2">
+                Press Enter to send · answers are based solely on the uploaded paper
+              </p>
             </div>
           </div>
         )}

@@ -1,18 +1,14 @@
 import { Sidebar } from "@/components/Sidebar";
-import { useUploadPdf, useIndexPapers, useComparePapers } from "@/hooks/use-papers";
+import { useComparePapers } from "@/hooks/use-papers";
 import { useState } from "react";
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Minus, Upload, Play, FileText, X, Loader2 } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import { RAGComparisonRow } from "@shared/routes";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
+import { API_BASE, getToken } from "@shared/routes";
 
 interface UploadedPaper {
   paper_id: string;
@@ -21,13 +17,9 @@ interface UploadedPaper {
 }
 
 interface TableData {
-  // headers: one entry per paper
   headers: { id: string; title: string }[];
-  // rows: one per dimension
-  rows: { dimension: string; label: string; values: Record<string, string> }[];
+  rows: { label: string; values: Record<string, string> }[];
 }
-
-// ─── Dimension display labels ─────────────────────────────────────────────────
 
 const DIMENSION_LABELS: Record<string, string> = {
   scope:            "Scope",
@@ -36,12 +28,6 @@ const DIMENSION_LABELS: Record<string, string> = {
   results:          "Results",
   additional_notes: "Additional Notes",
 };
-
-function dimensionLabel(dim: string): string {
-  return DIMENSION_LABELS[dim] ?? dim.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
-}
-
-// ─── Step indicator ───────────────────────────────────────────────────────────
 
 function StepBadge({ step, label, active, done }: { step: number; label: string; active: boolean; done: boolean }) {
   return (
@@ -57,69 +43,96 @@ function StepBadge({ step, label, active, done }: { step: number; label: string;
   );
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 export default function Compare() {
-  const uploadMutation  = useUploadPdf();
-  const indexMutation   = useIndexPapers();
   const compareMutation = useComparePapers();
-
-  const [papers, setPapers]             = useState<UploadedPaper[]>([]);
+  const [papers, setPapers]                 = useState<UploadedPaper[]>([]);
   const [comparisonName, setComparisonName] = useState("");
-  const [tableData, setTableData]       = useState<TableData | null>(null);
-  const [currentStep, setCurrentStep]   = useState<1 | 2 | 3>(1);
-
+  const [tableData, setTableData]           = useState<TableData | null>(null);
+  const [uploading, setUploading]           = useState(false);
+  const [indexing, setIndexing]             = useState(false);
+  const [indexed, setIndexed]               = useState(false);
   const { toast } = useToast();
 
-  // ── Step 1: upload files ──────────────────────────────────────────────────
-
+  // ── Step 1: upload ──────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
 
-    for (const file of files) {
-      try {
-        const result = await uploadMutation.mutateAsync(file);
-        setPapers((prev) => [...prev, {
-          paper_id:  result.paper_id,
-          file_path: result.file_path,
-          filename:  result.filename,
-        }]);
-        toast({ title: "Uploaded", description: `${file.name} is ready.` });
-      } catch (err: any) {
-        toast({ title: "Upload failed", description: err.message, variant: "destructive" });
-      }
-    }
+    setUploading(true);
+    try {
+      for (const file of files) {
+        const formData = new FormData();
+        formData.append("file", file);
 
-    e.target.value = "";
+        const res = await fetch(`${API_BASE}/upload_pdf`, {
+          method: "POST",
+          headers: { Authorization: `Bearer ${getToken()}` },
+          body: formData,
+        });
+
+        if (!res.ok) {
+          toast({ title: "Upload failed", description: `Could not upload ${file.name}`, variant: "destructive" });
+          continue;
+        }
+
+        const data = await res.json();
+        // backend returns: { file_path, filename, paper_id }
+        setPapers((prev) => [...prev, {
+          paper_id:  data.paper_id,
+          file_path: data.file_path,
+          filename:  data.filename,
+        }]);
+        setIndexed(false); // new file means we need to re-index
+        toast({ title: "Uploaded", description: `${file.name} ready.` });
+      }
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
   };
 
   const removePaper = (index: number) => {
     setPapers(papers.filter((_, i) => i !== index));
+    setIndexed(false);
   };
 
-  // ── Step 2: index ─────────────────────────────────────────────────────────
-
+  // ── Step 2: index ───────────────────────────────────────────────────────────
   const handleIndex = async () => {
     if (papers.length < 2) {
       toast({ title: "Need more files", description: "Upload at least 2 PDFs.", variant: "destructive" });
       return;
     }
+    setIndexing(true);
     try {
-      await indexMutation.mutateAsync({
-        paper_ids:  papers.map((p) => p.paper_id),
-        file_paths: papers.map((p) => p.file_path),
+      const res = await fetch(`${API_BASE}/papers/index`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
+        body: JSON.stringify({
+          paper_ids:  papers.map((p) => p.paper_id),
+          file_paths: papers.map((p) => p.file_path),
+        }),
       });
-      setCurrentStep(3);
-      toast({ title: "Indexed", description: "Papers are indexed and ready to compare." });
+
+      if (!res.ok) throw new Error("Indexing failed");
+
+      setIndexed(true);
+      toast({ title: "Indexed", description: "Papers are ready to compare." });
     } catch (err: any) {
       toast({ title: "Indexing failed", description: err.message, variant: "destructive" });
+    } finally {
+      setIndexing(false);
     }
   };
 
-  // ── Step 3: compare ───────────────────────────────────────────────────────
-
+  // ── Step 3: compare ─────────────────────────────────────────────────────────
   const handleCompare = () => {
+    if (papers.length < 2) {
+      toast({ title: "Add more files", description: "Upload at least 2 PDFs.", variant: "destructive" });
+      return;
+    }
     compareMutation.mutate(
       {
         paper_ids:       papers.map((p) => p.paper_id),
@@ -127,16 +140,11 @@ export default function Compare() {
       },
       {
         onSuccess: (data) => {
-          // Build table headers from paper list (we know filenames)
           const headers = papers.map((p) => ({ id: p.paper_id, title: p.filename }));
-
-          // Build rows from RAG rows
-          const rows = data.rows.map((r: RAGComparisonRow) => ({
-            dimension: r.dimension,
-            label:     dimensionLabel(r.dimension),
-            values:    r.values,
+          const rows = data.rows.map((r: any) => ({
+            label:  DIMENSION_LABELS[r.dimension] ?? r.dimension.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+            values: r.values,
           }));
-
           setTableData({ headers, rows });
         },
         onError: (err: any) => {
@@ -145,8 +153,6 @@ export default function Compare() {
       }
     );
   };
-
-  // ── Remove a column from the result table ─────────────────────────────────
 
   const removeColumn = (headerId: string) => {
     if (!tableData) return;
@@ -157,9 +163,9 @@ export default function Compare() {
     setTableData({
       headers: tableData.headers.filter((h) => h.id !== headerId),
       rows:    tableData.rows.map((row) => {
-        const newValues = { ...row.values };
-        delete newValues[headerId];
-        return { ...row, values: newValues };
+        const v = { ...row.values };
+        delete v[headerId];
+        return { ...row, values: v };
       }),
     });
   };
@@ -168,17 +174,11 @@ export default function Compare() {
     setTableData(null);
     setPapers([]);
     setComparisonName("");
-    setCurrentStep(1);
+    setIndexed(false);
   };
 
-  // ── Derived state ─────────────────────────────────────────────────────────
-
-  const isUploading = uploadMutation.isPending;
-  const isIndexing  = indexMutation.isPending;
-  const isComparing = compareMutation.isPending;
-  const isBusy      = isUploading || isIndexing || isComparing;
-
-  // ── Render ────────────────────────────────────────────────────────────────
+  const isBusy      = uploading || indexing || compareMutation.isPending;
+  const currentStep = indexed ? 3 : papers.length >= 2 ? 2 : 1;
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
@@ -196,20 +196,19 @@ export default function Compare() {
           </div>
         </div>
 
-        {/* Setup panel — hide once we have results */}
+        {/* Setup panel — hidden once results are ready */}
         {!tableData && (
           <div className="mb-8 space-y-6 max-w-2xl">
 
             {/* Step indicators */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <StepBadge step={1} label="Upload PDFs"  active={currentStep === 1} done={papers.length >= 2} />
               <div className="h-px flex-1 bg-border" />
-              <StepBadge step={2} label="Index Papers" active={currentStep === 1 && papers.length >= 2} done={currentStep === 3} />
+              <StepBadge step={2} label="Index Papers" active={currentStep === 2} done={indexed} />
               <div className="h-px flex-1 bg-border" />
               <StepBadge step={3} label="Compare"      active={currentStep === 3} done={!!tableData} />
             </div>
 
-            {/* Comparison name */}
             <Input
               placeholder="Comparison name (optional)"
               value={comparisonName}
@@ -219,28 +218,23 @@ export default function Compare() {
             {/* Upload button */}
             <div>
               <input
-                type="file"
-                accept=".pdf"
-                multiple
-                id="pdf-upload"
-                className="hidden"
-                onChange={handleFileUpload}
-                disabled={isBusy}
+                type="file" accept=".pdf" multiple id="pdf-upload"
+                className="hidden" onChange={handleFileUpload} disabled={isBusy}
               />
               <label htmlFor="pdf-upload">
                 <Button variant="outline" className="gap-2 cursor-pointer" disabled={isBusy} asChild>
                   <span>
-                    {isUploading
+                    {uploading
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
                       : <><Upload className="w-4 h-4" /> Upload PDFs</>
                     }
                   </span>
                 </Button>
               </label>
-              <p className="text-xs text-muted-foreground mt-1">Select multiple files at once</p>
+              <p className="text-xs text-muted-foreground mt-1">You can select multiple files at once</p>
             </div>
 
-            {/* Uploaded papers list */}
+            {/* Uploaded files list */}
             {papers.length > 0 && (
               <div className="space-y-2">
                 {papers.map((p, i) => (
@@ -248,9 +242,6 @@ export default function Compare() {
                     <div className="flex items-center gap-2">
                       <FileText className="w-4 h-4 text-muted-foreground" />
                       <span>{p.filename}</span>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        #{p.paper_id.slice(0, 8)}
-                      </span>
                     </div>
                     <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removePaper(i)} disabled={isBusy}>
                       <X className="w-3 h-3" />
@@ -258,29 +249,29 @@ export default function Compare() {
                   </div>
                 ))}
 
-                {/* Index button — shown when ≥2 papers uploaded and not yet indexed */}
-                {currentStep === 1 && (
+                {/* Index button */}
+                {!indexed && (
                   <Button
                     onClick={handleIndex}
                     disabled={isBusy || papers.length < 2}
                     variant="outline"
                     className="gap-2 w-full"
                   >
-                    {isIndexing
+                    {indexing
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Indexing papers...</>
                       : "Index Papers for RAG"
                     }
                   </Button>
                 )}
 
-                {/* Compare button — shown after indexing */}
-                {currentStep === 3 && (
+                {/* Compare button */}
+                {indexed && (
                   <Button
                     onClick={handleCompare}
                     disabled={isBusy}
                     className="gap-2 w-full"
                   >
-                    {isComparing
+                    {compareMutation.isPending
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Comparing... (this may take a minute)</>
                       : <><Play className="w-4 h-4" /> Run Comparison</>
                     }
@@ -291,8 +282,7 @@ export default function Compare() {
           </div>
         )}
 
-        {/* Loading skeleton */}
-        {isComparing && !tableData && (
+        {compareMutation.isPending && !tableData && (
           <Skeleton className="h-[500px] w-full rounded-xl" />
         )}
 
@@ -309,12 +299,9 @@ export default function Compare() {
                     {tableData.headers.map((header) => (
                       <TableHead key={header.id} className="min-w-[300px] align-top py-4">
                         <div className="flex items-start justify-between gap-2">
-                          <span className="font-semibold text-foreground text-base line-clamp-2">
-                            {header.title}
-                          </span>
+                          <span className="font-semibold text-foreground text-base line-clamp-2">{header.title}</span>
                           <Button
-                            variant="ghost"
-                            size="icon"
+                            variant="ghost" size="icon"
                             className="h-6 w-6 rounded-full hover:bg-destructive/10 hover:text-destructive"
                             onClick={() => removeColumn(header.id)}
                           >
@@ -333,10 +320,7 @@ export default function Compare() {
                       </TableCell>
                       {tableData.headers.map((header) => (
                         <TableCell key={header.id} className="align-top py-4 text-sm leading-relaxed">
-                          {row.values[header.id]
-                            ? row.values[header.id]
-                            : <span className="text-muted-foreground italic">Not specified</span>
-                          }
+                          {row.values[header.id] || <span className="text-muted-foreground italic">Not specified</span>}
                         </TableCell>
                       ))}
                     </TableRow>
@@ -345,9 +329,7 @@ export default function Compare() {
               </Table>
             </div>
             <div className="p-4 border-t border-border">
-              <Button variant="outline" onClick={handleReset}>
-                New Comparison
-              </Button>
+              <Button variant="outline" onClick={handleReset}>New Comparison</Button>
             </div>
           </div>
         )}
