@@ -3,8 +3,7 @@ import { z } from 'zod';
 // ============================================
 // CONFIG — change this to your deployed URL in prod
 // ============================================
-export const API_BASE = 'https://citecraft-production.up.railway.app';
-
+export const API_BASE = import.meta.env.VITE_API_URL ?? 'https://citecraft-production.up.railway.app';
 // ============================================
 // HELPERS
 // ============================================
@@ -60,6 +59,7 @@ export const PaperSchema = z.object({
 });
 
 export type Paper = z.infer<typeof PaperSchema>;
+
 
 // ============================================
 // RAG comparison row shape

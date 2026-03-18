@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { Search, Scale, Library, Plus, LayoutDashboard, BookOpen } from "lucide-react";
+import { Search, Scale, Library, Plus, LayoutDashboard, BookOpen, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCollections, useCreateCollection } from "@/hooks/use-collections";
 import {
@@ -54,6 +54,7 @@ export function Sidebar() {
     { name: "Paper Retrieval",    icon: Search,   href: "/"            },
     { name: "Comparison",         icon: Scale,    href: "/compare"     },
     { name: "Paper Understanding",icon: BookOpen, href: "/understand"  },
+    { name: "History",            icon: History,  href: "/history"     },
   ];
 
   return (

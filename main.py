@@ -398,6 +398,47 @@ def get_comparisons(
         for c in comparisons
     ]}
 
+@app.get("/comparisons/{comparison_id}")
+def get_comparison(
+    comparison_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    comparison = db.query(Comparison).filter(
+        Comparison.id == uuid.UUID(comparison_id)
+    ).first()
+    if not comparison:
+        raise HTTPException(status_code=404, detail="Comparison not found")
+
+    cp_rows = db.query(ComparisonPaper).filter(
+        ComparisonPaper.comparison_id == comparison.id
+    ).all()
+
+    # Get paper titles for headers
+    paper_ids = [cp.paper_id for cp in cp_rows]
+    papers = db.query(Paper).filter(Paper.id.in_(paper_ids)).all()
+    paper_map = {str(p.id): p.title or p.pdf_link or str(p.id) for p in papers}
+
+    # Reconstruct rows in the same shape as /papers/compare
+    dimensions = ["scope", "dataset", "methodology", "results", "additional_notes"]
+    rows = [
+        {
+            "dimension": dim,
+            "values": {
+                str(cp.paper_id): getattr(cp, dim) or ""
+                for cp in cp_rows
+            }
+        }
+        for dim in dimensions
+    ]
+
+    return {
+        "comparison_id": str(comparison.id),
+        "name": comparison.name,
+        "created_at": str(comparison.created_at),
+        "headers": [{"id": str(pid), "title": paper_map.get(str(pid), str(pid))} for pid in paper_ids],
+        "rows": rows,
+    }
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)

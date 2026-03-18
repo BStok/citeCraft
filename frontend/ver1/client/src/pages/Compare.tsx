@@ -21,13 +21,35 @@ interface TableData {
   rows: { label: string; values: Record<string, string> }[];
 }
 
-const DIMENSION_LABELS: Record<string, string> = {
-  scope:            "Scope",
-  dataset:          "Dataset",
-  methodology:      "Methodology",
-  results:          "Results",
-  additional_notes: "Additional Notes",
-};
+// All available dimensions with display labels
+const ALL_DIMENSIONS: { value: string; label: string }[] = [
+  { value: "scope",            label: "Scope"            },
+  { value: "dataset",          label: "Dataset"          },
+  { value: "methodology",      label: "Methodology"      },
+  { value: "results",          label: "Results"          },
+  { value: "additional_notes", label: "Additional Notes" },
+];
+
+function dimensionLabel(dim: string): string {
+  return ALL_DIMENSIONS.find((d) => d.value === dim)?.label
+    ?? dim.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function downloadCSV(tableData: TableData, name: string) {
+  const headers = ["Dimension", ...tableData.headers.map((h) => h.title)];
+  const rows = tableData.rows.map((row) => [
+    row.label,
+    ...tableData.headers.map((h) => `"${(row.values[h.id] || "").replace(/"/g, '""')}"`),
+  ]);
+  const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${name || "comparison"}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
 
 function StepBadge({ step, label, active, done }: { step: number; label: string; active: boolean; done: boolean }) {
   return (
@@ -51,7 +73,20 @@ export default function Compare() {
   const [uploading, setUploading]           = useState(false);
   const [indexing, setIndexing]             = useState(false);
   const [indexed, setIndexed]               = useState(false);
+
+  // Dimensions: all checked by default
+  const [selectedDimensions, setSelectedDimensions] = useState<string[]>(
+    ALL_DIMENSIONS.map((d) => d.value)
+  );
+  const [customQuestion, setCustomQuestion] = useState("");
+
   const { toast } = useToast();
+
+  const toggleDimension = (value: string) => {
+    setSelectedDimensions((prev) =>
+      prev.includes(value) ? prev.filter((d) => d !== value) : [...prev, value]
+    );
+  };
 
   // ── Step 1: upload ──────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,13 +111,12 @@ export default function Compare() {
         }
 
         const data = await res.json();
-        // backend returns: { file_path, filename, paper_id }
         setPapers((prev) => [...prev, {
           paper_id:  data.paper_id,
           file_path: data.file_path,
           filename:  data.filename,
         }]);
-        setIndexed(false); // new file means we need to re-index
+        setIndexed(false);
         toast({ title: "Uploaded", description: `${file.name} ready.` });
       }
     } finally {
@@ -117,7 +151,6 @@ export default function Compare() {
       });
 
       if (!res.ok) throw new Error("Indexing failed");
-
       setIndexed(true);
       toast({ title: "Indexed", description: "Papers are ready to compare." });
     } catch (err: any) {
@@ -129,20 +162,22 @@ export default function Compare() {
 
   // ── Step 3: compare ─────────────────────────────────────────────────────────
   const handleCompare = () => {
-    if (papers.length < 2) {
-      toast({ title: "Add more files", description: "Upload at least 2 PDFs.", variant: "destructive" });
+    if (selectedDimensions.length === 0) {
+      toast({ title: "Select dimensions", description: "Pick at least one dimension to compare.", variant: "destructive" });
       return;
     }
     compareMutation.mutate(
       {
         paper_ids:       papers.map((p) => p.paper_id),
+        dimensions:      selectedDimensions,
+        custom_question: customQuestion.trim() || undefined,
         comparison_name: comparisonName || "Untitled Comparison",
       },
       {
         onSuccess: (data) => {
           const headers = papers.map((p) => ({ id: p.paper_id, title: p.filename }));
           const rows = data.rows.map((r: any) => ({
-            label:  DIMENSION_LABELS[r.dimension] ?? r.dimension.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+            label:  dimensionLabel(r.dimension),
             values: r.values,
           }));
           setTableData({ headers, rows });
@@ -175,6 +210,8 @@ export default function Compare() {
     setPapers([]);
     setComparisonName("");
     setIndexed(false);
+    setCustomQuestion("");
+    setSelectedDimensions(ALL_DIMENSIONS.map((d) => d.value));
   };
 
   const isBusy      = uploading || indexing || compareMutation.isPending;
@@ -196,7 +233,7 @@ export default function Compare() {
           </div>
         </div>
 
-        {/* Setup panel — hidden once results are ready */}
+        {/* Setup panel */}
         {!tableData && (
           <div className="mb-8 space-y-6 max-w-2xl">
 
@@ -209,11 +246,47 @@ export default function Compare() {
               <StepBadge step={3} label="Compare"      active={currentStep === 3} done={!!tableData} />
             </div>
 
+            {/* Comparison name */}
             <Input
               placeholder="Comparison name (optional)"
               value={comparisonName}
               onChange={(e) => setComparisonName(e.target.value)}
             />
+
+            {/* Dimensions selector */}
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Dimensions to compare</p>
+              <div className="flex flex-wrap gap-2">
+                {ALL_DIMENSIONS.map((dim) => {
+                  const selected = selectedDimensions.includes(dim.value);
+                  return (
+                    <button
+                      key={dim.value}
+                      onClick={() => toggleDimension(dim.value)}
+                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors
+                        ${selected
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                        }`}
+                    >
+                      {dim.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-muted-foreground">Click to toggle. All selected by default.</p>
+            </div>
+
+            {/* Custom question */}
+            <div className="space-y-1">
+              <p className="text-sm font-medium">Custom question <span className="text-muted-foreground font-normal">(optional)</span></p>
+              <Input
+                placeholder="e.g. Which paper is more suitable for real-time applications?"
+                value={customQuestion}
+                onChange={(e) => setCustomQuestion(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">Ask a specific question to be answered across all papers.</p>
+            </div>
 
             {/* Upload button */}
             <div>
@@ -268,7 +341,7 @@ export default function Compare() {
                 {indexed && (
                   <Button
                     onClick={handleCompare}
-                    disabled={isBusy}
+                    disabled={isBusy || selectedDimensions.length === 0}
                     className="gap-2 w-full"
                   >
                     {compareMutation.isPending
@@ -328,8 +401,11 @@ export default function Compare() {
                 </TableBody>
               </Table>
             </div>
-            <div className="p-4 border-t border-border">
+            <div className="p-4 border-t border-border flex gap-2">
               <Button variant="outline" onClick={handleReset}>New Comparison</Button>
+              <Button variant="outline" onClick={() => downloadCSV(tableData, comparisonName)}>
+                Download CSV
+              </Button>
             </div>
           </div>
         )}
