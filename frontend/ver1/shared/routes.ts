@@ -20,7 +20,6 @@ export function buildUrl(path: string, params?: Record<string, string | number>)
   return url;
 }
 
-// Token helpers — stored in localStorage after login
 export function getToken(): string | null {
   return localStorage.getItem('token');
 }
@@ -33,7 +32,6 @@ export function clearToken(): void {
   localStorage.removeItem('token');
 }
 
-// Authenticated fetch — automatically attaches Bearer token
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getToken();
   return fetch(`${API_BASE}${path}`, {
@@ -47,7 +45,7 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
 }
 
 // ============================================
-// PAPER SCHEMA (matches FastAPI Paper model)
+// PAPER SCHEMA
 // ============================================
 export const PaperSchema = z.object({
   db_id:            z.string().optional(),
@@ -64,22 +62,26 @@ export const PaperSchema = z.object({
 export type Paper = z.infer<typeof PaperSchema>;
 
 // ============================================
-// API CONTRACT — mirrors FastAPI routes
+// RAG comparison row shape
+// { dimension: "scope", values: { "paper-uuid-1": "...", "paper-uuid-2": "..." } }
+// ============================================
+export const RAGComparisonRowSchema = z.object({
+  dimension: z.string(),
+  values:    z.record(z.string(), z.string()),
+});
+
+export type RAGComparisonRow = z.infer<typeof RAGComparisonRowSchema>;
+
+// ============================================
+// API CONTRACT
 // ============================================
 export const api = {
   auth: {
-    register: {
-      method: 'POST' as const,
-      path: '/auth/register' as const,
-    },
-    login: {
-      method: 'POST' as const,
-      path: '/auth/login' as const,
-    },
+    register: { method: 'POST' as const, path: '/auth/register' as const },
+    login:    { method: 'POST' as const, path: '/auth/login'    as const },
   },
 
   papers: {
-    // Maps to FastAPI POST /search_papers
     search: {
       method: 'POST' as const,
       path: '/search_papers' as const,
@@ -87,27 +89,51 @@ export const api = {
         200: z.object({ papers: z.array(PaperSchema) }),
       },
     },
-    // Maps to FastAPI POST /compare_papers
-    compare: {
+
+    // Step 1 of compare flow — upload a single PDF, get back paper_id + file_path
+    upload: {
       method: 'POST' as const,
-      path: '/compare_papers' as const,
+      path: '/upload_pdf' as const,
       responses: {
         200: z.object({
-          comparison_id: z.string(),
-          comparison: z.array(z.object({
-            file:             z.string(),
-            authors:          z.string().nullable().optional(),
-            date:             z.string().nullable().optional(),
-            scope:            z.string().nullable().optional(),
-            dataset:          z.string().nullable().optional(),
-            methodology:      z.string().nullable().optional(),
-            results:          z.string().nullable().optional(),
-            additional_notes: z.string().nullable().optional(),
-          })),
+          file_path: z.string(),
+          filename:  z.string(),
+          paper_id:  z.string(),
         }),
       },
     },
-    // Maps to FastAPI POST /search_papers (save is implicit on search)
+
+    // Step 2 — index uploaded PDFs before comparing
+    index: {
+      method: 'POST' as const,
+      path: '/papers/index' as const,
+      responses: {
+        200: z.object({ results: z.array(z.any()) }),
+      },
+    },
+
+    // Step 3 — RAG-based comparison using paper_ids
+    compare: {
+      method: 'POST' as const,
+      path: '/papers/compare' as const,
+      responses: {
+        200: z.object({
+          comparison_id: z.string(),
+          rows: z.array(RAGComparisonRowSchema),
+        }),
+      },
+    },
+
+    // Paper understanding — ask a question about a specific paper
+    ask: {
+      method: 'POST' as const,
+      // paper_id is interpolated at call time: `/papers/${paper_id}/ask`
+      pathTemplate: '/papers/:paper_id/ask' as const,
+      responses: {
+        200: z.object({ answer: z.string() }),
+      },
+    },
+
     save: {
       method: 'POST' as const,
       path: '/search_papers' as const,

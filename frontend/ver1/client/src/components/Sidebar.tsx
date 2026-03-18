@@ -1,6 +1,5 @@
-
 import { Link, useLocation } from "wouter";
-import { Search, Scale, Library, Plus, LayoutDashboard } from "lucide-react";
+import { Search, Scale, Library, Plus, LayoutDashboard, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCollections, useCreateCollection } from "@/hooks/use-collections";
 import {
@@ -31,7 +30,6 @@ export function Sidebar() {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
 
-  // Read username from localStorage
   const username = localStorage.getItem("username") || "User";
   const initials = username.slice(0, 2).toUpperCase();
 
@@ -53,8 +51,9 @@ export function Sidebar() {
   };
 
   const navItems = [
-    { name: "Paper Retrieval", icon: Search, href: "/" },
-    { name: "Comparison", icon: Scale, href: "/compare" },
+    { name: "Paper Retrieval",    icon: Search,   href: "/"            },
+    { name: "Comparison",         icon: Scale,    href: "/compare"     },
+    { name: "Paper Understanding",icon: BookOpen, href: "/understand"  },
   ];
 
   return (

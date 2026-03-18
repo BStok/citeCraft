@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Compare from "@/pages/Compare";
+import Understand from "@/pages/Understand";
 import Collection from "@/pages/Collection";
 import Login from "@/pages/Login";
 import { getToken } from "@shared/routes";
@@ -22,6 +23,7 @@ function Router() {
       <Route path="/login" component={Login} />
       <Route path="/" component={() => <ProtectedRoute component={Home} />} />
       <Route path="/compare" component={() => <ProtectedRoute component={Compare} />} />
+      <Route path="/understand" component={Understand} />
       <Route path="/collections/:id" component={() => <ProtectedRoute component={Collection} />} />
       <Route component={NotFound} />
     </Switch>
