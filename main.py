@@ -1,5 +1,6 @@
 from dotenv import load_dotenv
 load_dotenv()
+import os
 
 import uuid
 import shutil
@@ -8,8 +9,9 @@ from pathlib import Path
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Optional
 from sqlalchemy.orm import Session
@@ -19,8 +21,6 @@ from backend.comparison.comp import compare_papers
 from backend.db.db import get_db, init_db
 from backend.db.models import Paper, Comparison, ComparisonPaper, Collection, CollectionPaper, User
 from backend.auth.auth import hash_password, verify_password, generate_token, verify_token
-from backend.rag.pipeline import index_papers, compare_papers_rag, understand_paper
-from backend.rag.retriever import index_paper
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -84,35 +84,19 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
 @app.post("/upload_pdf")
 async def upload_pdf(
     file: UploadFile = File(...),
-    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
 
+    # Save with unique name to avoid collisions
     unique_name = f"{uuid.uuid4()}_{file.filename}"
     save_path = UPLOAD_DIR / unique_name
 
     with save_path.open("wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    # Create a Paper record so we have a paper_id for indexing
-    user_id = uuid.UUID(current_user["user_id"])
-    paper = Paper(
-        user_id  = user_id,
-        title    = file.filename.replace(".pdf", ""),
-        source   = "uploaded",
-        pdf_link = str(save_path),
-    )
-    db.add(paper)
-    db.commit()
-    db.refresh(paper)
-
-    return {
-        "file_path": str(save_path),
-        "filename":  file.filename,
-        "paper_id":  str(paper.id),
-    }
+    return {"file_path": str(save_path), "filename": file.filename}
 
 
 # ─── Search ───────────────────────────────────────────────────────────────────
@@ -156,107 +140,7 @@ def search_papers(
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-# ─── RAG: Index ───────────────────────────────────────────────────────────────
-
-class IndexRequest(BaseModel):
-    paper_ids: list[str]   # DB paper UUIDs
-    file_paths: list[str]  # corresponding PDF paths on server
-
-@app.post("/papers/index")
-def index_papers_endpoint(
-    body: IndexRequest,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    if len(body.paper_ids) != len(body.file_paths):
-        raise HTTPException(status_code=400, detail="paper_ids and file_paths must have the same length")
-    try:
-        results = index_papers(body.file_paths, body.paper_ids, db)
-        return {"results": results}
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
-
-
-# ─── RAG: Compare ─────────────────────────────────────────────────────────────
-
-class RAGCompareRequest(BaseModel):
-    paper_ids: list[str]
-    dimensions: Optional[list[str]] = None
-    custom_question: Optional[str] = None
-    comparison_name: Optional[str] = "Untitled Comparison"
-
-@app.post("/papers/compare")
-def rag_compare(
-    body: RAGCompareRequest,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    if len(body.paper_ids) < 2:
-        raise HTTPException(status_code=400, detail="At least 2 papers required")
-    try:
-        user_id = uuid.UUID(current_user["user_id"])
-
-        # Run RAG comparison
-        rows = compare_papers_rag(
-            paper_ids       = body.paper_ids,
-            db              = db,
-            dimensions      = body.dimensions,
-            custom_question = body.custom_question,
-        )
-
-        # Save to DB
-        comparison = Comparison(user_id=user_id, name=body.comparison_name)
-        db.add(comparison)
-        db.flush()
-
-        for paper_id in body.paper_ids:
-            cp = ComparisonPaper(
-                comparison_id = comparison.id,
-                paper_id      = uuid.UUID(paper_id),
-                scope         = next((r["values"].get(paper_id) for r in rows if r["dimension"] == "scope"), None),
-                dataset       = next((r["values"].get(paper_id) for r in rows if r["dimension"] == "dataset"), None),
-                methodology   = next((r["values"].get(paper_id) for r in rows if r["dimension"] == "methodology"), None),
-                results       = next((r["values"].get(paper_id) for r in rows if r["dimension"] == "results"), None),
-                additional_notes = next((r["values"].get(paper_id) for r in rows if r["dimension"] == "additional_notes"), None),
-            )
-            db.add(cp)
-
-        db.commit()
-        return {
-            "comparison_id": str(comparison.id),
-            "rows": rows,
-        }
-    except Exception as e:
-        db.rollback()
-        return JSONResponse({"error": str(e)}, status_code=500)
-
-
-# ─── RAG: Understand ──────────────────────────────────────────────────────────
-
-class UnderstandRequest(BaseModel):
-    question: str
-    section_filter: Optional[str] = None
-
-@app.post("/papers/{paper_id}/ask")
-def ask_paper(
-    paper_id: str,
-    body: UnderstandRequest,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    try:
-        answer = understand_paper(
-            paper_id       = paper_id,
-            question       = body.question,
-            db             = db,
-            section_filter = body.section_filter,
-        )
-        return {"answer": answer}
-    except Exception as e:
-        return JSONResponse({"error": str(e)}, status_code=500)
-
-
-# ─── Old Compare (GROBID-based, kept for reference) ───────────────────────────
+# ─── Compare ──────────────────────────────────────────────────────────────────
 
 class CompareRequest(BaseModel):
     file_paths: list[str]
@@ -351,13 +235,13 @@ def get_collection(
         "collection": {"id": str(col.id), "name": col.label, "created_at": str(col.created_at)},
         "papers": [
             {
-                "id":               str(p.id),
-                "title":            p.title,
-                "authors":          p.authors,
+                "id": str(p.id),
+                "title": p.title,
+                "authors": p.authors,
                 "publication_date": p.publication_date,
-                "abstract":         p.abstract,
-                "pdf_link":         p.pdf_link,
-                "source":           p.source,
+                "abstract": p.abstract,
+                "pdf_link": p.pdf_link,
+                "source": p.source,
             }
             for p in papers
         ],
@@ -373,14 +257,39 @@ def add_paper_to_collection(
     paper_id = body.get("paper_id")
     if not paper_id:
         raise HTTPException(status_code=400, detail="paper_id required")
+
+    # Enforce 5 paper limit
+    existing = db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id)
+    ).count()
+    if existing >= 5:
+        raise HTTPException(status_code=400, detail="Collection limit reached (5 papers max)")
+
+    # Check if already in collection
+    already = db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id),
+        CollectionPaper.paper_id == uuid.UUID(paper_id),
+    ).first()
+    if already:
+        raise HTTPException(status_code=400, detail="Paper already in collection")
+
     cp = CollectionPaper(
-        collection_id = uuid.UUID(collection_id),
-        paper_id      = uuid.UUID(paper_id),
+        collection_id=uuid.UUID(collection_id),
+        paper_id=uuid.UUID(paper_id),
     )
     db.add(cp)
+
+    # Auto-index if not already indexed
+    paper = db.query(Paper).filter(Paper.id == uuid.UUID(paper_id)).first()
+    if paper and not paper.is_indexed and paper.pdf_link:
+        try:
+            index_papers([paper.pdf_link], [paper_id], db)
+            paper.is_indexed = 1
+        except Exception:
+            pass  # don't block adding to collection if indexing fails
+
     db.commit()
     return {"message": "Paper added to collection"}
-
 
 # ─── Comparisons list ─────────────────────────────────────────────────────────
 
@@ -398,47 +307,36 @@ def get_comparisons(
         for c in comparisons
     ]}
 
-@app.get("/comparisons/{comparison_id}")
-def get_comparison(
-    comparison_id: str,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    comparison = db.query(Comparison).filter(
-        Comparison.id == uuid.UUID(comparison_id)
-    ).first()
-    if not comparison:
-        raise HTTPException(status_code=404, detail="Comparison not found")
-
-    cp_rows = db.query(ComparisonPaper).filter(
-        ComparisonPaper.comparison_id == comparison.id
-    ).all()
-
-    # Get paper titles for headers
-    paper_ids = [cp.paper_id for cp in cp_rows]
-    papers = db.query(Paper).filter(Paper.id.in_(paper_ids)).all()
-    paper_map = {str(p.id): p.title or p.pdf_link or str(p.id) for p in papers}
-
-    # Reconstruct rows in the same shape as /papers/compare
-    dimensions = ["scope", "dataset", "methodology", "results", "additional_notes"]
-    rows = [
-        {
-            "dimension": dim,
-            "values": {
-                str(cp.paper_id): getattr(cp, dim) or ""
-                for cp in cp_rows
-            }
-        }
-        for dim in dimensions
-    ]
-
-    return {
-        "comparison_id": str(comparison.id),
-        "name": comparison.name,
-        "created_at": str(comparison.created_at),
-        "headers": [{"id": str(pid), "title": paper_map.get(str(pid), str(pid))} for pid in paper_ids],
-        "rows": rows,
-    }
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
+
+# ─── File Upload ──────────────────────────────────────────────────────────────
+
+UPLOAD_DIR = Path("uploads")
+UPLOAD_DIR.mkdir(exist_ok=True)
+
+@app.post("/upload_pdf")
+async def upload_pdf(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+
+    # Save with unique name to avoid collisions
+    unique_name = f"{uuid.uuid4()}_{file.filename}"
+    save_path = UPLOAD_DIR / unique_name
+
+    with open(save_path, "wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    return {"path": str(save_path), "filename": file.filename}
+
+frontend_path = Path("frontend/ver1/client/dist")
+if frontend_path.exists():
+    app.mount("/assets", StaticFiles(directory=frontend_path / "assets"), name="assets")
+    
+    @app.get("/{full_path:path}")
+    def serve_frontend(full_path: str):
+        return FileResponse(frontend_path / "index.html")
