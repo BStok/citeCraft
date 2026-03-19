@@ -1,8 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { api, apiFetch, getToken, API_BASE, RAGComparisonRow } from "@shared/routes";
+import { api, apiFetch, RAGComparisonRow, SourceChunk } from "@shared/routes";
 import { useToast } from "@/hooks/use-toast";
-
-// ─── Search ───────────────────────────────────────────────────────────────────
 
 export function useSearchPapers(query: string) {
   return useQuery({
@@ -20,8 +18,6 @@ export function useSearchPapers(query: string) {
     enabled: !!query,
   });
 }
-
-// ─── RAG Compare ─────────────────────────────────────────────────────────────
 
 export interface ComparePayload {
   paper_ids: string[];
@@ -51,16 +47,19 @@ export function useComparePapers() {
   });
 }
 
-// ─── Ask / Understand paper ───────────────────────────────────────────────────
-
 export interface AskPayload {
   question: string;
   section_filter?: string;
 }
 
+export interface AskResult {
+  answer: string;
+  sources?: SourceChunk[];
+}
+
 export function useAskPaper(paperId: string) {
   return useMutation({
-    mutationFn: async (payload: AskPayload): Promise<{ answer: string }> => {
+    mutationFn: async (payload: AskPayload): Promise<AskResult> => {
       const res = await apiFetch(`/papers/${paperId}/ask`, {
         method: "POST",
         body: JSON.stringify(payload),
@@ -74,12 +73,9 @@ export function useAskPaper(paperId: string) {
   });
 }
 
-// ─── Save paper ───────────────────────────────────────────────────────────────
-
 export function useSavePaper() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
-
   return useMutation({
     mutationFn: async (paper: any) => {
       const res = await apiFetch(api.papers.save.path, {
@@ -98,8 +94,6 @@ export function useSavePaper() {
     },
   });
 }
-
-// ─── Comparisons list ─────────────────────────────────────────────────────────
 
 export function useComparisons() {
   return useQuery({

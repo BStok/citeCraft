@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 load_dotenv()
-import os
 
+import os
 import uuid
 import shutil
 import uvicorn
@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 
 from backend.acquisition.paper_acquisition import get_papers
 from backend.comparison.comp import compare_papers
-from backend.rag.pipeline import index_papers, compare_papers_rag, understand_paper
+from backend.rag.pipeline import index_papers as rag_index_papers, compare_papers_rag, understand_paper
 from backend.db.db import get_db, init_db
 from backend.db.models import Paper, Comparison, ComparisonPaper, Collection, CollectionPaper, User
 from backend.auth.auth import hash_password, verify_password, generate_token, verify_token
@@ -53,11 +53,41 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict:
     return payload
 
 
-# ─── Auth (public) ────────────────────────────────────────────────────────────
+# ─── Pydantic models ──────────────────────────────────────────────────────────
 
 class RegisterRequest(BaseModel):
     username: str
     password: str
+
+class SearchRequest(BaseModel):
+    query: str
+    save_csv: Optional[bool] = False
+    csv_filename: Optional[str] = "citeCraft.csv"
+
+class CompareRequest(BaseModel):
+    file_paths: list[str]
+    comparison_name: Optional[str] = "Untitled Comparison"
+
+class IndexRequest(BaseModel):
+    paper_ids: list[str]
+    file_paths: list[str]
+
+class RAGCompareRequest(BaseModel):
+    paper_ids: list[str]
+    dimensions: Optional[list[str]] = None
+    custom_question: Optional[str] = None
+    comparison_name: Optional[str] = "Untitled Comparison"
+
+class UnderstandRequest(BaseModel):
+    question: str
+    section_filter: Optional[str] = None
+
+class CollectionCreateRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+
+
+# ─── Auth ─────────────────────────────────────────────────────────────────────
 
 @app.post("/auth/register")
 def register(body: RegisterRequest, db: Session = Depends(get_db)):
@@ -80,32 +110,42 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     return {"access_token": token, "token_type": "bearer", "user_id": str(user.id), "username": user.username}
 
 
-# ─── File Upload ──────────────────────────────────────────────────────────────
+# ─── File upload ──────────────────────────────────────────────────────────────
 
 @app.post("/upload_pdf")
 async def upload_pdf(
     file: UploadFile = File(...),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
     if not file.filename.endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are allowed")
 
-    # Save with unique name to avoid collisions
     unique_name = f"{uuid.uuid4()}_{file.filename}"
     save_path = UPLOAD_DIR / unique_name
 
     with save_path.open("wb") as f:
         shutil.copyfileobj(file.file, f)
 
-    return {"file_path": str(save_path), "filename": file.filename}
+    user_id = uuid.UUID(current_user["user_id"])
+    paper = Paper(
+        user_id  = user_id,
+        title    = file.filename.replace(".pdf", ""),
+        source   = "uploaded",
+        pdf_link = str(save_path),
+    )
+    db.add(paper)
+    db.commit()
+    db.refresh(paper)
+
+    return {
+        "file_path": str(save_path),
+        "filename":  file.filename,
+        "paper_id":  str(paper.id),
+    }
 
 
 # ─── Search ───────────────────────────────────────────────────────────────────
-
-class SearchRequest(BaseModel):
-    query: str
-    save_csv: Optional[bool] = False
-    csv_filename: Optional[str] = "citeCraft.csv"
 
 @app.post("/search_papers")
 def search_papers(
@@ -141,11 +181,95 @@ def search_papers(
         return JSONResponse({"error": str(e)}, status_code=500)
 
 
-# ─── Compare ──────────────────────────────────────────────────────────────────
+# ─── RAG: Index ───────────────────────────────────────────────────────────────
 
-class CompareRequest(BaseModel):
-    file_paths: list[str]
-    comparison_name: Optional[str] = "Untitled Comparison"
+@app.post("/papers/index")
+def index_papers_endpoint(
+    body: IndexRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if len(body.paper_ids) != len(body.file_paths):
+        raise HTTPException(status_code=400, detail="paper_ids and file_paths must have the same length")
+    try:
+        results = rag_index_papers(body.file_paths, body.paper_ids, db)
+        return {"results": results}
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ─── RAG: Compare ─────────────────────────────────────────────────────────────
+
+@app.post("/papers/compare")
+def rag_compare(
+    body: RAGCompareRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if len(body.paper_ids) < 2:
+        raise HTTPException(status_code=400, detail="At least 2 papers required")
+    try:
+        user_id = uuid.UUID(current_user["user_id"])
+
+        rows = compare_papers_rag(
+            paper_ids       = body.paper_ids,
+            db              = db,
+            dimensions      = body.dimensions,
+            custom_question = body.custom_question,
+        )
+
+        comparison = Comparison(user_id=user_id, name=body.comparison_name)
+        db.add(comparison)
+        db.flush()
+
+        for paper_id in body.paper_ids:
+            cp = ComparisonPaper(
+                comparison_id    = comparison.id,
+                paper_id         = uuid.UUID(paper_id),
+                scope            = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "scope"), None),
+                dataset          = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "dataset"), None),
+                methodology      = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "methodology"), None),
+                results          = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "results"), None),
+                additional_notes = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "additional_notes"), None),
+                sources_json     = {
+                    dim: r["values"].get(paper_id, {}).get("sources", [])
+                    for r in rows for dim in [r["dimension"]]
+                },
+            )
+            db.add(cp)
+
+        db.commit()
+        return {
+            "comparison_id": str(comparison.id),
+            "rows": rows,
+        }
+    except Exception as e:
+        db.rollback()
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ─── RAG: Understand ──────────────────────────────────────────────────────────
+
+@app.post("/papers/{paper_id}/ask")
+def ask_paper(
+    paper_id: str,
+    body: UnderstandRequest,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    try:
+        result = understand_paper(
+            paper_id       = paper_id,
+            question       = body.question,
+            db             = db,
+            section_filter = body.section_filter,
+        )
+        return result
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
+
+
+# ─── Old Grobid compare (kept for reference) ──────────────────────────────────
 
 @app.post("/compare_papers")
 def compare(
@@ -192,10 +316,6 @@ def compare(
 
 # ─── Collections ──────────────────────────────────────────────────────────────
 
-class CollectionCreateRequest(BaseModel):
-    name: str
-    description: Optional[str] = None
-
 @app.get("/collections")
 def list_collections(
     db: Session = Depends(get_db),
@@ -203,7 +323,7 @@ def list_collections(
 ):
     user_id = uuid.UUID(current_user["user_id"])
     cols = db.query(Collection).filter(Collection.user_id == user_id).order_by(Collection.created_at.desc()).all()
-    return [{"id": str(c.id), "name": c.label, "created_at": str(c.created_at)} for c in cols]
+    return {"collections": [{"id": str(c.id), "name": c.label, "created_at": str(c.created_at)} for c in cols]}
 
 @app.post("/collections")
 def create_collection(
@@ -236,13 +356,14 @@ def get_collection(
         "collection": {"id": str(col.id), "name": col.label, "created_at": str(col.created_at)},
         "papers": [
             {
-                "id": str(p.id),
-                "title": p.title,
-                "authors": p.authors,
+                "id":               str(p.id),
+                "title":            p.title,
+                "authors":          p.authors,
                 "publication_date": p.publication_date,
-                "abstract": p.abstract,
-                "pdf_link": p.pdf_link,
-                "source": p.source,
+                "abstract":         p.abstract,
+                "pdf_link":         p.pdf_link,
+                "source":           p.source,
+                "is_indexed":       p.is_indexed,
             }
             for p in papers
         ],
@@ -259,14 +380,12 @@ def add_paper_to_collection(
     if not paper_id:
         raise HTTPException(status_code=400, detail="paper_id required")
 
-    # Enforce 5 paper limit
     existing = db.query(CollectionPaper).filter(
         CollectionPaper.collection_id == uuid.UUID(collection_id)
     ).count()
     if existing >= 5:
         raise HTTPException(status_code=400, detail="Collection limit reached (5 papers max)")
 
-    # Check if already in collection
     already = db.query(CollectionPaper).filter(
         CollectionPaper.collection_id == uuid.UUID(collection_id),
         CollectionPaper.paper_id == uuid.UUID(paper_id),
@@ -280,19 +399,65 @@ def add_paper_to_collection(
     )
     db.add(cp)
 
-    # Auto-index if not already indexed
     paper = db.query(Paper).filter(Paper.id == uuid.UUID(paper_id)).first()
     if paper and not paper.is_indexed and paper.pdf_link:
         try:
-            index_papers([paper.pdf_link], [paper_id], db)
+            rag_index_papers([paper.pdf_link], [paper_id], db)
             paper.is_indexed = 1
         except Exception:
-            pass  # don't block adding to collection if indexing fails
+            pass
 
     db.commit()
     return {"message": "Paper added to collection"}
 
-# ─── Comparisons list ─────────────────────────────────────────────────────────
+@app.post("/collections/{collection_id}/upload")
+async def upload_to_collection(
+    collection_id: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files allowed")
+
+    existing = db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id)
+    ).count()
+    if existing >= 5:
+        raise HTTPException(status_code=400, detail="Collection limit reached (5 papers max)")
+
+    unique_name = f"{uuid.uuid4()}_{file.filename}"
+    save_path = UPLOAD_DIR / unique_name
+    with save_path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    user_id = uuid.UUID(current_user["user_id"])
+    paper = Paper(
+        user_id  = user_id,
+        title    = file.filename.replace(".pdf", ""),
+        source   = "uploaded",
+        pdf_link = str(save_path),
+    )
+    db.add(paper)
+    db.flush()
+
+    cp = CollectionPaper(
+        collection_id = uuid.UUID(collection_id),
+        paper_id      = paper.id,
+    )
+    db.add(cp)
+
+    try:
+        rag_index_papers([str(save_path)], [str(paper.id)], db)
+        paper.is_indexed = 1
+    except Exception:
+        pass
+
+    db.commit()
+    return {"paper_id": str(paper.id), "filename": file.filename, "message": "Uploaded and added to collection"}
+
+
+# ─── Comparisons ──────────────────────────────────────────────────────────────
 
 @app.get("/comparisons")
 def get_comparisons(
@@ -308,87 +473,62 @@ def get_comparisons(
         for c in comparisons
     ]}
 
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)
-
-# ─── File Upload ──────────────────────────────────────────────────────────────
-
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-
-@app.post("/upload_pdf")
-async def upload_pdf(
-    file: UploadFile = File(...),
+@app.get("/comparisons/{comparison_id}")
+def get_comparison(
+    comparison_id: str,
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are allowed")
+    comparison = db.query(Comparison).filter(
+        Comparison.id == uuid.UUID(comparison_id)
+    ).first()
+    if not comparison:
+        raise HTTPException(status_code=404, detail="Comparison not found")
 
-    # Save with unique name to avoid collisions
-    unique_name = f"{uuid.uuid4()}_{file.filename}"
-    save_path = UPLOAD_DIR / unique_name
+    cp_rows = db.query(ComparisonPaper).filter(
+        ComparisonPaper.comparison_id == comparison.id
+    ).all()
 
-    with open(save_path, "wb") as f:
-        shutil.copyfileobj(file.file, f)
+    paper_ids = [cp.paper_id for cp in cp_rows]
+    papers = db.query(Paper).filter(Paper.id.in_(paper_ids)).all()
+    paper_map = {str(p.id): p.title or p.pdf_link or str(p.id) for p in papers}
 
-    return {"path": str(save_path), "filename": file.filename}
+    dimensions = ["scope", "dataset", "methodology", "results", "additional_notes"]
+    rows = [
+        {
+            "dimension": dim,
+            "values": {
+                str(cp.paper_id): {
+                    "answer":  getattr(cp, dim) or "",
+                    "sources": (cp.sources_json or {}).get(dim, []),
+                }
+                for cp in cp_rows
+            }
+        }
+        for dim in dimensions
+    ]
+
+    return {
+        "comparison_id": str(comparison.id),
+        "name":          comparison.name,
+        "created_at":    str(comparison.created_at),
+        "headers":       [{"id": str(pid), "title": paper_map.get(str(pid), str(pid))} for pid in paper_ids],
+        "rows":          rows,
+    }
+
+
+# ─── Frontend static files (MUST be last) ────────────────────────────────────
 
 frontend_path = Path("frontend/ver1/client/dist")
 if frontend_path.exists():
     app.mount("/assets", StaticFiles(directory=frontend_path / "assets"), name="assets")
-    
+
     @app.get("/{full_path:path}")
     def serve_frontend(full_path: str):
         return FileResponse(frontend_path / "index.html")
-    
-@app.post("/collections/{collection_id}/upload")
-async def upload_to_collection(
-    collection_id: str,
-    file: UploadFile = File(...),
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-):
-    if not file.filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files allowed")
 
-    # Check 5 paper limit
-    existing = db.query(CollectionPaper).filter(
-        CollectionPaper.collection_id == uuid.UUID(collection_id)
-    ).count()
-    if existing >= 5:
-        raise HTTPException(status_code=400, detail="Collection limit reached (5 papers max)")
 
-    # Save file
-    unique_name = f"{uuid.uuid4()}_{file.filename}"
-    save_path = UPLOAD_DIR / unique_name
-    with save_path.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
+# ─── Entry point ──────────────────────────────────────────────────────────────
 
-    # Create paper record
-    user_id = uuid.UUID(current_user["user_id"])
-    paper = Paper(
-        user_id  = user_id,
-        title    = file.filename.replace(".pdf", ""),
-        source   = "uploaded",
-        pdf_link = str(save_path),
-    )
-    db.add(paper)
-    db.flush()
-
-    # Add to collection
-    cp = CollectionPaper(
-        collection_id = uuid.UUID(collection_id),
-        paper_id      = paper.id,
-    )
-    db.add(cp)
-
-    # Index it
-    try:
-        index_papers([str(save_path)], [str(paper.id)], db)
-        paper.is_indexed = 1
-    except Exception:
-        pass
-
-    db.commit()
-    return {"paper_id": str(paper.id), "filename": file.filename, "message": "Uploaded and added to collection"}
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="0.0.0.0", port=5000, reload=True)

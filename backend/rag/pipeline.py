@@ -137,7 +137,18 @@ def compare_papers_rag(
             except Exception as e:
                 answer = f"Error generating answer: {e}"
 
-            values[paper_id] = answer
+            values[paper_id] = {
+                "answer": answer,
+                "sources": [
+                    {
+                        "section":     c["section"],
+                        "text":        c["text"],
+                        "score":       round(c["score"], 3),
+                        "chunk_index": c["chunk_index"],
+                    }
+                    for c in chunks
+                ]
+            }
 
         rows.append({
             "dimension": dimension,
@@ -154,19 +165,7 @@ def understand_paper(
     question: str,
     db: Session,
     section_filter: str = None,
-) -> str:
-    """
-    Answer a question about a single paper using RAG.
-
-    Args:
-        paper_id:       Paper DB UUID
-        question:       User's question
-        db:             DB session
-        section_filter: Optional section to restrict search
-
-    Returns:
-        Answer string
-    """
+) -> dict:
     chunks = retrieve_chunks(
         query=question,
         paper_ids=[paper_id],
@@ -181,4 +180,17 @@ def understand_paper(
         chunks=formatted,
     )
 
-    return _call_llm(prompt)
+    answer = _call_llm(prompt)
+
+    return {
+        "answer": answer,
+        "sources": [
+            {
+                "section":     c["section"],
+                "text":        c["text"],
+                "score":       round(c["score"], 3),
+                "chunk_index": c["chunk_index"],
+            }
+            for c in chunks
+        ]
+    }

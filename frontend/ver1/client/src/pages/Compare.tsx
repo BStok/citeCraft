@@ -5,15 +5,17 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Minus, Upload, Play, FileText, X, Loader2, Library, ChevronDown } from "lucide-react";
+import { ArrowLeft, Minus, Upload, Play, FileText, X, Loader2, Library, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
-import { API_BASE, getToken } from "@shared/routes";
+import { API_BASE, getToken, SourceChunk } from "@shared/routes";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 interface UploadedPaper {
   paper_id: string;
@@ -21,10 +23,17 @@ interface UploadedPaper {
   filename: string;
 }
 
+interface CellValue {
+  answer: string;
+  sources?: SourceChunk[];
+}
+
 interface TableData {
   headers: { id: string; title: string }[];
-  rows: { label: string; values: Record<string, string> }[];
+  rows: { label: string; values: Record<string, CellValue> }[];
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const ALL_DIMENSIONS: { value: string; label: string }[] = [
   { value: "scope",            label: "Scope"            },
@@ -39,11 +48,45 @@ function dimensionLabel(dim: string): string {
     ?? dim.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// ─── Source panel ─────────────────────────────────────────────────────────────
+
+function SourcesPanel({ sources }: { sources: SourceChunk[] }) {
+  const [open, setOpen] = useState(false);
+  if (!sources || sources.length === 0) return null;
+
+  return (
+    <div className="mt-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+      >
+        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        {open ? "Hide" : "Show"} {sources.length} source{sources.length > 1 ? "s" : ""}
+      </button>
+      {open && (
+        <div className="mt-2 space-y-2">
+          {sources.map((s, i) => (
+            <div key={i} className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-primary capitalize">{s.section}</span>
+                <span className="text-muted-foreground">relevance: {Math.round(s.score * 100)}%</span>
+              </div>
+              <p className="text-muted-foreground leading-relaxed line-clamp-4">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── CSV export ───────────────────────────────────────────────────────────────
+
 function downloadCSV(tableData: TableData, name: string) {
   const headers = ["Dimension", ...tableData.headers.map((h) => h.title)];
   const rows = tableData.rows.map((row) => [
     row.label,
-    ...tableData.headers.map((h) => `"${(row.values[h.id] || "").replace(/"/g, '""')}"`),
+    ...tableData.headers.map((h) => `"${(row.values[h.id]?.answer || "").replace(/"/g, '""')}"`),
   ]);
   const csv = [headers, ...rows].map((r) => r.join(",")).join("\n");
   const blob = new Blob([csv], { type: "text/csv" });
@@ -54,6 +97,8 @@ function downloadCSV(tableData: TableData, name: string) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ─── Step badge ───────────────────────────────────────────────────────────────
 
 function StepBadge({ step, label, active, done }: { step: number; label: string; active: boolean; done: boolean }) {
   return (
@@ -69,24 +114,20 @@ function StepBadge({ step, label, active, done }: { step: number; label: string;
   );
 }
 
-// ─── Collection picker dropdown ───────────────────────────────────────────────
+// ─── Collection picker ────────────────────────────────────────────────────────
 
 function CollectionPicker({ onAdd }: { onAdd: (paper: UploadedPaper) => void }) {
-  const { data: collectionsData } = useCollections();
-  const [selectedCollectionId, setSelectedCollectionId] = useState<string>("");
-  const { data: collectionDetail } = useCollection(selectedCollectionId);
+  const { data: collectionsData }   = useCollections();
+  const [selectedId, setSelectedId] = useState("");
+  const { data: collectionDetail }  = useCollection(selectedId);
   const { toast } = useToast();
 
-  const collections = collectionsData?.collections ?? collectionsData ?? [];
+  const collections      = collectionsData?.collections ?? collectionsData ?? [];
   const collectionPapers = collectionDetail?.papers ?? [];
 
   const handlePick = (paper: any) => {
     if (!paper.is_indexed) {
-      toast({
-        title: "Not indexed",
-        description: "This paper hasn't been indexed yet. Open its collection page to index it first.",
-        variant: "destructive",
-      });
+      toast({ title: "Not indexed", description: "Open the collection page to index this paper first.", variant: "destructive" });
       return;
     }
     onAdd({ paper_id: paper.id, file_path: paper.pdf_link || "", filename: paper.title || paper.id });
@@ -94,15 +135,11 @@ function CollectionPicker({ onAdd }: { onAdd: (paper: UploadedPaper) => void }) 
 
   return (
     <div className="flex items-center gap-2">
-      {/* Pick collection */}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="outline" size="sm" className="gap-2">
             <Library className="w-4 h-4" />
-            {selectedCollectionId && collectionDetail
-              ? collectionDetail.collection.name
-              : "Pick from Collection"
-            }
+            {selectedId && collectionDetail ? collectionDetail.collection.name : "Pick from Collection"}
             <ChevronDown className="w-3 h-3" />
           </Button>
         </DropdownMenuTrigger>
@@ -112,16 +149,13 @@ function CollectionPicker({ onAdd }: { onAdd: (paper: UploadedPaper) => void }) 
           {collections.length === 0
             ? <DropdownMenuItem disabled>No collections yet</DropdownMenuItem>
             : collections.map((c: any) => (
-                <DropdownMenuItem key={c.id} onClick={() => setSelectedCollectionId(c.id)}>
-                  {c.name}
-                </DropdownMenuItem>
+                <DropdownMenuItem key={c.id} onClick={() => setSelectedId(c.id)}>{c.name}</DropdownMenuItem>
               ))
           }
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Pick paper from selected collection */}
-      {selectedCollectionId && collectionPapers.length > 0 && (
+      {selectedId && collectionPapers.length > 0 && (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm" className="gap-2">
@@ -134,8 +168,7 @@ function CollectionPicker({ onAdd }: { onAdd: (paper: UploadedPaper) => void }) 
             {collectionPapers.map((p: any) => (
               <DropdownMenuItem key={p.id} onClick={() => handlePick(p)}
                 className={!p.is_indexed ? "text-muted-foreground" : ""}>
-                {p.title || "Untitled"}
-                {!p.is_indexed && " (not indexed)"}
+                {p.title || "Untitled"}{!p.is_indexed && " (not indexed)"}
               </DropdownMenuItem>
             ))}
           </DropdownMenuContent>
@@ -165,7 +198,6 @@ export default function Compare() {
     );
   };
 
-  // ── Upload ──────────────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
@@ -194,14 +226,12 @@ export default function Compare() {
     }
   };
 
-  // ── Add from collection (already indexed, skip index step) ─────────────────
   const handleAddFromCollection = (paper: UploadedPaper) => {
     if (papers.find((p) => p.paper_id === paper.paper_id)) {
       toast({ title: "Already added", description: "This paper is already in the list." });
       return;
     }
     setPapers((prev) => [...prev, paper]);
-    // Collection papers are already indexed — if all papers are from collection, mark as indexed
     setIndexed(false);
     toast({ title: "Added", description: `${paper.filename} added from collection.` });
   };
@@ -211,16 +241,13 @@ export default function Compare() {
     setIndexed(false);
   };
 
-  // ── Index ───────────────────────────────────────────────────────────────────
   const handleIndex = async () => {
     if (papers.length < 2) {
       toast({ title: "Need more files", description: "Add at least 2 papers.", variant: "destructive" });
       return;
     }
-    // Papers from collections are already indexed — only index non-indexed ones
     const toIndex = papers.filter((p) => p.file_path && !p.file_path.startsWith("http"));
     if (toIndex.length === 0) {
-      // All from collections, skip indexing
       setIndexed(true);
       toast({ title: "Ready", description: "All papers already indexed." });
       return;
@@ -245,7 +272,6 @@ export default function Compare() {
     }
   };
 
-  // ── Compare ─────────────────────────────────────────────────────────────────
   const handleCompare = () => {
     if (selectedDimensions.length === 0) {
       toast({ title: "Select dimensions", description: "Pick at least one dimension.", variant: "destructive" });
@@ -263,7 +289,14 @@ export default function Compare() {
           const headers = papers.map((p) => ({ id: p.paper_id, title: p.filename }));
           const rows = data.rows.map((r: any) => ({
             label:  dimensionLabel(r.dimension),
-            values: r.values,
+            values: Object.fromEntries(
+              Object.entries(r.values).map(([pid, val]: [string, any]) => [
+                pid,
+                typeof val === "string"
+                  ? { answer: val, sources: [] }
+                  : { answer: val.answer, sources: val.sources ?? [] },
+              ])
+            ),
           }));
           setTableData({ headers, rows });
         },
@@ -305,9 +338,7 @@ export default function Compare() {
       <main className="flex-1 ml-64 p-8 w-full overflow-hidden">
 
         <div className="flex items-center gap-4 mb-8">
-          <Link href="/">
-            <Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button>
-          </Link>
+          <Link href="/"><Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button></Link>
           <div>
             <h2 className="text-3xl font-display font-bold">Paper Comparison</h2>
             <p className="text-muted-foreground">Analyze differences across key dimensions.</p>
@@ -316,7 +347,6 @@ export default function Compare() {
 
         {!tableData && (
           <div className="mb-8 space-y-6 max-w-2xl">
-
             <div className="flex items-center gap-4">
               <StepBadge step={1} label="Add Papers"   active={currentStep === 1} done={papers.length >= 2} />
               <div className="h-px flex-1 bg-border" />
@@ -328,7 +358,6 @@ export default function Compare() {
             <Input placeholder="Comparison name (optional)" value={comparisonName}
               onChange={(e) => setComparisonName(e.target.value)} />
 
-            {/* Dimensions */}
             <div className="space-y-2">
               <p className="text-sm font-medium">Dimensions to compare</p>
               <div className="flex flex-wrap gap-2">
@@ -345,14 +374,12 @@ export default function Compare() {
               </div>
             </div>
 
-            {/* Custom question */}
             <div className="space-y-1">
               <p className="text-sm font-medium">Custom question <span className="text-muted-foreground font-normal">(optional)</span></p>
               <Input placeholder="e.g. Which paper is more suitable for real-time applications?"
                 value={customQuestion} onChange={(e) => setCustomQuestion(e.target.value)} />
             </div>
 
-            {/* Add papers — upload OR collection */}
             <div className="space-y-3">
               <p className="text-sm font-medium">Add papers</p>
               <div className="flex items-center gap-3 flex-wrap">
@@ -373,10 +400,9 @@ export default function Compare() {
                 <span className="text-xs text-muted-foreground">or</span>
                 <CollectionPicker onAdd={handleAddFromCollection} />
               </div>
-              <p className="text-xs text-muted-foreground">Papers from collections are already indexed — no need to re-index.</p>
+              <p className="text-xs text-muted-foreground">Papers from collections skip the index step.</p>
             </div>
 
-            {/* Paper list */}
             {papers.length > 0 && (
               <div className="space-y-2">
                 {papers.map((p, i) => (
@@ -446,11 +472,20 @@ export default function Compare() {
                       <TableCell className="font-medium text-muted-foreground sticky left-0 bg-card z-10 border-r border-border align-top py-4">
                         {row.label}
                       </TableCell>
-                      {tableData.headers.map((header) => (
-                        <TableCell key={header.id} className="align-top py-4 text-sm leading-relaxed">
-                          {row.values[header.id] || <span className="text-muted-foreground italic">Not specified</span>}
-                        </TableCell>
-                      ))}
+                      {tableData.headers.map((header) => {
+                        const cell = row.values[header.id];
+                        return (
+                          <TableCell key={header.id} className="align-top py-4 text-sm leading-relaxed">
+                            {cell?.answer
+                              ? <>
+                                  <p>{cell.answer}</p>
+                                  {cell.sources && <SourcesPanel sources={cell.sources} />}
+                                </>
+                              : <span className="text-muted-foreground italic">Not specified</span>
+                            }
+                          </TableCell>
+                        );
+                      })}
                     </TableRow>
                   ))}
                 </TableBody>

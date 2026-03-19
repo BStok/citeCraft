@@ -4,16 +4,18 @@ import { useCollections, useCollection } from "@/hooks/use-collections";
 import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb, Library, ChevronDown } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb, Library, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
-import { API_BASE, getToken } from "@shared/routes";
-import { useSession } from "@/context/SessionContext";
+import { API_BASE, getToken, SourceChunk } from "@shared/routes";
+import { useSession, Message } from "@/context/SessionContext";
 import ReactMarkdown from "react-markdown";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const SECTIONS = [
   { value: "",              label: "Whole paper"  },
@@ -32,20 +34,62 @@ const SUGGESTED_QUESTIONS = [
   "Summarize the methodology in simple terms.",
 ];
 
-function MessageBubble({ role, text }: { role: "user" | "assistant"; text: string }) {
-  const isUser = role === "user";
+// ─── Source chunks display ────────────────────────────────────────────────────
+
+function SourcesPanel({ sources }: { sources: SourceChunk[] }) {
+  const [open, setOpen] = useState(false);
+  if (!sources || sources.length === 0) return null;
+
+  return (
+    <div className="mt-2">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-primary transition-colors"
+      >
+        {open ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+        {open ? "Hide" : "Show"} {sources.length} source{sources.length > 1 ? "s" : ""}
+      </button>
+
+      {open && (
+        <div className="mt-2 space-y-2">
+          {sources.map((s, i) => (
+            <div key={i} className="rounded-lg border border-border/60 bg-muted/30 px-3 py-2 text-xs">
+              <div className="flex items-center justify-between mb-1">
+                <span className="font-medium text-primary capitalize">{s.section}</span>
+                <span className="text-muted-foreground">
+                  relevance: {Math.round(s.score * 100)}%
+                </span>
+              </div>
+              <p className="text-muted-foreground leading-relaxed line-clamp-4">{s.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Message bubble ───────────────────────────────────────────────────────────
+
+function MessageBubble({ message }: { message: Message }) {
+  const isUser = message.role === "user";
   return (
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold
         ${isUser ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>
         {isUser ? "You" : "AI"}
       </div>
-      <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed
-        ${isUser
-          ? "bg-primary text-primary-foreground rounded-tr-sm"
-          : "bg-muted/60 text-foreground rounded-tl-sm border border-border prose prose-sm max-w-none"
-        }`}>
-        {isUser ? text : <ReactMarkdown>{text}</ReactMarkdown>}
+      <div className="max-w-[75%] space-y-1">
+        <div className={`rounded-2xl px-4 py-3 text-sm leading-relaxed
+          ${isUser
+            ? "bg-primary text-primary-foreground rounded-tr-sm"
+            : "bg-muted/60 text-foreground rounded-tl-sm border border-border prose prose-sm max-w-none"
+          }`}>
+          {isUser ? message.text : <ReactMarkdown>{message.text}</ReactMarkdown>}
+        </div>
+        {!isUser && message.sources && message.sources.length > 0 && (
+          <SourcesPanel sources={message.sources} />
+        )}
       </div>
     </div>
   );
@@ -54,12 +98,12 @@ function MessageBubble({ role, text }: { role: "user" | "assistant"; text: strin
 // ─── Collection picker ────────────────────────────────────────────────────────
 
 function CollectionPicker({ onPick }: { onPick: (paper: any) => void }) {
-  const { data: collectionsData }  = useCollections();
+  const { data: collectionsData }   = useCollections();
   const [selectedId, setSelectedId] = useState("");
-  const { data: collectionDetail } = useCollection(selectedId);
+  const { data: collectionDetail }  = useCollection(selectedId);
   const { toast } = useToast();
 
-  const collections    = collectionsData?.collections ?? collectionsData ?? [];
+  const collections      = collectionsData?.collections ?? collectionsData ?? [];
   const collectionPapers = collectionDetail?.papers ?? [];
 
   const handlePick = (paper: any) => {
@@ -165,13 +209,13 @@ export default function Understand() {
     }
   };
 
-  // ── Pick from collection (already indexed) ──────────────────────────────────
+  // ── Pick from collection ────────────────────────────────────────────────────
   const handlePickFromCollection = (collectionPaper: any) => {
     updateState({
       paper: { paper_id: collectionPaper.id, filename: collectionPaper.title || collectionPaper.id, file_path: collectionPaper.pdf_link || "" },
       messages: [],
     });
-    toast({ title: "Paper loaded", description: `${collectionPaper.title} ready to ask questions.` });
+    toast({ title: "Paper loaded", description: `${collectionPaper.title} ready.` });
   };
 
   // ── Ask ─────────────────────────────────────────────────────────────────────
@@ -179,17 +223,26 @@ export default function Understand() {
     const q = question ?? (inputRef.current?.value ?? "").trim();
     if (!q || !paper) return;
     if (inputRef.current) inputRef.current.value = "";
-    const newMessages = [...messages, { role: "user" as const, text: q }];
+
+    const newMessages: Message[] = [...messages, { role: "user", text: q }];
     updateState({ messages: newMessages });
 
     askMutation.mutate(
       { question: q, section_filter: sectionFilter || undefined },
       {
         onSuccess: (data) => {
-          updateState({ messages: [...newMessages, { role: "assistant", text: data.answer }] });
+          updateState({
+            messages: [...newMessages, {
+              role:    "assistant",
+              text:    data.answer,
+              sources: data.sources,
+            }],
+          });
         },
         onError: (err: any) => {
-          updateState({ messages: [...newMessages, { role: "assistant", text: `Error: ${err.message}` }] });
+          updateState({
+            messages: [...newMessages, { role: "assistant", text: `Error: ${err.message}` }],
+          });
         },
       }
     );
@@ -286,7 +339,9 @@ export default function Understand() {
                   </div>
                 </div>
               )}
-              {messages.map((msg, i) => <MessageBubble key={i} role={msg.role} text={msg.text} />)}
+
+              {messages.map((msg, i) => <MessageBubble key={i} message={msg} />)}
+
               {askMutation.isPending && (
                 <div className="flex gap-3">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
