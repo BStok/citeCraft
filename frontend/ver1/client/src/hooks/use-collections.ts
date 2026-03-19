@@ -8,7 +8,9 @@ export function useCollections() {
     queryFn: async () => {
       const res = await apiFetch("/collections");
       if (!res.ok) throw new Error("Failed to fetch collections");
-      return res.json();
+      const data = await res.json();
+      // handle both { collections: [] } and bare array
+      return Array.isArray(data) ? data : (data.collections ?? []);
     },
   });
 }
