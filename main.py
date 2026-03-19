@@ -341,3 +341,54 @@ if frontend_path.exists():
     @app.get("/{full_path:path}")
     def serve_frontend(full_path: str):
         return FileResponse(frontend_path / "index.html")
+    
+@app.post("/collections/{collection_id}/upload")
+async def upload_to_collection(
+    collection_id: str,
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    if not file.filename.endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files allowed")
+
+    # Check 5 paper limit
+    existing = db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id)
+    ).count()
+    if existing >= 5:
+        raise HTTPException(status_code=400, detail="Collection limit reached (5 papers max)")
+
+    # Save file
+    unique_name = f"{uuid.uuid4()}_{file.filename}"
+    save_path = UPLOAD_DIR / unique_name
+    with save_path.open("wb") as f:
+        shutil.copyfileobj(file.file, f)
+
+    # Create paper record
+    user_id = uuid.UUID(current_user["user_id"])
+    paper = Paper(
+        user_id  = user_id,
+        title    = file.filename.replace(".pdf", ""),
+        source   = "uploaded",
+        pdf_link = str(save_path),
+    )
+    db.add(paper)
+    db.flush()
+
+    # Add to collection
+    cp = CollectionPaper(
+        collection_id = uuid.UUID(collection_id),
+        paper_id      = paper.id,
+    )
+    db.add(cp)
+
+    # Index it
+    try:
+        index_papers([str(save_path)], [str(paper.id)], db)
+        paper.is_indexed = 1
+    except Exception:
+        pass
+
+    db.commit()
+    return {"paper_id": str(paper.id), "filename": file.filename, "message": "Uploaded and added to collection"}
