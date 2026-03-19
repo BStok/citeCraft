@@ -11,7 +11,7 @@ import Collection from "@/pages/Collection";
 import Login from "@/pages/Login";
 import { getToken } from "@shared/routes";
 import History from "@/pages/History";
-
+import { SessionProvider } from "@/context/SessionContext";
 
 function ProtectedRoute({ component: Component }: { component: () => JSX.Element }) {
   const token = getToken();
@@ -38,10 +38,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <SessionProvider> 
+        <TooltipProvider>
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </SessionProvider> 
     </QueryClientProvider>
   );
 }
