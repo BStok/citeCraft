@@ -1,23 +1,14 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useAskPaper } from "@/hooks/use-papers";
-import { useState, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE, getToken } from "@shared/routes";
-
-interface Message {
-  role: "user" | "assistant";
-  text: string;
-}
-
-interface UploadedPaper {
-  paper_id: string;
-  filename: string;
-  file_path: string;
-}
+import { useSession } from "@/context/SessionContext";
+import ReactMarkdown from "react-markdown";
 
 const SECTIONS = [
   { value: "",              label: "Whole paper"  },
@@ -36,8 +27,8 @@ const SUGGESTED_QUESTIONS = [
   "Summarize the methodology in simple terms.",
 ];
 
-function MessageBubble({ message }: { message: Message }) {
-  const isUser = message.role === "user";
+function MessageBubble({ role, text }: { role: "user" | "assistant"; text: string }) {
+  const isUser = role === "user";
   return (
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
       <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 text-xs font-bold
@@ -47,22 +38,23 @@ function MessageBubble({ message }: { message: Message }) {
       <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed
         ${isUser
           ? "bg-primary text-primary-foreground rounded-tr-sm"
-          : "bg-muted/60 text-foreground rounded-tl-sm border border-border"
+          : "bg-muted/60 text-foreground rounded-tl-sm border border-border prose prose-sm max-w-none"
         }`}>
-        {message.text}
+        {isUser ? text : (
+          <ReactMarkdown>{text}</ReactMarkdown>
+        )}
       </div>
     </div>
   );
 }
 
 export default function Understand() {
-  const [paper, setPaper]                   = useState<UploadedPaper | null>(null);
-  const [uploading, setUploading]           = useState(false);
-  const [messages, setMessages]             = useState<Message[]>([]);
-  const [input, setInput]                   = useState("");
-  const [sectionFilter, setSectionFilter]   = useState("");
-  const bottomRef = useRef<HTMLDivElement>(null);
-  const { toast } = useToast();
+  const { understanding, setUnderstanding } = useSession();
+  const { paper, messages, sectionFilter }  = understanding;
+
+  const bottomRef   = useRef<HTMLDivElement>(null);
+  const inputRef    = useRef<HTMLInputElement>(null);
+  const { toast }   = useToast();
 
   const askMutation = useAskPaper(paper?.paper_id ?? "");
 
@@ -70,14 +62,16 @@ export default function Understand() {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  const updateState = (patch: Partial<typeof understanding>) =>
+    setUnderstanding({ ...understanding, ...patch });
+
   // ── Upload + auto-index ─────────────────────────────────────────────────────
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setUploading(true);
+    updateState({ paper: null, messages: [] });
     try {
-      // 1. Upload
       const formData = new FormData();
       formData.append("file", file);
 
@@ -86,63 +80,54 @@ export default function Understand() {
         headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
-
       if (!uploadRes.ok) throw new Error("Upload failed");
       const uploadData = await uploadRes.json();
-      // backend returns: { file_path, filename, paper_id }
 
-      // 2. Auto-index so /ask can find chunks
       const indexRes = await fetch(`${API_BASE}/papers/index`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({
           paper_ids:  [uploadData.paper_id],
           file_paths: [uploadData.file_path],
         }),
       });
-
       if (!indexRes.ok) throw new Error("Indexing failed");
 
-      setPaper({ paper_id: uploadData.paper_id, filename: uploadData.filename, file_path: uploadData.file_path });
-      setMessages([]);
-      toast({ title: "Paper ready", description: `${file.name} has been loaded and indexed.` });
+      updateState({
+        paper: { paper_id: uploadData.paper_id, filename: uploadData.filename, file_path: uploadData.file_path },
+        messages: [],
+      });
+      toast({ title: "Paper ready", description: `${file.name} loaded and indexed.` });
     } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
-      setUploading(false);
       e.target.value = "";
     }
   };
 
   // ── Ask ─────────────────────────────────────────────────────────────────────
   const handleAsk = (question?: string) => {
-    const q = question ?? input.trim();
+    const q = question ?? (inputRef.current?.value ?? "").trim();
     if (!q || !paper) return;
+    if (inputRef.current) inputRef.current.value = "";
 
-    setMessages((prev) => [...prev, { role: "user", text: q }]);
-    setInput("");
+    updateState({ messages: [...messages, { role: "user", text: q }] });
 
     askMutation.mutate(
       { question: q, section_filter: sectionFilter || undefined },
       {
         onSuccess: (data) => {
-          setMessages((prev) => [...prev, { role: "assistant", text: data.answer }]);
+          updateState({ messages: [...messages, { role: "user", text: q }, { role: "assistant", text: data.answer }] });
         },
         onError: (err: any) => {
-          setMessages((prev) => [...prev, { role: "assistant", text: `Error: ${err.message}` }]);
+          updateState({ messages: [...messages, { role: "user", text: q }, { role: "assistant", text: `Error: ${err.message}` }] });
         },
       }
     );
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleAsk();
-    }
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleAsk(); }
   };
 
   return (
@@ -167,7 +152,7 @@ export default function Understand() {
           )}
         </div>
 
-        {/* No paper loaded */}
+        {/* No paper */}
         {!paper ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -176,39 +161,30 @@ export default function Understand() {
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-2">Load a research paper</h3>
               <p className="text-muted-foreground text-sm max-w-sm">
-                Upload a PDF and then ask questions — the AI will answer based on the paper's content.
+                Upload a PDF and ask questions — answers are based solely on the paper's content.
               </p>
             </div>
             <input type="file" accept=".pdf" id="understand-upload" className="hidden" onChange={handleUpload} />
             <label htmlFor="understand-upload">
-              <Button className="gap-2 cursor-pointer" disabled={uploading} asChild>
-                <span>
-                  {uploading
-                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Loading paper...</>
-                    : <><Upload className="w-4 h-4" /> Upload PDF</>
-                  }
-                </span>
+              <Button className="gap-2 cursor-pointer" asChild>
+                <span><Upload className="w-4 h-4" /> Upload PDF</span>
               </Button>
             </label>
           </div>
         ) : (
-          // Chat interface
           <div className="flex-1 flex flex-col overflow-hidden">
 
-            {/* Section filter + swap paper */}
+            {/* Section filter */}
             <div className="px-8 py-3 border-b border-border shrink-0 flex items-center gap-3 flex-wrap">
               <span className="text-sm text-muted-foreground">Focus on:</span>
               <div className="flex gap-2 flex-wrap">
                 {SECTIONS.map((s) => (
-                  <button
-                    key={s.value}
-                    onClick={() => setSectionFilter(s.value)}
+                  <button key={s.value} onClick={() => updateState({ sectionFilter: s.value })}
                     className={`text-xs px-3 py-1 rounded-full border transition-colors
                       ${sectionFilter === s.value
                         ? "bg-primary text-primary-foreground border-primary"
                         : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                      }`}
-                  >
+                      }`}>
                     {s.label}
                   </button>
                 ))}
@@ -216,11 +192,8 @@ export default function Understand() {
               <div className="ml-auto">
                 <input type="file" accept=".pdf" id="understand-swap" className="hidden" onChange={handleUpload} />
                 <label htmlFor="understand-swap">
-                  <Button variant="ghost" size="sm" className="gap-1 text-xs cursor-pointer" disabled={uploading} asChild>
-                    <span>
-                      <Upload className="w-3 h-3" />
-                      {uploading ? "Loading..." : "Change paper"}
-                    </span>
+                  <Button variant="ghost" size="sm" className="gap-1 text-xs cursor-pointer" asChild>
+                    <span><Upload className="w-3 h-3" /> Change paper</span>
                   </Button>
                 </label>
               </div>
@@ -236,11 +209,8 @@ export default function Understand() {
                   </div>
                   <div className="flex flex-col gap-2">
                     {SUGGESTED_QUESTIONS.map((q) => (
-                      <button
-                        key={q}
-                        onClick={() => handleAsk(q)}
-                        className="text-left text-sm px-4 py-3 rounded-xl border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground"
-                      >
+                      <button key={q} onClick={() => handleAsk(q)}
+                        className="text-left text-sm px-4 py-3 rounded-xl border border-border hover:border-primary/50 hover:bg-muted/30 transition-colors text-muted-foreground hover:text-foreground">
                         {q}
                       </button>
                     ))}
@@ -249,7 +219,7 @@ export default function Understand() {
               )}
 
               {messages.map((msg, i) => (
-                <MessageBubble key={i} message={msg} />
+                <MessageBubble key={i} role={msg.role} text={msg.text} />
               ))}
 
               {askMutation.isPending && (
@@ -262,30 +232,21 @@ export default function Understand() {
                   </div>
                 </div>
               )}
-
               <div ref={bottomRef} />
             </div>
 
-            {/* Input bar */}
+            {/* Input */}
             <div className="px-8 py-4 border-t border-border shrink-0">
               <div className="flex gap-3">
                 <Input
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  ref={inputRef}
                   onKeyDown={handleKeyDown}
                   placeholder="Ask anything about the paper..."
                   disabled={askMutation.isPending}
                   className="flex-1"
                 />
-                <Button
-                  onClick={() => handleAsk()}
-                  disabled={!input.trim() || askMutation.isPending}
-                  size="icon"
-                >
-                  {askMutation.isPending
-                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                    : <Send className="w-4 h-4" />
-                  }
+                <Button onClick={() => handleAsk()} disabled={askMutation.isPending} size="icon">
+                  {askMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
