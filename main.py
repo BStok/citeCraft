@@ -18,6 +18,7 @@ from sqlalchemy.orm import Session
 
 from backend.acquisition.paper_acquisition import get_papers
 from backend.comparison.comp import compare_papers
+from backend.rag.pipeline import index_papers, compare_papers_rag, understand_paper
 from backend.db.db import get_db, init_db
 from backend.db.models import Paper, Comparison, ComparisonPaper, Collection, CollectionPaper, User
 from backend.auth.auth import hash_password, verify_password, generate_token, verify_token

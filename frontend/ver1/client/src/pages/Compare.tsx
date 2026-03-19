@@ -1,14 +1,19 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useComparePapers } from "@/hooks/use-papers";
+import { useCollections, useCollection } from "@/hooks/use-collections";
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Minus, Upload, Play, FileText, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Minus, Upload, Play, FileText, X, Loader2, Library, ChevronDown } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { API_BASE, getToken } from "@shared/routes";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 interface UploadedPaper {
   paper_id: string;
@@ -21,7 +26,6 @@ interface TableData {
   rows: { label: string; values: Record<string, string> }[];
 }
 
-// All available dimensions with display labels
 const ALL_DIMENSIONS: { value: string; label: string }[] = [
   { value: "scope",            label: "Scope"            },
   { value: "dataset",          label: "Dataset"          },
@@ -65,6 +69,84 @@ function StepBadge({ step, label, active, done }: { step: number; label: string;
   );
 }
 
+// ─── Collection picker dropdown ───────────────────────────────────────────────
+
+function CollectionPicker({ onAdd }: { onAdd: (paper: UploadedPaper) => void }) {
+  const { data: collectionsData } = useCollections();
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string>("");
+  const { data: collectionDetail } = useCollection(selectedCollectionId);
+  const { toast } = useToast();
+
+  const collections = collectionsData?.collections ?? collectionsData ?? [];
+  const collectionPapers = collectionDetail?.papers ?? [];
+
+  const handlePick = (paper: any) => {
+    if (!paper.is_indexed) {
+      toast({
+        title: "Not indexed",
+        description: "This paper hasn't been indexed yet. Open its collection page to index it first.",
+        variant: "destructive",
+      });
+      return;
+    }
+    onAdd({ paper_id: paper.id, file_path: paper.pdf_link || "", filename: paper.title || paper.id });
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      {/* Pick collection */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Library className="w-4 h-4" />
+            {selectedCollectionId && collectionDetail
+              ? collectionDetail.collection.name
+              : "Pick from Collection"
+            }
+            <ChevronDown className="w-3 h-3" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Your collections</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {collections.length === 0
+            ? <DropdownMenuItem disabled>No collections yet</DropdownMenuItem>
+            : collections.map((c: any) => (
+                <DropdownMenuItem key={c.id} onClick={() => setSelectedCollectionId(c.id)}>
+                  {c.name}
+                </DropdownMenuItem>
+              ))
+          }
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Pick paper from selected collection */}
+      {selectedCollectionId && collectionPapers.length > 0 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              Add paper <ChevronDown className="w-3 h-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel className="text-xs text-muted-foreground">Papers in collection</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            {collectionPapers.map((p: any) => (
+              <DropdownMenuItem key={p.id} onClick={() => handlePick(p)}
+                className={!p.is_indexed ? "text-muted-foreground" : ""}>
+                {p.title || "Untitled"}
+                {!p.is_indexed && " (not indexed)"}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function Compare() {
   const compareMutation = useComparePapers();
   const [papers, setPapers]                 = useState<UploadedPaper[]>([]);
@@ -73,13 +155,8 @@ export default function Compare() {
   const [uploading, setUploading]           = useState(false);
   const [indexing, setIndexing]             = useState(false);
   const [indexed, setIndexed]               = useState(false);
-
-  // Dimensions: all checked by default
-  const [selectedDimensions, setSelectedDimensions] = useState<string[]>(
-    ALL_DIMENSIONS.map((d) => d.value)
-  );
+  const [selectedDimensions, setSelectedDimensions] = useState<string[]>(ALL_DIMENSIONS.map((d) => d.value));
   const [customQuestion, setCustomQuestion] = useState("");
-
   const { toast } = useToast();
 
   const toggleDimension = (value: string) => {
@@ -88,34 +165,26 @@ export default function Compare() {
     );
   };
 
-  // ── Step 1: upload ──────────────────────────────────────────────────────────
+  // ── Upload ──────────────────────────────────────────────────────────────────
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (!files.length) return;
-
     setUploading(true);
     try {
       for (const file of files) {
         const formData = new FormData();
         formData.append("file", file);
-
         const res = await fetch(`${API_BASE}/upload_pdf`, {
           method: "POST",
           headers: { Authorization: `Bearer ${getToken()}` },
           body: formData,
         });
-
         if (!res.ok) {
           toast({ title: "Upload failed", description: `Could not upload ${file.name}`, variant: "destructive" });
           continue;
         }
-
         const data = await res.json();
-        setPapers((prev) => [...prev, {
-          paper_id:  data.paper_id,
-          file_path: data.file_path,
-          filename:  data.filename,
-        }]);
+        setPapers((prev) => [...prev, { paper_id: data.paper_id, file_path: data.file_path, filename: data.filename }]);
         setIndexed(false);
         toast({ title: "Uploaded", description: `${file.name} ready.` });
       }
@@ -125,31 +194,47 @@ export default function Compare() {
     }
   };
 
+  // ── Add from collection (already indexed, skip index step) ─────────────────
+  const handleAddFromCollection = (paper: UploadedPaper) => {
+    if (papers.find((p) => p.paper_id === paper.paper_id)) {
+      toast({ title: "Already added", description: "This paper is already in the list." });
+      return;
+    }
+    setPapers((prev) => [...prev, paper]);
+    // Collection papers are already indexed — if all papers are from collection, mark as indexed
+    setIndexed(false);
+    toast({ title: "Added", description: `${paper.filename} added from collection.` });
+  };
+
   const removePaper = (index: number) => {
     setPapers(papers.filter((_, i) => i !== index));
     setIndexed(false);
   };
 
-  // ── Step 2: index ───────────────────────────────────────────────────────────
+  // ── Index ───────────────────────────────────────────────────────────────────
   const handleIndex = async () => {
     if (papers.length < 2) {
-      toast({ title: "Need more files", description: "Upload at least 2 PDFs.", variant: "destructive" });
+      toast({ title: "Need more files", description: "Add at least 2 papers.", variant: "destructive" });
+      return;
+    }
+    // Papers from collections are already indexed — only index non-indexed ones
+    const toIndex = papers.filter((p) => p.file_path && !p.file_path.startsWith("http"));
+    if (toIndex.length === 0) {
+      // All from collections, skip indexing
+      setIndexed(true);
+      toast({ title: "Ready", description: "All papers already indexed." });
       return;
     }
     setIndexing(true);
     try {
       const res = await fetch(`${API_BASE}/papers/index`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${getToken()}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
         body: JSON.stringify({
           paper_ids:  papers.map((p) => p.paper_id),
           file_paths: papers.map((p) => p.file_path),
         }),
       });
-
       if (!res.ok) throw new Error("Indexing failed");
       setIndexed(true);
       toast({ title: "Indexed", description: "Papers are ready to compare." });
@@ -160,10 +245,10 @@ export default function Compare() {
     }
   };
 
-  // ── Step 3: compare ─────────────────────────────────────────────────────────
+  // ── Compare ─────────────────────────────────────────────────────────────────
   const handleCompare = () => {
     if (selectedDimensions.length === 0) {
-      toast({ title: "Select dimensions", description: "Pick at least one dimension to compare.", variant: "destructive" });
+      toast({ title: "Select dimensions", description: "Pick at least one dimension.", variant: "destructive" });
       return;
     }
     compareMutation.mutate(
@@ -206,11 +291,8 @@ export default function Compare() {
   };
 
   const handleReset = () => {
-    setTableData(null);
-    setPapers([]);
-    setComparisonName("");
-    setIndexed(false);
-    setCustomQuestion("");
+    setTableData(null); setPapers([]); setComparisonName("");
+    setIndexed(false); setCustomQuestion("");
     setSelectedDimensions(ALL_DIMENSIONS.map((d) => d.value));
   };
 
@@ -222,7 +304,6 @@ export default function Compare() {
       <Sidebar />
       <main className="flex-1 ml-64 p-8 w-full overflow-hidden">
 
-        {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Link href="/">
             <Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button>
@@ -233,81 +314,69 @@ export default function Compare() {
           </div>
         </div>
 
-        {/* Setup panel */}
         {!tableData && (
           <div className="mb-8 space-y-6 max-w-2xl">
 
-            {/* Step indicators */}
             <div className="flex items-center gap-4">
-              <StepBadge step={1} label="Upload PDFs"  active={currentStep === 1} done={papers.length >= 2} />
+              <StepBadge step={1} label="Add Papers"   active={currentStep === 1} done={papers.length >= 2} />
               <div className="h-px flex-1 bg-border" />
               <StepBadge step={2} label="Index Papers" active={currentStep === 2} done={indexed} />
               <div className="h-px flex-1 bg-border" />
               <StepBadge step={3} label="Compare"      active={currentStep === 3} done={!!tableData} />
             </div>
 
-            {/* Comparison name */}
-            <Input
-              placeholder="Comparison name (optional)"
-              value={comparisonName}
-              onChange={(e) => setComparisonName(e.target.value)}
-            />
+            <Input placeholder="Comparison name (optional)" value={comparisonName}
+              onChange={(e) => setComparisonName(e.target.value)} />
 
-            {/* Dimensions selector */}
+            {/* Dimensions */}
             <div className="space-y-2">
               <p className="text-sm font-medium">Dimensions to compare</p>
               <div className="flex flex-wrap gap-2">
-                {ALL_DIMENSIONS.map((dim) => {
-                  const selected = selectedDimensions.includes(dim.value);
-                  return (
-                    <button
-                      key={dim.value}
-                      onClick={() => toggleDimension(dim.value)}
-                      className={`text-xs px-3 py-1.5 rounded-full border transition-colors
-                        ${selected
-                          ? "bg-primary text-primary-foreground border-primary"
-                          : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
-                        }`}
-                    >
-                      {dim.label}
-                    </button>
-                  );
-                })}
+                {ALL_DIMENSIONS.map((dim) => (
+                  <button key={dim.value} onClick={() => toggleDimension(dim.value)}
+                    className={`text-xs px-3 py-1.5 rounded-full border transition-colors
+                      ${selectedDimensions.includes(dim.value)
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+                      }`}>
+                    {dim.label}
+                  </button>
+                ))}
               </div>
-              <p className="text-xs text-muted-foreground">Click to toggle. All selected by default.</p>
             </div>
 
             {/* Custom question */}
             <div className="space-y-1">
               <p className="text-sm font-medium">Custom question <span className="text-muted-foreground font-normal">(optional)</span></p>
-              <Input
-                placeholder="e.g. Which paper is more suitable for real-time applications?"
-                value={customQuestion}
-                onChange={(e) => setCustomQuestion(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">Ask a specific question to be answered across all papers.</p>
+              <Input placeholder="e.g. Which paper is more suitable for real-time applications?"
+                value={customQuestion} onChange={(e) => setCustomQuestion(e.target.value)} />
             </div>
 
-            {/* Upload button */}
-            <div>
-              <input
-                type="file" accept=".pdf" multiple id="pdf-upload"
-                className="hidden" onChange={handleFileUpload} disabled={isBusy}
-              />
-              <label htmlFor="pdf-upload">
-                <Button variant="outline" className="gap-2 cursor-pointer" disabled={isBusy} asChild>
-                  <span>
-                    {uploading
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
-                      : <><Upload className="w-4 h-4" /> Upload PDFs</>
-                    }
-                  </span>
-                </Button>
-              </label>
-              <p className="text-xs text-muted-foreground mt-1">You can select multiple files at once</p>
+            {/* Add papers — upload OR collection */}
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Add papers</p>
+              <div className="flex items-center gap-3 flex-wrap">
+                <div>
+                  <input type="file" accept=".pdf" multiple id="pdf-upload"
+                    className="hidden" onChange={handleFileUpload} disabled={isBusy} />
+                  <label htmlFor="pdf-upload">
+                    <Button variant="outline" className="gap-2 cursor-pointer" disabled={isBusy} asChild>
+                      <span>
+                        {uploading
+                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+                          : <><Upload className="w-4 h-4" /> Upload PDFs</>
+                        }
+                      </span>
+                    </Button>
+                  </label>
+                </div>
+                <span className="text-xs text-muted-foreground">or</span>
+                <CollectionPicker onAdd={handleAddFromCollection} />
+              </div>
+              <p className="text-xs text-muted-foreground">Papers from collections are already indexed — no need to re-index.</p>
             </div>
 
-            {/* Uploaded files list */}
+            {/* Paper list */}
             {papers.length > 0 && (
               <div className="space-y-2">
                 {papers.map((p, i) => (
@@ -322,30 +391,21 @@ export default function Compare() {
                   </div>
                 ))}
 
-                {/* Index button */}
                 {!indexed && (
-                  <Button
-                    onClick={handleIndex}
-                    disabled={isBusy || papers.length < 2}
-                    variant="outline"
-                    className="gap-2 w-full"
-                  >
+                  <Button onClick={handleIndex} disabled={isBusy || papers.length < 2}
+                    variant="outline" className="gap-2 w-full">
                     {indexing
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Indexing papers...</>
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Indexing...</>
                       : "Index Papers for RAG"
                     }
                   </Button>
                 )}
 
-                {/* Compare button */}
                 {indexed && (
-                  <Button
-                    onClick={handleCompare}
-                    disabled={isBusy || selectedDimensions.length === 0}
-                    className="gap-2 w-full"
-                  >
+                  <Button onClick={handleCompare} disabled={isBusy || selectedDimensions.length === 0}
+                    className="gap-2 w-full">
                     {compareMutation.isPending
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Comparing... (this may take a minute)</>
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Comparing...</>
                       : <><Play className="w-4 h-4" /> Run Comparison</>
                     }
                   </Button>
@@ -355,11 +415,8 @@ export default function Compare() {
           </div>
         )}
 
-        {compareMutation.isPending && !tableData && (
-          <Skeleton className="h-[500px] w-full rounded-xl" />
-        )}
+        {compareMutation.isPending && !tableData && <Skeleton className="h-[500px] w-full rounded-xl" />}
 
-        {/* Results table */}
         {tableData && (
           <div className="rounded-xl border border-border overflow-hidden bg-card shadow-sm">
             <div className="overflow-x-auto">
@@ -373,11 +430,9 @@ export default function Compare() {
                       <TableHead key={header.id} className="min-w-[300px] align-top py-4">
                         <div className="flex items-start justify-between gap-2">
                           <span className="font-semibold text-foreground text-base line-clamp-2">{header.title}</span>
-                          <Button
-                            variant="ghost" size="icon"
+                          <Button variant="ghost" size="icon"
                             className="h-6 w-6 rounded-full hover:bg-destructive/10 hover:text-destructive"
-                            onClick={() => removeColumn(header.id)}
-                          >
+                            onClick={() => removeColumn(header.id)}>
                             <Minus className="w-3 h-3" />
                           </Button>
                         </div>
@@ -403,9 +458,7 @@ export default function Compare() {
             </div>
             <div className="p-4 border-t border-border flex gap-2">
               <Button variant="outline" onClick={handleReset}>New Comparison</Button>
-              <Button variant="outline" onClick={() => downloadCSV(tableData, comparisonName)}>
-                Download CSV
-              </Button>
+              <Button variant="outline" onClick={() => downloadCSV(tableData, comparisonName)}>Download CSV</Button>
             </div>
           </div>
         )}

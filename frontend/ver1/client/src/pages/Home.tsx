@@ -2,18 +2,21 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowRight, Download, ExternalLink, User, Loader2, Copy, Check, ChevronDown } from "lucide-react";
+import { Search, ArrowRight, Download, ExternalLink, User, Loader2, Copy, Check, ChevronDown, BookmarkPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@shared/routes";
 import { useSession } from "@/context/SessionContext";
+import { useCollections, useAddPaperToCollection } from "@/hooks/use-collections";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 
 // ─── Citation formats ─────────────────────────────────────────────────────────
@@ -59,21 +62,16 @@ function generateCitation(paper: any, format: CitationFormat): string {
   switch (format) {
     case "APA":
       return `${formatAuthorsAPA(authors)} (${year}). ${title}. ${source}.${doi ? ` ${doi}` : ""}`;
-
     case "MLA":
       return `${formatAuthorsMLA(authors)}. "${title}." ${source}, ${year}.${doi ? ` ${doi}` : ""}`;
-
     case "IEEE":
       return `${formatAuthorsIEEE(authors)}, "${title}," ${source}, ${year}.${doi ? ` DOI: ${doi}` : ""}`;
-
     case "BibTeX": {
       const key = `${(authors.split(",")[0] || "unknown").trim().split(" ").pop()?.toLowerCase()}${year}${slugify(title)}`;
       return `@article{${key},\n  author = {${authors}},\n  title = {${title}},\n  year = {${year}},\n  journal = {${source}}${doi ? `,\n  url = {${doi}}` : ""}\n}`;
     }
   }
 }
-
-// ─── Copy button ──────────────────────────────────────────────────────────────
 
 function CopyButton({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -134,6 +132,50 @@ function exportCSV(papers: any[]) {
   URL.revokeObjectURL(url);
 }
 
+// ─── Add to Collection button ─────────────────────────────────────────────────
+
+function AddToCollectionButton({ paper }: { paper: any }) {
+  const { data: collectionsData } = useCollections();
+  const addMutation = useAddPaperToCollection();
+  const { toast } = useToast();
+
+  const collections = collectionsData?.collections ?? collectionsData ?? [];
+
+  const handleAdd = (collectionId: string) => {
+    if (!paper.db_id) {
+      toast({ title: "Cannot add", description: "Paper has no DB id.", variant: "destructive" });
+      return;
+    }
+    addMutation.mutate({ collectionId, paperId: paper.db_id });
+  };
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7" disabled={addMutation.isPending}>
+          {addMutation.isPending
+            ? <Loader2 className="w-3 h-3 animate-spin" />
+            : <BookmarkPlus className="w-3 h-3" />
+          }
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel className="text-xs text-muted-foreground">Add to collection</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        {collections.length === 0 ? (
+          <DropdownMenuItem disabled>No collections yet</DropdownMenuItem>
+        ) : (
+          collections.map((c: any) => (
+            <DropdownMenuItem key={c.id} onClick={() => handleAdd(c.id)}>
+              {c.name}
+            </DropdownMenuItem>
+          ))
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Home() {
@@ -142,9 +184,9 @@ export default function Home() {
   const [isLoading, setIsLoading]           = useState(false);
   const [selectedPapers, setSelectedPapers] = useState<Set<number>>(new Set());
   const [citationFormat, setCitationFormat] = useState<CitationFormat>("APA");
-  const { toast }        = useToast();
-  const loadingMessage   = useStreamingMessage(isLoading);
-  const papers           = retrieval.papers;
+  const { toast }      = useToast();
+  const loadingMessage = useStreamingMessage(isLoading);
+  const papers         = retrieval.papers;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,7 +231,6 @@ export default function Home() {
       <Sidebar />
       <main className="flex-1 ml-64 p-8 max-w-7xl mx-auto w-full">
 
-        {/* Header */}
         <div className="mb-10 space-y-6">
           <div className="space-y-2">
             <h2 className="text-3xl font-display font-bold">Paper Retrieval</h2>
@@ -200,21 +241,18 @@ export default function Home() {
               <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
               <Input
                 placeholder="Describe your research topic (e.g., 'Transformers in Computer Vision')..."
-                className="pl-10 py-6 text-lg rounded-xl shadow-sm border-border/60 focus:ring-primary/20"
+                className="pl-10 py-6 text-lg rounded-xl shadow-sm border-border/60"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
               />
             </div>
-            <Button type="submit" size="lg" className="rounded-xl px-8 shadow-lg shadow-primary/20" disabled={isLoading}>
+            <Button type="submit" size="lg" className="rounded-xl px-8" disabled={isLoading}>
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Search"}
             </Button>
           </form>
         </div>
 
-        {/* Results */}
         <div className="space-y-6">
-
-          {/* Toolbar */}
           {papers.length > 0 && !isLoading && (
             <div className="flex items-center justify-between pb-4 border-b border-border">
               <div className="flex items-center gap-4">
@@ -229,14 +267,13 @@ export default function Home() {
                 <Button variant="outline" size="sm" className="gap-2" onClick={() => exportCSV(papers)}>
                   <Download className="w-4 h-4" /> Export CSV
                 </Button>
-                <Button onClick={handleCompare} disabled={selectedPapers.size < 2} className="gap-2 shadow-md">
+                <Button onClick={handleCompare} disabled={selectedPapers.size < 2} className="gap-2">
                   Compare Selected <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Loading */}
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -244,7 +281,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Table */}
           {!isLoading && (
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <Table>
@@ -258,7 +294,6 @@ export default function Home() {
                     <TableHead>PDF Link</TableHead>
                     <TableHead>Authors</TableHead>
                     <TableHead>Source</TableHead>
-                    {/* Citation column header with format dropdown */}
                     <TableHead className="min-w-[220px]">
                       <div className="flex items-center gap-2">
                         <span>Citation</span>
@@ -270,11 +305,8 @@ export default function Home() {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start">
                             {(["APA", "MLA", "IEEE", "BibTeX"] as CitationFormat[]).map((fmt) => (
-                              <DropdownMenuItem
-                                key={fmt}
-                                onClick={() => setCitationFormat(fmt)}
-                                className={citationFormat === fmt ? "text-primary font-medium" : ""}
-                              >
+                              <DropdownMenuItem key={fmt} onClick={() => setCitationFormat(fmt)}
+                                className={citationFormat === fmt ? "text-primary font-medium" : ""}>
                                 {fmt}
                               </DropdownMenuItem>
                             ))}
@@ -282,6 +314,7 @@ export default function Home() {
                         </DropdownMenu>
                       </div>
                     </TableHead>
+                    <TableHead className="w-[40px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -312,7 +345,6 @@ export default function Home() {
                       <TableCell>
                         <Badge variant="secondary">{paper.source}</Badge>
                       </TableCell>
-                      {/* Citation cell */}
                       <TableCell className="text-xs text-muted-foreground max-w-[220px]">
                         <div className="flex items-start gap-1">
                           <span className={`${citationFormat === "BibTeX" ? "font-mono whitespace-pre" : "line-clamp-3"} flex-1`}>
@@ -321,12 +353,14 @@ export default function Home() {
                           <CopyButton text={generateCitation(paper, citationFormat)} />
                         </div>
                       </TableCell>
+                      <TableCell>
+                        <AddToCollectionButton paper={paper} />
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
 
-              {/* Empty states */}
               {retrieval.query && papers.length === 0 && (
                 <div className="text-center py-20 bg-muted/20">
                   <h3 className="text-lg font-medium">No results found</h3>

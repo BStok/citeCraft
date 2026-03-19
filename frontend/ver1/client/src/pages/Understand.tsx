@@ -1,14 +1,19 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useAskPaper } from "@/hooks/use-papers";
-import { useRef, useEffect } from "react";
+import { useCollections, useCollection } from "@/hooks/use-collections";
+import { useRef, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb } from "lucide-react";
+import { ArrowLeft, Upload, FileText, Send, Loader2, BookOpen, Lightbulb, Library, ChevronDown } from "lucide-react";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE, getToken } from "@shared/routes";
 import { useSession } from "@/context/SessionContext";
 import ReactMarkdown from "react-markdown";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuTrigger, DropdownMenuLabel, DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 const SECTIONS = [
   { value: "",              label: "Whole paper"  },
@@ -40,22 +45,82 @@ function MessageBubble({ role, text }: { role: "user" | "assistant"; text: strin
           ? "bg-primary text-primary-foreground rounded-tr-sm"
           : "bg-muted/60 text-foreground rounded-tl-sm border border-border prose prose-sm max-w-none"
         }`}>
-        {isUser ? text : (
-          <ReactMarkdown>{text}</ReactMarkdown>
-        )}
+        {isUser ? text : <ReactMarkdown>{text}</ReactMarkdown>}
       </div>
     </div>
   );
 }
 
+// ─── Collection picker ────────────────────────────────────────────────────────
+
+function CollectionPicker({ onPick }: { onPick: (paper: any) => void }) {
+  const { data: collectionsData }  = useCollections();
+  const [selectedId, setSelectedId] = useState("");
+  const { data: collectionDetail } = useCollection(selectedId);
+  const { toast } = useToast();
+
+  const collections    = collectionsData?.collections ?? collectionsData ?? [];
+  const collectionPapers = collectionDetail?.papers ?? [];
+
+  const handlePick = (paper: any) => {
+    if (!paper.is_indexed) {
+      toast({ title: "Not indexed", description: "Open the collection page to index this paper first.", variant: "destructive" });
+      return;
+    }
+    onPick(paper);
+  };
+
+  return (
+    <div className="flex items-center gap-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Library className="w-4 h-4" />
+            {selectedId && collectionDetail ? collectionDetail.collection.name : "Pick from Collection"}
+            <ChevronDown className="w-3 h-3" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel className="text-xs text-muted-foreground">Your collections</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          {collections.length === 0
+            ? <DropdownMenuItem disabled>No collections yet</DropdownMenuItem>
+            : collections.map((c: any) => (
+                <DropdownMenuItem key={c.id} onClick={() => setSelectedId(c.id)}>{c.name}</DropdownMenuItem>
+              ))
+          }
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {selectedId && collectionPapers.length > 0 && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" size="sm" className="gap-2">
+              Select paper <ChevronDown className="w-3 h-3" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            {collectionPapers.map((p: any) => (
+              <DropdownMenuItem key={p.id} onClick={() => handlePick(p)}
+                className={!p.is_indexed ? "text-muted-foreground" : ""}>
+                {p.title || "Untitled"}{!p.is_indexed && " (not indexed)"}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
+    </div>
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function Understand() {
   const { understanding, setUnderstanding } = useSession();
   const { paper, messages, sectionFilter }  = understanding;
-
-  const bottomRef   = useRef<HTMLDivElement>(null);
-  const inputRef    = useRef<HTMLInputElement>(null);
-  const { toast }   = useToast();
-
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef  = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
   const askMutation = useAskPaper(paper?.paper_id ?? "");
 
   useEffect(() => {
@@ -69,12 +134,10 @@ export default function Understand() {
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     updateState({ paper: null, messages: [] });
     try {
       const formData = new FormData();
       formData.append("file", file);
-
       const uploadRes = await fetch(`${API_BASE}/upload_pdf`, {
         method: "POST",
         headers: { Authorization: `Bearer ${getToken()}` },
@@ -86,10 +149,7 @@ export default function Understand() {
       const indexRes = await fetch(`${API_BASE}/papers/index`, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}` },
-        body: JSON.stringify({
-          paper_ids:  [uploadData.paper_id],
-          file_paths: [uploadData.file_path],
-        }),
+        body: JSON.stringify({ paper_ids: [uploadData.paper_id], file_paths: [uploadData.file_path] }),
       });
       if (!indexRes.ok) throw new Error("Indexing failed");
 
@@ -105,22 +165,31 @@ export default function Understand() {
     }
   };
 
+  // ── Pick from collection (already indexed) ──────────────────────────────────
+  const handlePickFromCollection = (collectionPaper: any) => {
+    updateState({
+      paper: { paper_id: collectionPaper.id, filename: collectionPaper.title || collectionPaper.id, file_path: collectionPaper.pdf_link || "" },
+      messages: [],
+    });
+    toast({ title: "Paper loaded", description: `${collectionPaper.title} ready to ask questions.` });
+  };
+
   // ── Ask ─────────────────────────────────────────────────────────────────────
   const handleAsk = (question?: string) => {
     const q = question ?? (inputRef.current?.value ?? "").trim();
     if (!q || !paper) return;
     if (inputRef.current) inputRef.current.value = "";
-
-    updateState({ messages: [...messages, { role: "user", text: q }] });
+    const newMessages = [...messages, { role: "user" as const, text: q }];
+    updateState({ messages: newMessages });
 
     askMutation.mutate(
       { question: q, section_filter: sectionFilter || undefined },
       {
         onSuccess: (data) => {
-          updateState({ messages: [...messages, { role: "user", text: q }, { role: "assistant", text: data.answer }] });
+          updateState({ messages: [...newMessages, { role: "assistant", text: data.answer }] });
         },
         onError: (err: any) => {
-          updateState({ messages: [...messages, { role: "user", text: q }, { role: "assistant", text: `Error: ${err.message}` }] });
+          updateState({ messages: [...newMessages, { role: "assistant", text: `Error: ${err.message}` }] });
         },
       }
     );
@@ -135,14 +204,13 @@ export default function Understand() {
       <Sidebar />
       <main className="flex-1 ml-64 flex flex-col h-screen overflow-hidden">
 
-        {/* Top bar */}
         <div className="flex items-center gap-4 p-8 pb-4 border-b border-border shrink-0">
           <Link href="/">
             <Button variant="ghost" size="icon"><ArrowLeft className="w-5 h-5" /></Button>
           </Link>
           <div className="flex-1">
             <h2 className="text-3xl font-display font-bold">Paper Understanding</h2>
-            <p className="text-muted-foreground">Upload a paper and ask anything about it.</p>
+            <p className="text-muted-foreground">Upload a paper or pick from a collection and ask anything.</p>
           </div>
           {paper && (
             <div className="flex items-center gap-2 bg-primary/10 text-primary rounded-lg px-3 py-2 text-sm max-w-xs">
@@ -152,7 +220,6 @@ export default function Understand() {
           )}
         </div>
 
-        {/* No paper */}
         {!paper ? (
           <div className="flex-1 flex flex-col items-center justify-center gap-6 p-8">
             <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
@@ -161,20 +228,23 @@ export default function Understand() {
             <div className="text-center">
               <h3 className="text-xl font-semibold mb-2">Load a research paper</h3>
               <p className="text-muted-foreground text-sm max-w-sm">
-                Upload a PDF and ask questions — answers are based solely on the paper's content.
+                Upload a new PDF or pick an indexed paper from your collections.
               </p>
             </div>
-            <input type="file" accept=".pdf" id="understand-upload" className="hidden" onChange={handleUpload} />
-            <label htmlFor="understand-upload">
-              <Button className="gap-2 cursor-pointer" asChild>
-                <span><Upload className="w-4 h-4" /> Upload PDF</span>
-              </Button>
-            </label>
+            <div className="flex items-center gap-3 flex-wrap justify-center">
+              <input type="file" accept=".pdf" id="understand-upload" className="hidden" onChange={handleUpload} />
+              <label htmlFor="understand-upload">
+                <Button className="gap-2 cursor-pointer" asChild>
+                  <span><Upload className="w-4 h-4" /> Upload PDF</span>
+                </Button>
+              </label>
+              <span className="text-xs text-muted-foreground">or</span>
+              <CollectionPicker onPick={handlePickFromCollection} />
+            </div>
           </div>
         ) : (
           <div className="flex-1 flex flex-col overflow-hidden">
 
-            {/* Section filter */}
             <div className="px-8 py-3 border-b border-border shrink-0 flex items-center gap-3 flex-wrap">
               <span className="text-sm text-muted-foreground">Focus on:</span>
               <div className="flex gap-2 flex-wrap">
@@ -189,23 +259,22 @@ export default function Understand() {
                   </button>
                 ))}
               </div>
-              <div className="ml-auto">
+              <div className="ml-auto flex items-center gap-2">
+                <CollectionPicker onPick={handlePickFromCollection} />
                 <input type="file" accept=".pdf" id="understand-swap" className="hidden" onChange={handleUpload} />
                 <label htmlFor="understand-swap">
                   <Button variant="ghost" size="sm" className="gap-1 text-xs cursor-pointer" asChild>
-                    <span><Upload className="w-3 h-3" /> Change paper</span>
+                    <span><Upload className="w-3 h-3" /> Upload new</span>
                   </Button>
                 </label>
               </div>
             </div>
 
-            {/* Messages */}
             <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
               {messages.length === 0 && (
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                    <Lightbulb className="w-4 h-4" />
-                    <span>Suggested questions</span>
+                    <Lightbulb className="w-4 h-4" /><span>Suggested questions</span>
                   </div>
                   <div className="flex flex-col gap-2">
                     {SUGGESTED_QUESTIONS.map((q) => (
@@ -217,11 +286,7 @@ export default function Understand() {
                   </div>
                 </div>
               )}
-
-              {messages.map((msg, i) => (
-                <MessageBubble key={i} role={msg.role} text={msg.text} />
-              ))}
-
+              {messages.map((msg, i) => <MessageBubble key={i} role={msg.role} text={msg.text} />)}
               {askMutation.isPending && (
                 <div className="flex gap-3">
                   <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0">
@@ -235,16 +300,11 @@ export default function Understand() {
               <div ref={bottomRef} />
             </div>
 
-            {/* Input */}
             <div className="px-8 py-4 border-t border-border shrink-0">
               <div className="flex gap-3">
-                <Input
-                  ref={inputRef}
-                  onKeyDown={handleKeyDown}
+                <Input ref={inputRef} onKeyDown={handleKeyDown}
                   placeholder="Ask anything about the paper..."
-                  disabled={askMutation.isPending}
-                  className="flex-1"
-                />
+                  disabled={askMutation.isPending} className="flex-1" />
                 <Button onClick={() => handleAsk()} disabled={askMutation.isPending} size="icon">
                   {askMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                 </Button>
