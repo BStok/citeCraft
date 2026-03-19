@@ -2,13 +2,92 @@ import { useState, useEffect } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, ArrowRight, Download, ExternalLink, User, Loader2 } from "lucide-react";
+import { Search, ArrowRight, Download, ExternalLink, User, Loader2, Copy, Check, ChevronDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { apiFetch } from "@shared/routes";
 import { useSession } from "@/context/SessionContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+// ─── Citation formats ─────────────────────────────────────────────────────────
+
+type CitationFormat = "APA" | "MLA" | "IEEE" | "BibTeX";
+
+function formatAuthorsAPA(authors: string): string {
+  if (!authors) return "Unknown Author";
+  const list = authors.split(",").map((a) => a.trim());
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return `${list[0]} & ${list[1]}`;
+  return `${list[0]} et al.`;
+}
+
+function formatAuthorsMLA(authors: string): string {
+  if (!authors) return "Unknown Author";
+  const list = authors.split(",").map((a) => a.trim());
+  if (list.length === 1) return list[0];
+  if (list.length === 2) return `${list[0]}, and ${list[1]}`;
+  return `${list[0]}, et al.`;
+}
+
+function formatAuthorsIEEE(authors: string): string {
+  if (!authors) return "Unknown Author";
+  const list = authors.split(",").map((a) => a.trim());
+  if (list.length <= 3) return list.join(", ");
+  return `${list.slice(0, 3).join(", ")} et al.`;
+}
+
+function slugify(title: string): string {
+  return (title || "untitled").toLowerCase().replace(/\s+/g, "_").replace(/[^a-z0-9_]/g, "").slice(0, 20);
+}
+
+function generateCitation(paper: any, format: CitationFormat): string {
+  const title   = paper.title || "Untitled";
+  const authors = paper.authors || "";
+  const year    = paper.publication_date
+    ? new Date(paper.publication_date).getFullYear() || paper.publication_date
+    : "n.d.";
+  const doi     = paper.doi ? `https://doi.org/${paper.doi}` : (paper.pdf_link || "");
+  const source  = paper.source || "Unknown Source";
+
+  switch (format) {
+    case "APA":
+      return `${formatAuthorsAPA(authors)} (${year}). ${title}. ${source}.${doi ? ` ${doi}` : ""}`;
+
+    case "MLA":
+      return `${formatAuthorsMLA(authors)}. "${title}." ${source}, ${year}.${doi ? ` ${doi}` : ""}`;
+
+    case "IEEE":
+      return `${formatAuthorsIEEE(authors)}, "${title}," ${source}, ${year}.${doi ? ` DOI: ${doi}` : ""}`;
+
+    case "BibTeX": {
+      const key = `${(authors.split(",")[0] || "unknown").trim().split(" ").pop()?.toLowerCase()}${year}${slugify(title)}`;
+      return `@article{${key},\n  author = {${authors}},\n  title = {${title}},\n  year = {${year}},\n  journal = {${source}}${doi ? `,\n  url = {${doi}}` : ""}\n}`;
+    }
+  }
+}
+
+// ─── Copy button ──────────────────────────────────────────────────────────────
+
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 1800);
+  };
+  return (
+    <button onClick={handleCopy} className="ml-1 shrink-0 text-muted-foreground hover:text-primary transition-colors">
+      {copied ? <Check className="w-3 h-3 text-primary" /> : <Copy className="w-3 h-3" />}
+    </button>
+  );
+}
 
 // ─── Streaming loading messages ───────────────────────────────────────────────
 
@@ -58,14 +137,14 @@ function exportCSV(papers: any[]) {
 // ─── Component ────────────────────────────────────────────────────────────────
 
 export default function Home() {
-  const { retrieval, setRetrieval } = useSession();
-  const [query, setQuery]           = useState(retrieval.query);
-  const [isLoading, setIsLoading]   = useState(false);
+  const { retrieval, setRetrieval }         = useSession();
+  const [query, setQuery]                   = useState(retrieval.query);
+  const [isLoading, setIsLoading]           = useState(false);
   const [selectedPapers, setSelectedPapers] = useState<Set<number>>(new Set());
-  const { toast } = useToast();
-  const loadingMessage = useStreamingMessage(isLoading);
-
-  const papers = retrieval.papers;
+  const [citationFormat, setCitationFormat] = useState<CitationFormat>("APA");
+  const { toast }        = useToast();
+  const loadingMessage   = useStreamingMessage(isLoading);
+  const papers           = retrieval.papers;
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -116,7 +195,6 @@ export default function Home() {
             <h2 className="text-3xl font-display font-bold">Paper Retrieval</h2>
             <p className="text-muted-foreground">Search across millions of research papers, save to collections, and analyze findings.</p>
           </div>
-
           <form onSubmit={handleSearch} className="flex gap-4 max-w-3xl">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-5 w-5 text-muted-foreground" />
@@ -133,7 +211,7 @@ export default function Home() {
           </form>
         </div>
 
-        {/* Results area */}
+        {/* Results */}
         <div className="space-y-6">
 
           {/* Toolbar */}
@@ -151,18 +229,14 @@ export default function Home() {
                 <Button variant="outline" size="sm" className="gap-2" onClick={() => exportCSV(papers)}>
                   <Download className="w-4 h-4" /> Export CSV
                 </Button>
-                <Button
-                  onClick={handleCompare}
-                  disabled={selectedPapers.size < 2}
-                  className="gap-2 shadow-md"
-                >
+                <Button onClick={handleCompare} disabled={selectedPapers.size < 2} className="gap-2 shadow-md">
                   Compare Selected <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* Loading state */}
+          {/* Loading */}
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-24 gap-4">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -170,7 +244,7 @@ export default function Home() {
             </div>
           )}
 
-          {/* Results table */}
+          {/* Table */}
           {!isLoading && (
             <div className="rounded-xl border border-border bg-card overflow-hidden">
               <Table>
@@ -184,16 +258,37 @@ export default function Home() {
                     <TableHead>PDF Link</TableHead>
                     <TableHead>Authors</TableHead>
                     <TableHead>Source</TableHead>
+                    {/* Citation column header with format dropdown */}
+                    <TableHead className="min-w-[220px]">
+                      <div className="flex items-center gap-2">
+                        <span>Citation</span>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="sm" className="h-6 gap-1 px-2 text-xs font-normal text-muted-foreground hover:text-foreground">
+                              {citationFormat} <ChevronDown className="w-3 h-3" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="start">
+                            {(["APA", "MLA", "IEEE", "BibTeX"] as CitationFormat[]).map((fmt) => (
+                              <DropdownMenuItem
+                                key={fmt}
+                                onClick={() => setCitationFormat(fmt)}
+                                className={citationFormat === fmt ? "text-primary font-medium" : ""}
+                              >
+                                {fmt}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {papers.map((paper: any, idx: number) => (
                     <TableRow key={idx} className="hover:bg-muted/5">
                       <TableCell>
-                        <Checkbox
-                          checked={selectedPapers.has(idx)}
-                          onCheckedChange={() => toggleSelection(idx)}
-                        />
+                        <Checkbox checked={selectedPapers.has(idx)} onCheckedChange={() => toggleSelection(idx)} />
                       </TableCell>
                       <TableCell className="font-semibold">{paper.title}</TableCell>
                       <TableCell className="text-xs text-muted-foreground">{paper.doi}</TableCell>
@@ -211,12 +306,20 @@ export default function Home() {
                       </TableCell>
                       <TableCell className="text-sm italic">
                         <div className="flex items-center gap-1">
-                          <User className="w-3 h-3" />
-                          {paper.authors}
+                          <User className="w-3 h-3" /> {paper.authors}
                         </div>
                       </TableCell>
                       <TableCell>
                         <Badge variant="secondary">{paper.source}</Badge>
+                      </TableCell>
+                      {/* Citation cell */}
+                      <TableCell className="text-xs text-muted-foreground max-w-[220px]">
+                        <div className="flex items-start gap-1">
+                          <span className={`${citationFormat === "BibTeX" ? "font-mono whitespace-pre" : "line-clamp-3"} flex-1`}>
+                            {generateCitation(paper, citationFormat)}
+                          </span>
+                          <CopyButton text={generateCitation(paper, citationFormat)} />
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -224,13 +327,12 @@ export default function Home() {
               </Table>
 
               {/* Empty states */}
-              {!isLoading && retrieval.query && papers.length === 0 && (
+              {retrieval.query && papers.length === 0 && (
                 <div className="text-center py-20 bg-muted/20">
                   <h3 className="text-lg font-medium">No results found</h3>
                   <p className="text-muted-foreground">Try adjusting your search terms.</p>
                 </div>
               )}
-
               {!retrieval.query && papers.length === 0 && (
                 <div className="text-center py-20">
                   <h3 className="text-lg font-medium">Start your research</h3>
