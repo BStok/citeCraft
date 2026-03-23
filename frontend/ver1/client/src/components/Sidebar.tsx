@@ -62,7 +62,7 @@ export function Sidebar() {
     <div className="w-64 border-r border-border h-screen bg-card flex flex-col fixed left-0 top-0 z-50">
       <div className="p-6">
         <h1 className="text-xl font-display font-bold text-primary flex items-center gap-2">
-          <GooglyEyes />
+          <GooglyEyes size={22} />
           CiteCraft
         </h1>
       </div>

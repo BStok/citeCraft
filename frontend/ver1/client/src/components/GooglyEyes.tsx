@@ -1,6 +1,10 @@
 import { useEffect, useRef } from 'react';
 
-export function GooglyEyes() {
+interface GooglyEyesProps {
+  size?: number;
+}
+
+export function GooglyEyes({ size = 36 }: GooglyEyesProps) {
   const leftEyeRef = useRef<HTMLDivElement>(null);
   const rightEyeRef = useRef<HTMLDivElement>(null);
 
@@ -24,9 +28,11 @@ export function GooglyEyes() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
+  const pupilSize = Math.round(size * 0.39);
+
   const eyeStyle: React.CSSProperties = {
-    width: 36,
-    height: 36,
+    width: size,
+    height: size,
     background: '#F3F4F6',
     border: '1px solid #E5E7EB',
     borderRadius: '50%',
@@ -37,8 +43,8 @@ export function GooglyEyes() {
   };
 
   const pupilStyle: React.CSSProperties = {
-    width: 14,
-    height: 14,
+    width: pupilSize,
+    height: pupilSize,
     background: '#111111',
     borderRadius: '50%',
     transition: 'transform 75ms ease-out',
@@ -47,8 +53,8 @@ export function GooglyEyes() {
 
   const highlightStyle: React.CSSProperties = {
     position: 'absolute',
-    width: 5,
-    height: 5,
+    width: Math.round(size * 0.14),
+    height: Math.round(size * 0.14),
     background: '#FFFFFF',
     opacity: 0.8,
     top: 1,
