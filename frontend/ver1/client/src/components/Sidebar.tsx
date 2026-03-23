@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { GooglyEyes } from "@/components/GooglyEyes";
 import { Search, Scale, Library, Plus, LayoutDashboard, BookOpen, History } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCollections, useCreateCollection } from "@/hooks/use-collections";
@@ -61,7 +62,7 @@ export function Sidebar() {
     <div className="w-64 border-r border-border h-screen bg-card flex flex-col fixed left-0 top-0 z-50">
       <div className="p-6">
         <h1 className="text-xl font-display font-bold text-primary flex items-center gap-2">
-          <LayoutDashboard className="w-6 h-6" />
+          <GooglyEyes />
           CiteCraft
         </h1>
       </div>
