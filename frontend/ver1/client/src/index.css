@@ -11,7 +11,7 @@
   --background: 0 0% 100%;
   --foreground: 222 47% 11%;
   
-  --primary: 221 83% 53%;
+  --primary: 345 40% 52%;
   --primary-foreground: 210 40% 98%;
   
   --secondary: 210 40% 96%;
@@ -28,7 +28,7 @@
 
   --border: 214 32% 91%;
   --input: 214 32% 91%;
-  --ring: 221 83% 53%;
+  --ring: 345 40% 52%;
 
   --radius: 0.5rem;
 }
