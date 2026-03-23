@@ -9,6 +9,7 @@ import Compare from "@/pages/Compare";
 import Understand from "@/pages/Understand";
 import Collection from "@/pages/Collection";
 import Login from "@/pages/Login";
+import Landing from "@/pages/Landing";
 import { getToken } from "@shared/routes";
 import History from "@/pages/History";
 import { SessionProvider } from "@/context/SessionContext";
@@ -19,31 +20,36 @@ function ProtectedRoute({ component: Component }: { component: () => JSX.Element
   return <Component />;
 }
 
+function PublicOnlyRoute({ component: Component }: { component: () => JSX.Element }) {
+  const token = getToken();
+  if (token) return <Redirect to="/app" />;
+  return <Component />;
+}
+
 function Router() {
   return (
     <Switch>
-      <Route path="/login" component={Login} />
-      <Route path="/" component={() => <ProtectedRoute component={Home} />} />
+      <Route path="/" component={() => <PublicOnlyRoute component={Landing} />} />
+      <Route path="/login" component={() => <PublicOnlyRoute component={Login} />} />
+      <Route path="/app" component={() => <ProtectedRoute component={Home} />} />
       <Route path="/compare" component={() => <ProtectedRoute component={Compare} />} />
       <Route path="/understand" component={Understand} />
       <Route path="/collections/:id" component={() => <ProtectedRoute component={Collection} />} />
       <Route path="/history" component={() => <ProtectedRoute component={History} />} />
-
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <SessionProvider> 
+      <SessionProvider>
         <TooltipProvider>
           <Toaster />
           <Router />
         </TooltipProvider>
-      </SessionProvider> 
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

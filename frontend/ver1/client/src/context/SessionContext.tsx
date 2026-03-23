@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-
-// ─── Retrieval state ──────────────────────────────────────────────────────────
+import { SourceChunk } from "@shared/routes";
 
 interface Paper {
   db_id?: string;
@@ -19,11 +18,10 @@ interface RetrievalState {
   papers: Paper[];
 }
 
-// ─── Understanding state ──────────────────────────────────────────────────────
-
-interface Message {
+export interface Message {
   role: "user" | "assistant";
   text: string;
+  sources?: SourceChunk[];
 }
 
 interface UnderstandingState {
@@ -31,8 +29,6 @@ interface UnderstandingState {
   messages: Message[];
   sectionFilter: string;
 }
-
-// ─── Context ──────────────────────────────────────────────────────────────────
 
 interface SessionContextType {
   retrieval: RetrievalState;

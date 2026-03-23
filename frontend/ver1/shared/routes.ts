@@ -1,35 +1,20 @@
 import { z } from 'zod';
 
-// ============================================
-// CONFIG — change this to your deployed URL in prod
-// ============================================
 export const API_BASE = import.meta.env.VITE_API_URL ?? 'https://citecraft-production.up.railway.app';
-// ============================================
-// HELPERS
-// ============================================
+
 export function buildUrl(path: string, params?: Record<string, string | number>): string {
   let url = `${API_BASE}${path}`;
   if (params) {
     Object.entries(params).forEach(([key, value]) => {
-      if (url.includes(`:${key}`)) {
-        url = url.replace(`:${key}`, String(value));
-      }
+      if (url.includes(`:${key}`)) url = url.replace(`:${key}`, String(value));
     });
   }
   return url;
 }
 
-export function getToken(): string | null {
-  return localStorage.getItem('token');
-}
-
-export function setToken(token: string): void {
-  localStorage.setItem('token', token);
-}
-
-export function clearToken(): void {
-  localStorage.removeItem('token');
-}
+export function getToken(): string | null { return localStorage.getItem('token'); }
+export function setToken(token: string): void { localStorage.setItem('token', token); }
+export function clearToken(): void { localStorage.removeItem('token'); }
 
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getToken();
@@ -43,9 +28,8 @@ export async function apiFetch(path: string, options: RequestInit = {}): Promise
   });
 }
 
-// ============================================
-// PAPER SCHEMA
-// ============================================
+// ─── Schemas ──────────────────────────────────────────────────────────────────
+
 export const PaperSchema = z.object({
   db_id:            z.string().optional(),
   title:            z.string().nullable().optional(),
@@ -57,24 +41,27 @@ export const PaperSchema = z.object({
   pdf_link:         z.string().nullable().optional(),
   source:           z.string().nullable().optional(),
 });
-
 export type Paper = z.infer<typeof PaperSchema>;
 
+export const SourceChunkSchema = z.object({
+  section:     z.string(),
+  text:        z.string(),
+  score:       z.number(),
+  chunk_index: z.number(),
+});
+export type SourceChunk = z.infer<typeof SourceChunkSchema>;
 
-// ============================================
-// RAG comparison row shape
-// { dimension: "scope", values: { "paper-uuid-1": "...", "paper-uuid-2": "..." } }
-// ============================================
 export const RAGComparisonRowSchema = z.object({
   dimension: z.string(),
-  values:    z.record(z.string(), z.string()),
+  values: z.record(z.string(), z.object({
+    answer:  z.string(),
+    sources: z.array(SourceChunkSchema).optional(),
+  })),
 });
-
 export type RAGComparisonRow = z.infer<typeof RAGComparisonRowSchema>;
 
-// ============================================
-// API CONTRACT
-// ============================================
+// ─── API contract ─────────────────────────────────────────────────────────────
+
 export const api = {
   auth: {
     register: { method: 'POST' as const, path: '/auth/register' as const },
@@ -90,7 +77,6 @@ export const api = {
       },
     },
 
-    // Step 1 of compare flow — upload a single PDF, get back paper_id + file_path
     upload: {
       method: 'POST' as const,
       path: '/upload_pdf' as const,
@@ -103,7 +89,6 @@ export const api = {
       },
     },
 
-    // Step 2 — index uploaded PDFs before comparing
     index: {
       method: 'POST' as const,
       path: '/papers/index' as const,
@@ -112,7 +97,6 @@ export const api = {
       },
     },
 
-    // Step 3 — RAG-based comparison using paper_ids
     compare: {
       method: 'POST' as const,
       path: '/papers/compare' as const,
@@ -124,13 +108,14 @@ export const api = {
       },
     },
 
-    // Paper understanding — ask a question about a specific paper
     ask: {
       method: 'POST' as const,
-      // paper_id is interpolated at call time: `/papers/${paper_id}/ask`
       pathTemplate: '/papers/:paper_id/ask' as const,
       responses: {
-        200: z.object({ answer: z.string() }),
+        200: z.object({
+          answer:  z.string(),
+          sources: z.array(SourceChunkSchema).optional(),
+        }),
       },
     },
 
