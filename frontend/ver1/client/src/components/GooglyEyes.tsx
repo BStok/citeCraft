@@ -33,8 +33,8 @@ export function GooglyEyes({ size = 36 }: GooglyEyesProps) {
   const eyeStyle: React.CSSProperties = {
     width: size,
     height: size,
-    background: '#F3F4F6',
-    border: '1px solid #E5E7EB',
+    background: '#eaefef',
+    border: '1.5px solid #525158',
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
@@ -45,7 +45,7 @@ export function GooglyEyes({ size = 36 }: GooglyEyesProps) {
   const pupilStyle: React.CSSProperties = {
     width: pupilSize,
     height: pupilSize,
-    background: '#111111',
+    background: '#43092b',
     borderRadius: '50%',
     transition: 'transform 75ms ease-out',
     position: 'relative',
@@ -64,17 +64,29 @@ export function GooglyEyes({ size = 36 }: GooglyEyesProps) {
   };
 
   return (
-    <div className="flex gap-2 items-center" style={{ filter: 'drop-shadow(0 2px 8px rgba(180,60,90,0.18))' }}>
-      <div ref={leftEyeRef} style={eyeStyle}>
-        <div className="pupil" style={pupilStyle}>
-          <div style={highlightStyle} />
+    <div className="flex flex-col items-center" style={{ filter: 'drop-shadow(0 2px 8px rgba(180,60,90,0.18))' }}>
+      <div className="flex gap-2 items-center">
+        <div ref={leftEyeRef} style={eyeStyle}>
+          <div className="pupil" style={pupilStyle}>
+            <div style={highlightStyle} />
+          </div>
+        </div>
+        <div ref={rightEyeRef} style={eyeStyle}>
+          <div className="pupil" style={pupilStyle}>
+            <div style={highlightStyle} />
+          </div>
         </div>
       </div>
-      <div ref={rightEyeRef} style={eyeStyle}>
-        <div className="pupil" style={pupilStyle}>
-          <div style={highlightStyle} />
-        </div>
-      </div>
+      <svg width={size * 1.5} height={size * 0.3} viewBox="0 0 40 16">
+        <path
+          d="M 6 4 Q 20 16 34 4"
+          stroke="#4e0505"
+          strokeWidth="2"
+          strokeLinecap="round"
+          fill="none"
+        />
+      </svg>
     </div>
   );
+
 }
