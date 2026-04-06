@@ -10,7 +10,7 @@ export default function Landing() {
     <div className="min-h-screen bg-background text-foreground font-sans">
 
       {/* NAV */}
-      <header className="fixed top-0 left-0 right-0 z-50" style={{ background: 'hsl(220,18%,14%)' }}>
+      <header className="fixed top-0 left-0 right-0 z-50" style={{ background: 'hsl(218, 23%, 41%)' }}>
         <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <GooglyEyes />
           <nav className="hidden md:flex items-center gap-8 text-sm" style={{ color: 'hsl(220,15%,65%)' }}>
@@ -24,7 +24,7 @@ export default function Landing() {
               className="text-sm transition-colors hidden md:block"
               style={{ color: 'hsl(220,15%,65%)', background: 'none', border: 'none', cursor: 'pointer' }}
               onMouseEnter={e => (e.currentTarget.style.color='#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color='hsl(220,15%,65%)')}
+              onMouseLeave={e => (e.currentTarget.style.color='hsl(220, 2%, 39%)')}
             >
               Log in
             </button>

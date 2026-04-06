@@ -48,7 +48,7 @@ export default function Login() {
 
       setToken(data.access_token);
       localStorage.setItem("username", data.username);
-      navigate("/");
+      navigate("/app");
     } catch (e) {
       toast({ title: "Error", description: "Could not connect to server.", variant: "destructive" });
     } finally {
