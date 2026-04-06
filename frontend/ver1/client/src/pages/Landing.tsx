@@ -22,9 +22,9 @@ export default function Landing() {
             <button
               onClick={() => navigate('/login')}
               className="text-sm transition-colors hidden md:block"
-              style={{ color: 'hsl(221, 21%, 71%)', background: 'none', border: 'none', cursor: 'pointer' }}
-              onMouseEnter={e => (e.currentTarget.style.color='#fff')}
-              onMouseLeave={e => (e.currentTarget.style.color='hsl(220, 2%, 39%)')}
+              style={{ color: 'hsl(359, 40%, 28%)', background: 'none', border: 'none', cursor: 'pointer' }}
+              onMouseEnter={e => (e.currentTarget.style.color='#623636')}
+              onMouseLeave={e => (e.currentTarget.style.color='hsl(210, 2%, 20%)')}
             >
               Log in
             </button>
