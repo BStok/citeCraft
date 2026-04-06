@@ -74,7 +74,6 @@ export default function Landing() {
                   Start for free
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
-                <span className="text-xs text-muted-foreground">No credit card required</span>
               </div>
             </div>
             
