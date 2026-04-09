@@ -1,15 +1,19 @@
 import { Sidebar } from "@/components/Sidebar";
-import { useCollection } from "@/hooks/use-collections";
+import { useCollection, useRenameCollection, useDeleteCollection, useRemovePaperFromCollection } from "@/hooks/use-collections";
 import { useRoute, useLocation } from "wouter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ExternalLink, User, Scale, BookOpen, Upload, Loader2 } from "lucide-react";
+import { 
+  ExternalLink, User, Scale, BookOpen, Upload, Loader2, 
+  Edit2, Trash2, X as XIcon, Check 
+} from "lucide-react";
 import { useSession } from "@/context/SessionContext";
 import { useToast } from "@/hooks/use-toast";
 import { API_BASE, getToken } from "@shared/routes";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { Input } from "@/components/ui/input";
 
 export default function Collection() {
   const [, params]       = useRoute("/collections/:id");
@@ -20,6 +24,12 @@ export default function Collection() {
   const { toast }        = useToast();
   const queryClient      = useQueryClient();
   const [uploading, setUploading] = useState(false);
+  const [renamingId, setRenamingId] = useState<string | null>(null);
+  const [newName, setNewName] = useState("");
+
+  const renameCollection = useRenameCollection();
+  const deleteCollection = useDeleteCollection();
+  const removePaper = useRemovePaperFromCollection();
 
   if (isLoading) {
     return (
@@ -37,6 +47,7 @@ export default function Collection() {
   if (!data) return <div className="p-8">Collection not found</div>;
 
   const papers = data.papers ?? [];
+  const collection = data.collection;
 
   // ── Upload PDF directly to collection ──────────────────────────────────────
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,6 +78,39 @@ export default function Collection() {
       setUploading(false);
       e.target.value = "";
     }
+  };
+
+  // ── Rename collection ─────────────────────────────────────────────────────
+  const handleRename = async () => {
+    if (!newName.trim()) {
+      toast({ title: "Error", description: "Name cannot be empty", variant: "destructive" });
+      return;
+    }
+    renameCollection.mutate(
+      { collectionId, name: newName.trim() },
+      {
+        onSuccess: () => {
+          setRenamingId(null);
+          setNewName("");
+        },
+      }
+    );
+  };
+
+  // ── Delete collection ─────────────────────────────────────────────────────
+  const handleDelete = async () => {
+    if (!confirm("Are you sure you want to delete this collection? This cannot be undone.")) return;
+    deleteCollection.mutate(collectionId, {
+      onSuccess: () => {
+        navigate("/");
+      },
+    });
+  };
+
+  // ── Remove paper from collection ──────────────────────────────────────────
+  const handleRemovePaper = (paperId: string, paperTitle: string) => {
+    if (!confirm(`Remove "${paperTitle}" from this collection?`)) return;
+    removePaper.mutate({ collectionId, paperId });
   };
 
   // ── Use in Understanding ────────────────────────────────────────────────────
@@ -130,33 +174,89 @@ export default function Collection() {
       <Sidebar />
       <main className="flex-1 ml-64 p-8 w-full max-w-7xl mx-auto">
 
-        {/* Header */}
-        <div className="mb-8 border-b border-border pb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-3xl font-display font-bold text-primary">{data.collection.name}</h2>
-            <p className="text-muted-foreground mt-1 text-sm">{papers.length} / 5 papers</p>
+        {/* Header with rename and delete */}
+        <div className="mb-8 border-b border-border pb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              {renamingId === collectionId ? (
+                <div className="flex items-center gap-2">
+                  <Input
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    placeholder={collection.name}
+                    className="w-64"
+                    autoFocus
+                  />
+                  <Button
+                    size="sm"
+                    onClick={handleRename}
+                    disabled={renameCollection.isPending}
+                  >
+                    {renameCollection.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setRenamingId(null);
+                      setNewName("");
+                    }}
+                  >
+                    <XIcon className="w-3 h-3" />
+                  </Button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-3xl font-display font-bold text-primary">{collection.name}</h2>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      setRenamingId(collectionId);
+                      setNewName(collection.name);
+                    }}
+                    disabled={renamingId !== null}
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </Button>
+                </>
+              )}
+            </div>
+
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={deleteCollection.isPending}
+              className="gap-2"
+            >
+              {deleteCollection.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+              Delete Collection
+            </Button>
           </div>
 
-          {/* Upload PDF to collection */}
-          {papers.length < 5 && (
-            <div>
-              <input
-                type="file" accept=".pdf" id="collection-upload"
-                className="hidden" onChange={handleUpload} disabled={uploading}
-              />
-              <label htmlFor="collection-upload">
-                <Button variant="outline" className="gap-2 cursor-pointer" disabled={uploading} asChild>
-                  <span>
-                    {uploading
-                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
-                      : <><Upload className="w-4 h-4" /> Upload PDF to Collection</>
-                    }
-                  </span>
-                </Button>
-              </label>
-            </div>
-          )}
+          <p className="text-muted-foreground mt-2 text-sm">{papers.length} / 5 papers</p>
         </div>
+
+        {/* Upload PDF to collection */}
+        {papers.length < 5 && (
+          <div className="mb-6">
+            <input
+              type="file" accept=".pdf" id="collection-upload"
+              className="hidden" onChange={handleUpload} disabled={uploading}
+            />
+            <label htmlFor="collection-upload">
+              <Button variant="outline" className="gap-2 cursor-pointer" disabled={uploading} asChild>
+                <span>
+                  {uploading
+                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Uploading...</>
+                    : <><Upload className="w-4 h-4" /> Upload PDF to Collection</>
+                  }
+                </span>
+              </Button>
+            </label>
+          </div>
+        )}
 
         {/* Papers list */}
         <div className="grid grid-cols-1 gap-4">
@@ -192,6 +292,15 @@ export default function Collection() {
                       {paper.is_indexed ? "Indexed" : "Not indexed"}
                     </Badge>
                     <Badge variant="secondary">{paper.source}</Badge>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleRemovePaper(paper.id, paper.title || "Untitled")}
+                      disabled={removePaper.isPending}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      {removePaper.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <XIcon className="w-4 h-4" />}
+                    </Button>
                   </div>
                 </div>
 

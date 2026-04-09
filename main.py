@@ -86,6 +86,13 @@ class CollectionCreateRequest(BaseModel):
     name: str
     description: Optional[str] = None
 
+# ── NEW: replaces bare `dict` in PATCH and POST /papers ──────────────────────
+class CollectionUpdateRequest(BaseModel):
+    name: str
+
+class AddPaperRequest(BaseModel):
+    paper_id: str
+
 
 # ─── Auth ─────────────────────────────────────────────────────────────────────
 
@@ -328,6 +335,7 @@ def list_collections(
     cols = db.query(Collection).filter(Collection.user_id == user_id).order_by(Collection.created_at.desc()).all()
     return {"collections": [{"id": str(c.id), "name": c.label, "created_at": str(c.created_at)} for c in cols]}
 
+
 @app.post("/collections")
 def create_collection(
     body: CollectionCreateRequest,
@@ -335,11 +343,86 @@ def create_collection(
     current_user: dict = Depends(get_current_user),
 ):
     user_id = uuid.UUID(current_user["user_id"])
+
+    existing = db.query(Collection).filter(
+        Collection.user_id == user_id,
+        Collection.label == body.name
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Collection with this name already exists")
+
     col = Collection(user_id=user_id, label=body.name)
     db.add(col)
     db.commit()
     db.refresh(col)
     return {"id": str(col.id), "name": col.label, "created_at": str(col.created_at)}
+
+
+@app.patch("/collections/{collection_id}")
+def update_collection(
+    collection_id: str,
+    body: CollectionUpdateRequest,  # FIX: was `body: dict`
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    user_id = uuid.UUID(current_user["user_id"])
+    col = db.query(Collection).filter(
+        Collection.id == uuid.UUID(collection_id),
+        Collection.user_id == user_id
+    ).first()
+
+    if not col:
+        raise HTTPException(status_code=404, detail="Collection not found")
+
+    new_name = body.name.strip()
+    if not new_name:
+        raise HTTPException(status_code=400, detail="Name cannot be empty")
+
+    existing = db.query(Collection).filter(
+        Collection.user_id == user_id,
+        Collection.label == new_name,
+        Collection.id != uuid.UUID(collection_id)
+    ).first()
+
+    if existing:
+        raise HTTPException(status_code=400, detail="Collection with this name already exists")
+
+    col.label = new_name
+    db.commit()
+    db.refresh(col)
+
+    return {
+        "id": str(col.id),
+        "name": col.label,
+        "created_at": str(col.created_at)
+    }
+
+
+@app.delete("/collections/{collection_id}")
+def delete_collection(
+    collection_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    user_id = uuid.UUID(current_user["user_id"])
+    col = db.query(Collection).filter(
+        Collection.id == uuid.UUID(collection_id),
+        Collection.user_id == user_id
+    ).first()
+
+    if not col:
+        raise HTTPException(status_code=404, detail="Collection not found")
+
+    db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id)
+    ).delete()
+
+    db.delete(col)
+    db.commit()
+
+    return {"message": "Collection deleted"}
+
 
 @app.get("/collections/{collection_id}")
 def get_collection(
@@ -372,16 +455,15 @@ def get_collection(
         ],
     }
 
+
 @app.post("/collections/{collection_id}/papers")
 def add_paper_to_collection(
     collection_id: str,
-    body: dict,
+    body: AddPaperRequest,  # FIX: was `body: dict`
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
-    paper_id = body.get("paper_id")
-    if not paper_id:
-        raise HTTPException(status_code=400, detail="paper_id required")
+    paper_id = body.paper_id
 
     existing = db.query(CollectionPaper).filter(
         CollectionPaper.collection_id == uuid.UUID(collection_id)
@@ -412,6 +494,7 @@ def add_paper_to_collection(
 
     db.commit()
     return {"message": "Paper added to collection"}
+
 
 @app.post("/collections/{collection_id}/upload")
 async def upload_to_collection(
@@ -458,6 +541,37 @@ async def upload_to_collection(
 
     db.commit()
     return {"paper_id": str(paper.id), "filename": file.filename, "message": "Uploaded and added to collection"}
+
+
+@app.delete("/collections/{collection_id}/papers/{paper_id}")
+def remove_paper_from_collection(
+    collection_id: str,
+    paper_id: str,
+    db: Session = Depends(get_db),
+    current_user: dict = Depends(get_current_user),
+):
+    user_id = uuid.UUID(current_user["user_id"])
+
+    col = db.query(Collection).filter(
+        Collection.id == uuid.UUID(collection_id),
+        Collection.user_id == user_id
+    ).first()
+
+    if not col:
+        raise HTTPException(status_code=404, detail="Collection not found")
+
+    cp = db.query(CollectionPaper).filter(
+        CollectionPaper.collection_id == uuid.UUID(collection_id),
+        CollectionPaper.paper_id == uuid.UUID(paper_id)
+    ).first()
+
+    if not cp:
+        raise HTTPException(status_code=404, detail="Paper not in collection")
+
+    db.delete(cp)
+    db.commit()
+
+    return {"message": "Paper removed from collection"}
 
 
 # ─── Comparisons ──────────────────────────────────────────────────────────────
