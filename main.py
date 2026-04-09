@@ -223,6 +223,12 @@ def rag_compare(
         db.flush()
 
         for paper_id in body.paper_ids:
+            sources_json = {}
+            for row in rows:
+                dimension = row["dimension"]
+                cell_value = row["values"].get(paper_id, {})
+                sources_json[dimension] = cell_value.get("sources", [])
+
             cp = ComparisonPaper(
                 comparison_id    = comparison.id,
                 paper_id         = uuid.UUID(paper_id),
@@ -231,10 +237,7 @@ def rag_compare(
                 methodology      = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "methodology"), None),
                 results          = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "results"), None),
                 additional_notes = next((r["values"].get(paper_id, {}).get("answer") for r in rows if r["dimension"] == "additional_notes"), None),
-                sources_json     = {
-                    dim: r["values"].get(paper_id, {}).get("sources", [])
-                    for r in rows for dim in [r["dimension"]]
-                },
+                sources_json     = sources_json
             )
             db.add(cp)
 
