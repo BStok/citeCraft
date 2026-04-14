@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const API_BASE = import.meta.env.VITE_API_URL ?? 'https://citecraft-production.up.railway.app';
+export const API_BASE = import.meta.env.VITE_API_URL ||'https://citecraft.onrender.com';
 
 export function buildUrl(path: string, params?: Record<string, string | number>): string {
   let url = `${API_BASE}${path}`;
