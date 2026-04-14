@@ -1,37 +1,34 @@
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from backend.db.models import Base
 from dotenv import load_dotenv
+
+# Ensure the Base is imported so it's available for init_db
+from backend.db.models import Base 
 
 load_dotenv()
 
-# Use single DATABASE_URL if available (Railway), otherwise build from parts (local)
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
+# Basic cleanup for Railway/Supabase compatibility
 if DATABASE_URL:
-    # Railway uses postgres:// but SQLAlchemy needs postgresql://
     if DATABASE_URL.startswith("postgres://"):
         DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
-else:
-    # Local dev fallback
-    DATABASE_URL = (
-        f"postgresql://{os.environ.get('DB_USER', 'postgres')}:"
-        f"{os.environ.get('DB_PASSWORD')}@"
-        f"{os.environ.get('DB_HOST', 'localhost')}:"
-        f"{os.environ.get('DB_PORT', '5432')}/"
-        f"{os.environ.get('DB_NAME', 'citecraft')}"
-    )
 
-engine = create_engine(DATABASE_URL)
+# Create the engine
+engine = create_engine(
+    DATABASE_URL,
+    # This helps with the 'pooler' connection by keeping the connection alive
+    pool_pre_ping=True
+)
 SessionLocal = sessionmaker(bind=engine)
 
 def init_db():
     """Creates all tables if they don't exist."""
-    Base.metadata.create_all(engine)
+    # This is the line that actually talks to Supabase
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
-    """Returns a DB session. Use as context manager."""
     db = SessionLocal()
     try:
         yield db
