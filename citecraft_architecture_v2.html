@@ -1,0 +1,138 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.wrap{padding:24px 20px;display:flex;flex-direction:column;gap:0;font-family:var(--font-sans)}
+.deploy-row{display:flex;gap:12px;justify-content:center;margin-bottom:20px}
+.badge{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:500;letter-spacing:.3px}
+.badge-v{background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC}
+.badge-r{background:#E1F5EE;color:#085041;border:1px solid #5DCAA5}
+.layer{border-radius:14px;padding:16px;margin-bottom:4px;border:1px solid transparent}
+.layer-label{font-size:11px;font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;opacity:.7}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:400;white-space:nowrap;border:1px solid transparent}
+.chip-title{font-size:13px;font-weight:500;display:block;margin-bottom:2px}
+.chip-sub{font-size:11px;opacity:.75;display:block}
+
+/* Layers */
+.l-frontend{background:#EEEDFE;border-color:#AFA9EC}
+.l-frontend .layer-label{color:#534AB7}
+.chip-purple{background:#CECBF6;color:#26215C;border-color:#AFA9EC}
+
+.l-backend{background:#E1F5EE;border-color:#5DCAA5}
+.l-backend .layer-label{color:#0F6E56}
+.chip-teal{background:#9FE1CB;color:#04342C;border-color:#5DCAA5}
+
+.l-rag{background:#FAEEDA;border-color:#FAC775}
+.l-rag .layer-label{color:#854F0B}
+.chip-amber{background:#FAC775;color:#412402;border-color:#EF9F27}
+
+.l-db{background:#EAF3DE;border-color:#97C459}
+.l-db .layer-label{color:#3B6D11}
+.chip-green{background:#C0DD97;color:#173404;border-color:#97C459}
+
+.l-llm{background:#FAECE7;border-color:#F0997B}
+.l-llm .layer-label{color:#993C1D}
+.chip-coral{background:#F5C4B3;color:#4A1B0C;border-color:#F0997B}
+
+.l-ext{background:#E6F1FB;border-color:#85B7EB}
+.l-ext .layer-label{color:#185FA5}
+.chip-blue{background:#B5D4F4;color:#042C53;border-color:#85B7EB}
+
+/* RAG pipeline steps */
+.rag-steps{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.rag-step{display:flex;align-items:center;gap:8px}
+.rag-step-box{background:#FAC775;color:#412402;border:1px solid #EF9F27;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:500;flex:1}
+.rag-arrow{color:#854F0B;font-size:14px;flex-shrink:0}
+
+/* Connector between layers */
+.connector{display:flex;align-items:center;justify-content:center;height:28px;gap:6px}
+.conn-line{flex:1;max-width:60px;height:1px;background:var(--color-border-secondary)}
+.conn-label{font-size:11px;color:var(--color-text-tertiary);font-weight:400}
+.conn-dot{width:6px;height:6px;border-radius:50%;background:var(--color-border-secondary);flex-shrink:0}
+
+/* Two col for DB + LLM side by side */
+.row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+</style>
+
+<div class="wrap">
+
+  <div class="deploy-row">
+    <span class="badge badge-v">▲ Vercel — frontend</span>
+    <span class="badge badge-r">◈ Render — backend</span>
+  </div>
+
+  <!-- FRONTEND -->
+  <div class="layer l-frontend">
+    <div class="layer-label">React frontend</div>
+    <div class="chips">
+      <div class="chip chip-purple"><span class="chip-title">TanStack Query</span><span class="chip-sub">Server state + caching</span></div>
+      <div class="chip chip-purple"><span class="chip-title">shadcn/ui + Zod</span><span class="chip-sub">Components + validation</span></div>
+      <div class="chip chip-purple"><span class="chip-title">Wouter</span><span class="chip-sub">Client-side routing</span></div>
+      <div class="chip chip-purple"><span class="chip-title">Vite + TypeScript</span><span class="chip-sub">Build toolchain</span></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="conn-line"></div><span class="conn-label">REST / HTTP</span><div class="conn-line"></div></div>
+
+  <!-- BACKEND -->
+  <div class="layer l-backend">
+    <div class="layer-label">FastAPI backend</div>
+    <div class="chips">
+      <div class="chip chip-teal"><span class="chip-title">FastAPI</span><span class="chip-sub">Routes + Swagger docs</span></div>
+      <div class="chip chip-teal"><span class="chip-title">SQLAlchemy ORM</span><span class="chip-sub">DB session + models</span></div>
+      <div class="chip chip-teal"><span class="chip-title">Pydantic</span><span class="chip-sub">Request / response schemas</span></div>
+      <div class="chip chip-teal"><span class="chip-title">JWT + OAuth2</span><span class="chip-sub">Auth flow</span></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="conn-line"></div><div class="conn-dot"></div><div class="conn-line"></div></div>
+
+  <!-- RAG -->
+  <div class="layer l-rag">
+    <div class="layer-label">RAG pipeline</div>
+    <div class="rag-steps">
+      <div class="rag-step"><div class="rag-step-box">PDF upload → pypdf text extraction</div></div>
+      <div class="rag-step"><span class="rag-arrow">↓</span><div class="rag-step-box">Section-aware chunking</div></div>
+      <div class="rag-step"><span class="rag-arrow">↓</span><div class="rag-step-box">sentence-transformers — embed chunks</div></div>
+      <div class="rag-step"><span class="rag-arrow">↓</span><div class="rag-step-box">Cosine similarity retrieval + section filter</div></div>
+      <div class="rag-step"><span class="rag-arrow">↓</span><div class="rag-step-box">Top-k chunks → LLM context window</div></div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="conn-line"></div><div class="conn-dot"></div><div class="conn-line"></div></div>
+
+  <!-- DB + LLM side by side -->
+  <div class="row-2">
+    <div class="layer l-db" style="margin-bottom:0">
+      <div class="layer-label">Supabase — PostgreSQL 16</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="chip chip-green"><span class="chip-title">papers + chunks</span><span class="chip-sub">JSONB embeddings</span></div>
+        <div class="chip chip-green"><span class="chip-title">comparisons</span><span class="chip-sub">Results + history</span></div>
+        <div class="chip chip-green"><span class="chip-title">collections</span><span class="chip-sub">5-paper limit, index status</span></div>
+      </div>
+    </div>
+    <div class="layer l-llm" style="margin-bottom:0">
+      <div class="layer-label">LLM — HuggingFace</div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="chip chip-coral"><span class="chip-title">Qwen 2.5-72B</span><span class="chip-sub">Answer generation</span></div>
+        <div class="chip chip-coral"><span class="chip-title">Inference API</span><span class="chip-sub">Free tier, swappable</span></div>
+        <div class="chip chip-coral"><span class="chip-title">pipeline.py</span><span class="chip-sub">Isolated LLM call</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="connector"><div class="conn-line"></div><div class="conn-dot"></div><div class="conn-line"></div></div>
+
+  <!-- External sources -->
+  <div class="layer l-ext">
+    <div class="layer-label">External academic sources</div>
+    <div class="chips">
+      <div class="chip chip-blue"><span class="chip-title">Semantic Scholar</span><span class="chip-sub">Citations + metadata</span></div>
+      <div class="chip chip-blue"><span class="chip-title">arXiv</span><span class="chip-sub">Preprints</span></div>
+      <div class="chip chip-blue"><span class="chip-title">CORE</span><span class="chip-sub">Open access papers</span></div>
+      <div class="chip chip-blue"><span class="chip-title">APA / MLA / BibTeX</span><span class="chip-sub">Client-side export</span></div>
+    </div>
+  </div>
+
+</div>
