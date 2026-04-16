@@ -59,23 +59,23 @@ The system was originally built with Grobid for PDF parsing. This was replaced w
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                     React Frontend                       │
+│                     React Frontend                      │
 │  TanStack Query · Wouter · shadcn/ui · Zod validation   │
 └────────────────────────┬────────────────────────────────┘
                          │ REST
 ┌────────────────────────▼────────────────────────────────┐
-│                    FastAPI Backend                       │
+│                    FastAPI Backend                      │
 │         JWT Auth · SQLAlchemy ORM · Pydantic            │
 └──────┬──────────────┬──────────────────┬────────────────┘
        │              │                  │
 ┌──────▼──────┐ ┌─────▼──────┐ ┌────────▼───────┐
-│  PostgreSQL │ │ RAG Pipeline│ │  HuggingFace   │
-│  (Railway)  │ │             │ │  Inference API │
-│             │ │ pypdf       │ │                │
-│  papers     │ │ chunking    │ │  Qwen 2.5-72B  │
-│  chunks     │ │ embeddings  │ │                │
-│  comparisons│ │ retrieval   │ └────────────────┘
-│  collections│ └─────────────┘
+│  PostgreSQL │ │RAG Pipeline│ │  HuggingFace   │
+│  (Supabase) │ |            │ │  Inference API │
+│             │ │ pypdf      │ │                │
+│  papers     │ │ chunking   │ │  Qwen 2.5-72B  │
+│  chunks     │ │ embeddings │ │                │
+│  comparisons│ │ retrieval  │ └────────────────┘
+│  collections│ └────────────┘
 └─────────────┘
 ```
 
@@ -227,6 +227,7 @@ Fixed-size chunking splits text arbitrarily, often breaking semantic units. Sect
 
 **Why JSONB for embeddings?**
 Pragmatic choice for initial deployment — pgvector requires explicit extension enablement and ORM configuration overhead. JSONB works correctly at current scale. Migration to pgvector with HNSW indexing is planned for production scaling.
+
 
 **Why Qwen 2.5-72B?**
 Free tier access via HuggingFace Inference API with strong multilingual academic reasoning. Easily swappable — the LLM call is isolated in `pipeline.py`.
