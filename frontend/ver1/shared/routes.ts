@@ -1,3 +1,5 @@
+import { auth } from "../client/src/lib/firebase";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { z } from 'zod';
 
 export const API_BASE = import.meta.env.VITE_API_URL ||'https://citecraft.onrender.com';
@@ -15,6 +17,26 @@ export function buildUrl(path: string, params?: Record<string, string | number>)
 export function getToken(): string | null { return localStorage.getItem('token'); }
 export function setToken(token: string): void { localStorage.setItem('token', token); }
 export function clearToken(): void { localStorage.removeItem('token'); }
+
+const provider = new GoogleAuthProvider();
+
+export async function loginWithGoogle() {
+  const result = await signInWithPopup(auth, provider);
+
+  const firebaseToken = await result.user.getIdToken();
+
+  const res = await fetch(`${API_BASE}/auth/firebase`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${firebaseToken}`,
+    },
+  });
+
+  const data = await res.json();
+
+  setToken(data.token); // use your existing helper
+  return data;
+}
 
 export async function apiFetch(path: string, options: RequestInit = {}): Promise<Response> {
   const token = getToken();

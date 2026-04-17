@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { apiFetch, setToken } from "@shared/routes";
+import { apiFetch, setToken, loginWithGoogle } from "@shared/routes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -21,7 +21,6 @@ export default function Login() {
     try {
       const path = isRegister ? "/auth/register" : "/auth/login";
 
-      // Login uses form data (OAuth2), register uses JSON
       let res: Response;
       if (isRegister) {
         res = await apiFetch(path, {
@@ -42,7 +41,11 @@ export default function Login() {
       const data = await res.json();
 
       if (!res.ok) {
-        toast({ title: "Error", description: data.detail || "Something went wrong", variant: "destructive" });
+        toast({
+          title: "Error",
+          description: data.detail || "Something went wrong",
+          variant: "destructive",
+        });
         return;
       }
 
@@ -50,7 +53,29 @@ export default function Login() {
       localStorage.setItem("username", data.username);
       navigate("/app");
     } catch (e) {
-      toast({ title: "Error", description: "Could not connect to server.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Could not connect to server.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ NEW: Google login handler
+  const handleGoogleLogin = async () => {
+    setLoading(true);
+    try {
+      const data = await loginWithGoogle();
+      setToken(data.token); // backend returns your JWT
+      navigate("/app");
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Google login failed",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -64,10 +89,27 @@ export default function Login() {
             {isRegister ? "Create an account" : "Welcome back"}
           </CardTitle>
           <CardDescription>
-            {isRegister ? "Sign up to start using CiteCraft" : "Sign in to your CiteCraft account"}
+            {isRegister
+              ? "Sign up to start using CiteCraft"
+              : "Sign in to your CiteCraft account"}
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
+          {/* ✅ Google Login Button */}
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={handleGoogleLogin}
+            disabled={loading}
+          >
+            Continue with Google
+          </Button>
+
+          {/* Divider */}
+          <div className="text-center text-sm text-muted-foreground">or</div>
+
+          {/* Existing form */}
           <Input
             placeholder="Username"
             value={username}
@@ -81,11 +123,23 @@ export default function Login() {
             onChange={(e) => setPassword(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
           />
-          <Button className="w-full" onClick={handleSubmit} disabled={loading}>
-            {loading ? "Please wait..." : isRegister ? "Register" : "Login"}
+
+          <Button
+            className="w-full"
+            onClick={handleSubmit}
+            disabled={loading}
+          >
+            {loading
+              ? "Please wait..."
+              : isRegister
+              ? "Register"
+              : "Login"}
           </Button>
+
           <p className="text-sm text-center text-muted-foreground">
-            {isRegister ? "Already have an account?" : "Don't have an account?"}{" "}
+            {isRegister
+              ? "Already have an account?"
+              : "Don't have an account?"}{" "}
             <button
               className="text-primary underline"
               onClick={() => setIsRegister(!isRegister)}
