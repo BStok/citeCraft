@@ -32,3 +32,5 @@ uploads/
 
 # OS
 Thumbs.db
+
+**/firebase.json
