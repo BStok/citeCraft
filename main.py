@@ -39,6 +39,7 @@ app = FastAPI(lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -120,7 +121,16 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
 
 @app.post("/auth/firebase")
 def firebase_login(request: Request, db: Session = Depends(get_db)):
-    token = request.headers.get("Authorization").split(" ")[1]
+    auth_header = request.headers.get("Authorization")
+    print(f"🔥 Auth header: {auth_header}")  # Debug log
+    
+    if not auth_header:
+        raise HTTPException(status_code=400, detail="Missing Authorization header")
+    
+    try:
+        token = auth_header.split(" ")[1]
+    except IndexError:
+        raise HTTPException(status_code=400, detail="Malformed Authorization header")
 
     decoded = verify_firebase_token(token)
     if not decoded:

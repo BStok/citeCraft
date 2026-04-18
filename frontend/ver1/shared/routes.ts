@@ -30,7 +30,6 @@ const provider = new GoogleAuthProvider();
 
 export async function loginWithGoogle() {
   const result = await signInWithPopup(auth, provider);
-
   const firebaseToken = await result.user.getIdToken();
 
   const res = await fetch(`${API_BASE}/auth/firebase`, {
@@ -40,9 +39,14 @@ export async function loginWithGoogle() {
     },
   });
 
-  const data = await res.json();
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error("🔥 Firebase login failed:", res.status, errorData);
+    throw new Error(errorData.detail || "Firebase login failed");
+  }
 
-  setToken(data.token); // use your existing helper
+  const data = await res.json();
+  setToken(data.token);
   return data;
 }
 
