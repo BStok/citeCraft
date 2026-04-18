@@ -7,6 +7,7 @@ import shutil
 import uvicorn
 from pathlib import Path
 from contextlib import asynccontextmanager
+from fastapi import Request
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, FileResponse
@@ -22,6 +23,7 @@ from backend.rag.pipeline import index_papers as rag_index_papers, compare_paper
 from backend.db.db import get_db, init_db
 from backend.db.models import Paper, Comparison, ComparisonPaper, Collection, CollectionPaper, User
 from backend.auth.auth import hash_password, verify_password, generate_token, verify_token
+from backend.auth.firebase_auth import verify_firebase_token
 
 UPLOAD_DIR = Path("uploads")
 UPLOAD_DIR.mkdir(exist_ok=True)
@@ -116,7 +118,33 @@ def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get
     token = generate_token(str(user.id))
     return {"access_token": token, "token_type": "bearer", "user_id": str(user.id), "username": user.username}
 
+@app.post("/auth/firebase")
+def firebase_login(request: Request, db: Session = Depends(get_db)):
+    token = request.headers.get("Authorization").split(" ")[1]
 
+    decoded = verify_firebase_token(token)
+    if not decoded:
+        raise HTTPException(status_code=401, detail="Invalid Firebase token")
+
+    firebase_uid = decoded["uid"]
+    email = decoded.get("email")
+
+    # check if user exists
+    user = db.query(User).filter(User.firebase_uid == firebase_uid).first()
+
+    if not user:
+        user = User(firebase_uid=firebase_uid, username=email)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    jwt_token = generate_token(str(user.id))
+
+    return {
+        "token": jwt_token,
+        "user_id": str(user.id),
+        "username": user.username
+    }
 # ─── File upload ──────────────────────────────────────────────────────────────
 
 @app.post("/upload_pdf")
