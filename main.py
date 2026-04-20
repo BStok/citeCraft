@@ -18,6 +18,7 @@ from typing import Optional
 from sqlalchemy.orm import Session
 
 from backend.acquisition.paper_acquisition import get_papers
+from backend.ranking.paperRanking import rankPaper
 from backend.comparison.comp import compare_papers
 from backend.rag.pipeline import index_papers as rag_index_papers, compare_papers_rag, understand_paper
 from backend.db.db import get_db, init_db
@@ -191,6 +192,9 @@ async def upload_pdf(
 
 
 # ─── Search ───────────────────────────────────────────────────────────────────
+from your_ranking_module import rankPaper  # Import at the top
+import pandas as pd
+import os
 
 @app.post("/search_papers")
 def search_papers(
@@ -220,12 +224,47 @@ def search_papers(
             saved.append({**p, "db_id": str(paper.id)})
 
         db.commit()
+
+        # ─── RANKING ───────────────────────────────────────────────────────────
+        if body.save_csv and body.csv_filename:
+            try:
+                # Rank papers using the CSV file
+                ranked_df = rankPaper(
+                    csv_path=body.csv_filename,
+                    query=body.query,
+                    w_sim=0.6,
+                    w_time=0.25,
+                    w_if=0.15
+                )
+
+                # Create a mapping of titles to ranking scores
+                ranking_scores = pd.Series(
+                    ranked_df["final_score"].values,
+                    index=ranked_df["title"].values
+                ).to_dict()
+
+                # Add ranking scores to saved papers
+                for paper in saved:
+                    paper_title = paper.get("title")
+                    if paper_title in ranking_scores:
+                        paper["ranking_score"] = float(ranking_scores[paper_title])
+                    else:
+                        paper["ranking_score"] = 0.0
+
+                # Sort by ranking score (descending)
+                saved = sorted(saved, key=lambda x: x.get("ranking_score", 0), reverse=True)
+
+            except Exception as ranking_error:
+                # If ranking fails, return papers unranked with warning
+                print(f"Ranking failed: {ranking_error}")
+                for paper in saved:
+                    paper["ranking_score"] = None
+
         return {"papers": saved}
+        
     except Exception as e:
         db.rollback()
         return JSONResponse({"error": str(e)}, status_code=500)
-
-
 # ─── RAG: Index ───────────────────────────────────────────────────────────────
 
 @app.post("/papers/index")
