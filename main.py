@@ -192,9 +192,6 @@ async def upload_pdf(
 
 
 # ─── Search ───────────────────────────────────────────────────────────────────
-from your_ranking_module import rankPaper  # Import at the top
-import pandas as pd
-import os
 
 @app.post("/search_papers")
 def search_papers(
