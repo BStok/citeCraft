@@ -2,10 +2,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-# DEBUG: Check if token is loaded
-token = os.environ.get("HF_TOKEN")
-print(f"HF_TOKEN loaded: {token[:20] if token else 'NOT FOUND'}...")
-
 import re
 import json
 from huggingface_hub import InferenceClient
