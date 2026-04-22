@@ -90,13 +90,40 @@ function CopyButton({ text }: { text: string }) {
 // ─── Streaming loading messages ───────────────────────────────────────────────
 
 const LOADING_MESSAGES = [
-  "Searching academic databases...",
-  "Scanning Semantic Scholar...",
-  "Checking arXiv...",
-  "Ranking results by relevance...",
-  "Almost there...",
+  "Searching academic databases",
+  "Scanning Semantic Scholar",
+  "Checking arXiv",
+  "Almost there",
+  "Searching Google Scholar",
+  "Checking PubMed",
+  "Ranking results by relevance",
+  "Finalizing results",
+  
 ];
 
+function useLoadingStep(isLoading: boolean) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setStep(0);
+      return;
+    }
+
+    setStep(0);
+
+    const durationPerStep = 2800; // tweak speed here
+
+    const timers = LOADING_MESSAGES.map((_, i) =>
+      setTimeout(() => setStep(i), i * durationPerStep)
+    );
+
+    return () => timers.forEach(clearTimeout);
+  }, [isLoading]);
+
+  return step;
+}
+/*
 function useStreamingMessage(isLoading: boolean) {
   const [msgIndex, setMsgIndex] = useState(0);
   useEffect(() => {
@@ -107,7 +134,7 @@ function useStreamingMessage(isLoading: boolean) {
     return () => clearInterval(interval);
   }, [isLoading]);
   return LOADING_MESSAGES[msgIndex];
-}
+}*/
 
 // ─── CSV export ───────────────────────────────────────────────────────────────
 
@@ -185,7 +212,8 @@ export default function Home() {
   const [selectedPapers, setSelectedPapers] = useState<Set<number>>(new Set());
   const [citationFormat, setCitationFormat] = useState<CitationFormat>("APA");
   const { toast }      = useToast();
-  const loadingMessage = useStreamingMessage(isLoading);
+  const step = useLoadingStep(isLoading);
+  //const loadingMessage = useStreamingMessage(isLoading);
   const papers         = retrieval.papers;
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -275,9 +303,26 @@ export default function Home() {
           )}
 
           {isLoading && (
-            <div className="flex flex-col items-center justify-center py-24 gap-4">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-              <p className="text-muted-foreground text-sm animate-pulse">{loadingMessage}</p>
+            <div className="flex flex-col items-center justify-center py-24 gap-5">
+
+              {/* 1. Circular loader */}
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+
+              {/* 2. Progress bar */}
+              <div className="w-72 h-1.5 bg-muted rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all duration-300"
+                  style={{
+                    width: `${((step + 1) / LOADING_MESSAGES.length) * 100}%`,
+                  }}
+                />
+              </div>
+
+              {/* 3. Step message */}
+              <p className="text-sm text-muted-foreground text-center">
+                {LOADING_MESSAGES[step]}
+              </p>
+
             </div>
           )}
 
