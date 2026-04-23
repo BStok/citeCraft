@@ -67,8 +67,6 @@ class RegisterRequest(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
-    save_csv: Optional[bool] = False
-    csv_filename: Optional[str] = "citeCraft.csv"
 
 class CompareRequest(BaseModel):
     file_paths: list[str]
@@ -191,8 +189,6 @@ async def upload_pdf(
         "filename":  file.filename,
         "paper_id":  str(paper.id),
     }
-
-
 # ─── Search ───────────────────────────────────────────────────────────────────
 
 @app.post("/search_papers")
@@ -201,9 +197,20 @@ def search_papers(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
 ):
+    """
+    Search for papers and rank them by relevance.
+    
+    Fixed issues:
+    1. Always ranks papers (no conditional save_csv)
+    2. Handles missing columns gracefully
+    3. Sorts results by ranking_score before returning
+    """
     try:
         user_id = uuid.UUID(current_user["user_id"])
-        papers = get_papers(body.query, save_csv=body.save_csv, csv_filename=body.csv_filename)
+        
+        # FIXED: Always generate a unique CSV for ranking
+        csv_filename = f"search_{uuid.uuid4()}.csv"
+        papers = get_papers(body.query, save_csv=True, csv_filename=csv_filename)
 
         saved = []
         for p in papers:
@@ -224,45 +231,51 @@ def search_papers(
 
         db.commit()
 
-        # ─── RANKING ───────────────────────────────────────────────────────────
-        if body.save_csv and body.csv_filename:
-            try:
-                # Rank papers using the CSV file
-                ranked_df = rankPaper(
-                    csv_path=body.csv_filename,
-                    query=body.query,
-                    w_sim=0.6,
-                    w_time=0.25,
-                    w_if=0.15
-                )
+        #  FIXED: Always rank papers (no conditional logic)
+        try:
+            ranked_df = rankPaper(
+                csv_path=csv_filename,
+                query=body.query,
+                w_sim=0.6,      # Similarity weight (60%)
+                w_time=0.25,    # Recency weight (25%)
+                w_if=0.15       # Impact factor weight (15%)
+            )
 
-                # Create a mapping of titles to ranking scores
-                ranking_scores = pd.Series(
-                    ranked_df["final_score"].values,
-                    index=ranked_df["title"].values
-                ).to_dict()
+            # Create a mapping of titles to ranking scores
+            ranking_scores = pd.Series(
+                ranked_df["final_score"].values,
+                index=ranked_df["title"].values
+            ).to_dict()
 
-                # Add ranking scores to saved papers
-                for paper in saved:
-                    paper_title = paper.get("title")
-                    if paper_title in ranking_scores:
-                        paper["ranking_score"] = float(ranking_scores[paper_title])
-                    else:
-                        paper["ranking_score"] = 0.0
+            # Add ranking scores to saved papers
+            for paper in saved:
+                paper_title = paper.get("title", "")
+                if paper_title in ranking_scores:
+                    paper["ranking_score"] = float(ranking_scores[paper_title])
+                else:
+                    paper["ranking_score"] = 0.0
 
-                # Sort by ranking score (descending)
-                saved = sorted(saved, key=lambda x: x.get("ranking_score", 0), reverse=True)
+            # FIXED: Sort by ranking score (descending)
+            saved = sorted(saved, key=lambda x: x.get("ranking_score", 0), reverse=True)
+            
+            print(f" Ranked {len(saved)} papers. Top score: {saved[0].get('ranking_score', 0):.4f}")
 
-            except Exception as ranking_error:
-                # If ranking fails, return papers unranked with warning
-                print(f"Ranking failed: {ranking_error}")
-                for paper in saved:
-                    paper["ranking_score"] = None
+        except Exception as ranking_error:
+            # If ranking fails, return papers unranked with warning
+            print(f"⚠️  Ranking failed: {ranking_error}")
+            import traceback
+            traceback.print_exc()
+            
+            for paper in saved:
+                paper["ranking_score"] = None
 
         return {"papers": saved}
         
     except Exception as e:
         db.rollback()
+        print(f"Search error: {e}")
+        import traceback
+        traceback.print_exc()
         return JSONResponse({"error": str(e)}, status_code=500)
 # ─── RAG: Index ───────────────────────────────────────────────────────────────
 
