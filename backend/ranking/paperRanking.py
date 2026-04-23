@@ -9,6 +9,7 @@ import io
 logger = logging.getLogger(__name__)
 
 def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
+    
     """
     Rank papers by similarity to query.
     
@@ -26,10 +27,8 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
     """
     
     try:
-        # ──────────────────────────────────────────────────────────────────────────
         # ISSUE: CSV has inconsistent field counts (e.g., 7 fields on line 1, 8 on line 10)
         # This happens when fields contain commas or newlines
-        # ──────────────────────────────────────────────────────────────────────────
         
         logger.info(f"Loading CSV from {csv_path}")
         
@@ -43,6 +42,7 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
                 quoting=3,  # QUOTE_NONE with escapechar
                 escapechar='\\'
             )
+            print(df.columns)
             logger.info(f"✅ Loaded CSV using lenient parser. Rows: {len(df)}")
         except Exception as first_error:
             logger.warning(f"Lenient parser failed: {first_error}. Trying fallback...")
@@ -65,10 +65,7 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
         logger.info(f"CSV columns: {df.columns.tolist()}")
         logger.info(f"CSV shape: {df.shape}")
         
-        # ──────────────────────────────────────────────────────────────────────────
-        # Extract year from publication_date
-        # ──────────────────────────────────────────────────────────────────────────
-        
+     
         if "publication_date" in df.columns:
             df["year"] = pd.to_datetime(df["publication_date"], errors="coerce").dt.year
             logger.info(f"Extracted year from publication_date. Years range: {df['year'].min()}-{df['year'].max()}")
@@ -80,10 +77,7 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
         current_year = datetime.now().year
         df["year"] = df["year"].fillna(current_year)
         
-        # ──────────────────────────────────────────────────────────────────────────
-        # Build corpus safely
-        # ──────────────────────────────────────────────────────────────────────────
-        
+      
         title = df["title"].fillna("").astype(str)
         abstract = df["abstract"].fillna("").astype(str)
         corpus = (title + " " + abstract).tolist()
@@ -112,19 +106,12 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
             except Exception as e:
                 logger.error(f"Error computing similarity: {e}")
                 df["sim_score"] = 0.0
-        
-        # ──────────────────────────────────────────────────────────────────────────
-        # Recency score
-        # ──────────────────────────────────────────────────────────────────────────
-        
+      
         years_ago = (current_year - df["year"]).clip(lower=0)
         df["time_score"] = 1.0 / (1.0 + years_ago)
         
         logger.info(f"✅ Time scores computed. Mean: {df['time_score'].mean():.4f}")
         
-        # ──────────────────────────────────────────────────────────────────────────
-        # Impact factor
-        # ──────────────────────────────────────────────────────────────────────────
         
         if "impact_factor" in df.columns and df["impact_factor"].notna().sum() > 0:
             max_if = df["impact_factor"].max()
@@ -136,11 +123,7 @@ def rankPaper(csv_path, query, w_sim=0.6, w_time=0.25, w_if=0.15):
         else:
             logger.warning("No impact factor data available")
             df["if_score"] = 0.0
-        
-        # ──────────────────────────────────────────────────────────────────────────
-        # Normalize and calculate final score
-        # ──────────────────────────────────────────────────────────────────────────
-        
+      
         # Normalize similarity scores to [0, 1]
         if df["sim_score"].max() > 0:
             df["sim_score"] = df["sim_score"] / df["sim_score"].max()
