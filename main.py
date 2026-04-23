@@ -257,7 +257,7 @@ def search_papers(
 
             # FIXED: Sort by ranking score (descending)
             saved = sorted(saved, key=lambda x: x.get("ranking_score", 0), reverse=True)
-            
+            print("✅ Ranking succeeded")
             print(f" Ranked {len(saved)} papers. Top score: {saved[0].get('ranking_score', 0):.4f}")
 
         except Exception as ranking_error:
@@ -268,7 +268,7 @@ def search_papers(
             
             for paper in saved:
                 paper["ranking_score"] = None
-
+            print(" Ranking not succeeded")
         return {"papers": saved}
         
     except Exception as e:
