@@ -48,11 +48,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <div className="flex flex-col md:flex-row items-center gap-16 py-20">
             <div className="flex-1 min-w-0">
-              <div className="inline-flex items-center gap-2 mb-6 px-3 py-1.5 rounded-full" style={{ background: 'hsl(345,40%,52%,0.1)', border: '1px solid hsl(345,40%,52%,0.3)' }}>
-                <Zap className="w-3.5 h-3.5" style={{ color: 'hsl(345,40%,52%)' }} />
-                <span className="text-xs font-semibold" style={{ color: 'hsl(345,40%,52%)' }}>Research simplified</span>
-              </div>
-              
+                            
               <h1 className="text-6xl md:text-7xl font-bold leading-tight text-foreground mb-4 tracking-tight">
                 Ask questions to research papers
               </h1>
