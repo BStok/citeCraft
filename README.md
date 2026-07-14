@@ -15,7 +15,9 @@ CiteCraft replaces manual literature review workflows with an end-to-end AI pipe
 
 The system was originally built with Grobid for PDF parsing. This was replaced with a custom section-aware chunking and RAG pipeline to reduce deployment overhead and enable richer semantic retrieval.
 
-**Live demo:** [cite-craft.vercel.app](https://cite-craft.vercel.app)
+## Demo
+- **Live demo:** [cite-craft.vercel.app](https://cite-craft.vercel.app)
+- **Watch demo video** [here](https://drive.google.com/file/d/1DoXK4ylpawe8AgIVmvCC1KF4qV45dGsc/view?usp=sharing)
 
 ---
 
